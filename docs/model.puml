@@ -1,0 +1,194 @@
+@startuml
+skinparam linetype ortho
+
+/'
+
+Basic blocks
+
+'/
+
+class PartType {
+  String name
+  Color defaultColor
+}
+
+class Part {
+  UUID id
+  Color color
+}
+
+Part -- PartType
+
+class Tool {
+  int id
+}
+
+/'
+
+Conveyors
+
+'/
+
+class Conveyor {
+  int id
+}
+
+Conveyor -- Part
+
+class ConveyorLinear {
+
+}
+
+ConveyorLinear --|> Conveyor
+
+class ConveyorRotative {
+
+}
+
+ConveyorConveyorRotative --|> Conveyor
+
+class ConveyorAssembly {
+
+}
+
+ConveyorAssembly --|> Conveyor
+
+
+class ConveyorSlider {
+
+}
+
+ConveyorSlider --|> Conveyor
+
+
+class ConveyorPusher {
+
+}
+
+ConveyorPusher --|> Conveyor
+
+/'
+
+Regions
+
+'/
+
+class Region {
+  String name
+  Conveyor[] inputs
+  Conveyor[] output
+  Conveyor[] internal
+}
+
+Region "1" -- "*" Conveyor
+
+class RegionStorage {
+
+}
+
+RegionStorage --|> Region
+RegionStorage -- "*" Part
+
+class RegionLoadingBay {
+
+}
+
+RegionLoadingBay --|> Region
+
+class RegionAssemblyLineLeft {
+
+}
+
+RegionAssemblyLineLeft --|> Region
+
+class RegionAssemblyLineRight {
+
+}
+
+RegionAssemblyLineRight --|> Region
+
+/'
+
+Processes
+
+'/
+
+class Process {
+  Time time
+}
+
+Process -- "2" PartType
+Process -- "1" Tool
+
+/'
+
+Communication
+
+'/
+
+class Command {
+
+}
+
+'Requests'
+
+class CommandRequest {
+
+}
+
+CommandRequest --|> Command
+
+class CommandRequestTransform {
+  int orderID
+  Date date
+
+  PartType source
+  PartType result
+  int quantity
+
+  int deadline
+  int penalty
+}
+
+CommandRequestTransform --|> CommandRequest
+CommandRequestTransform -- "2" PartType
+
+class CommandRequestUnload {
+  int orderID
+  PartType type
+  int quantity
+}
+
+CommandRequestTransform --|> CommandRequest
+CommandRequestUnload -- "1" ConveyorSlider
+CommandRequestUnload -- "2" PartType
+
+class CommandRequestLoad {
+  int orderID
+  PartType type
+}
+
+CommandRequestTransform --|> CommandRequest
+CommandRequestLoad -- "1" ConveyorLinear
+CommandRequestLoad -- "2" PartType
+
+class CommandRequestList {
+}
+
+CommandRequestList --|> CommandRequest
+
+'Responses'
+
+class CommandResponse {
+
+}
+
+CommandResponse --|> Command
+
+class CommandResponseList {
+
+}
+
+CommandResponseList --|> CommandResponse
+
+@enduml
