@@ -1,0 +1,81 @@
+@startuml
+skinparam linetype ortho
+skinparam Monochrome true
+
+title Low-Level UML
+
+/'
+
+Conveyors
+
+'/
+
+class Conveyor {
+  int id;
+  string Actuators[];
+  string Sensors[];
+  bool HasPart[];
+}
+
+class ConveyorLinear {
+  int id;
+  bool ReadyToReceive;
+  bool ReadyToSend;
+  
+  void MoveFoward();
+  void MoveBackward();
+}
+
+class ConveyorRotative {
+  int id;
+  bool ReadyToReceive;
+  bool ReadyToSend;
+
+  void MoveFoward();
+  void MoveBackward();
+  void RotateClockWise();
+  void RotateCounterClockWise();
+}
+
+class ConveyorPusher {
+  int id;
+  bool ReadyToReceive;
+  bool ReadyToSend;
+  
+  void MoveFoward();
+  void MoveBackward();
+  void Push();
+}
+
+class ConveyorSlider {
+  int id;
+  bool ReadyToReceive;
+}
+
+class ConveyorAssembly {
+  int id;
+  EnumTool Tool;
+  bool ReadyToReceive;
+  bool ReadyToSend;  
+
+  void MoveFoward();
+  void MoveBackward();
+  void Assemble();
+  void ChangeTool();
+}
+
+ConveyorLinear --|> Conveyor
+ConveyorRotative --|> Conveyor
+ConveyorPusher --|> Conveyor
+ConveyorSlider --|> Conveyor
+ConveyorAssembly --|> Conveyor
+
+/'
+
+
+
+'/
+
+
+
+@enduml
