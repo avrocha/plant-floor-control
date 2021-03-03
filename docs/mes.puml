@@ -1,8 +1,21 @@
 @startuml
 skinparam linetype ortho
 skinparam Monochrome true
+skinparam classAttributeIconSize 0
 
 title MES UML
+
+'Factory'
+class Factory <<Singleton>> {
+
+}
+
+CommandManager "1"--* Factory
+DatabaseManager "1"--* Factory
+StorageManager "1"--* Factory
+RoutingManager "1"--* Factory
+RegionManager "1"--* Factory
+CommsManager "1"--* Factory
 
 /'
 
@@ -11,19 +24,28 @@ Basic blocks
 '/
 
 class PartType {
-  String name;
-  Color defaultColor;
+  - String name;
+  - Color defaultColor;
+
+  + String getName();
+  + Color getDefaultColor();
 }
 
 class Part {
-  UUID id;
-  Color color;
+  - UUID id;
+  - Color color;
+
+  + UUID getID();
+  + Color getColor();
+  + PartType getType();
 }
 
 Part -- PartType
 
 class Tool {
-  int id;
+  - int id;
+  
+  + int getID();
 }
 
 /'
@@ -33,8 +55,11 @@ Conveyors
 '/
 
 class Conveyor {
-  int id;
-  EnumConveyor type;
+  - int id;
+  - EnumConveyor type;
+
+  + int getID();
+  + Part[] getParts();
 }
 
 Conveyor -- Part
@@ -44,44 +69,46 @@ Conveyor -- Part
 Regions
 
 '/
+class RegionManager{
+  - Region[] regions;
+  + Region getRegions();
+  + Region getPartRegion(Part);
+  + Region getConveyorRegion(Conveyor);
+}
 
 class Region {
-  String name;
-  Conveyor[] inputs;
-  Conveyor[] output;
-  Conveyor[] internal;
+  - String name;
+  - Conveyor[] inputs;
+  - Conveyor[] output;
+  - Conveyor[] internal;
 
-  bool canReceiveFrom(Conveyor);
-  void send(Conveyor);
+  + bool canReceiveFrom(Conveyor);
+  + void send(Conveyor);
+  + int getNumParts();
+  + int getNumParts(PartType);
+  + string getName();
 }
 
 Region "1" -- "*" Conveyor
+Region "*"-- RegionManager
 
 class RegionStorage {
-  int getQuantity(PartType);
-  void store(Part);
-  void extract(PartType);
+  + void store(Part);
+  + void extract(PartType);
 }
 
 RegionStorage --|> Region
-RegionStorage -- "*" Part
 
 class RegionLoadingBay {
 }
 
 RegionLoadingBay --|> Region
 
-class RegionAssemblyLineLeft {
-  void executeProcess(Process, Conveyor);
+class RegionAssemblyLine {
+  + void executeProcess(Process, Conveyor);
 }
 
-RegionAssemblyLineLeft --|> Region
-
-class RegionAssemblyLineRight {
-  void executeProcess(Process, Conveyor);
-}
-
-RegionAssemblyLineRight --|> Region
+RegionAssemblyLine "2"--|> Region
 
 /'
 
@@ -90,7 +117,9 @@ Processes
 '/
 
 class Process {
-  Time time;
+  - Time time;
+
+  + Time getTime();
 }
 
 Process -- "2" PartType
@@ -104,63 +133,141 @@ Communication
 
 'Requests'
 
+class CommandManager{
+  - CommandRequest[] requestQueue;
+
+  - void serializeResponse();
+  - void deserializeRequest();
+  + void sendResponse();
+  + void pollRequests();
+  + void enqueueRequest(string);
+}
+
 class CommandRequest {
-  void parseRequest();
-  void onReceive();
+  + void onReceive();
 }
 
 class CommandRequestTransform {
-  int orderID;
-  Date date;
-
-  PartType source;
-  PartType result;
-  int quantity;
-
-  int deadline;
-  int penalty;
-
-  
 }
 
 CommandRequestTransform --|> CommandRequest
-CommandRequestTransform -- "2" PartType
+CommandRequestTransform --"1" TransformOrder
+TransformOrder -- "2" PartType
+
 
 class CommandRequestUnload {
-  int orderID
-  PartType type
-  int quantity
+  - int orderID;
+  - int quantity;
+
+  + int getOrderID();
+  + int getQuantity();
 }
 
 CommandRequestUnload --|> CommandRequest
 CommandRequestUnload -- "1" Conveyor
-CommandRequestUnload -- "2" PartType
+CommandRequestUnload -- "1" PartType
 
 class CommandRequestLoad {
-  int orderID
-  PartType type
+  - int orderID;
+
+  + int getOrderID();
 }
 
 CommandRequestLoad --|> CommandRequest
 CommandRequestLoad -- "1" Conveyor
-CommandRequestLoad -- "2" PartType
+CommandRequestLoad -- "1" PartType
 
-class CommandRequestList {
+class CommandRequestOrderList {
 }
 
-CommandRequestList --|> CommandRequest
+CommandRequestOrderList --|> CommandRequest
+
+class CommandRequestPartList {
+}
+
+CommandRequestPartList --|> CommandRequest
+
+'Orders'
+class TransformOrder{
+  - int orderID;
+  - Date date;
+
+  - int quantity;
+
+  - int deadline;
+  - int penalty;
+
+  + int getOrderID();
+  + Date getDate();
+  + int getQuantity();
+  + int getDayPenalty();
+  + int computePenalty(Date);
+}
 
 'Responses'
 
 class CommandResponse {
-  void serializeResponse();
-  void send();
 }
 
-class CommandResponseList {
+class CommandResponseOrderList {
+}
+
+CommandResponseOrderList --|> CommandResponse
+CommandResponseOrderList --"*" TransformOrder
+
+class CommandResponsePartList {
+}
+
+(CommandResponsePartList, PartType) .. ResponsePartData
+
+class ResponsePartData { 
+  + int quantity;
+}
+
+CommandResponsePartList --|> CommandResponse
+
+/'
+
+Database
+
+'/
+class DatabaseManager{
+
+}
+
+/'
+
+Storage
+
+'/
+class StorageManager{
+  + int getQuantity(PartType);
+  + void store(Part);
+  + void extract(PartType);
+}
+
+StorageManager -- "*" Part
+
+/'
+
+UDP Manager
+
+'/
+class CommsManager{
+  - int port;
+
+  + void stopServer();
+  + void startServer();
+}
+
+/'
+
+Routing
+
+'/
+
+class RoutingManager{
   
 }
-
-CommandResponseList --|> CommandResponse
 
 @enduml
