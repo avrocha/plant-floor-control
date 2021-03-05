@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="349px" preserveAspectRatio="none" style="width:898px;height:349px;" version="1.1" viewBox="0 0 898 349" width="898px" zoomAndPan="magnify"><defs><filter height="300%" id="f16r1d34tk9ivk" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacingAndGlyphs" textLength="138" x="383.5" y="16.708">Low-Level UML</text><!--MD5=[f65362758b67a43b72be2bdcb313dddf]
+class Conveyor--><rect fill="#F8F8F8" filter="url(#f16r1d34tk9ivk)" height="99.2188" id="Conveyor" style="stroke: #383838; stroke-width: 1.5;" width="115" x="410" y="238.9531"/><ellipse cx="436.7" cy="254.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M439.6688,260.5938 Q439.0906,260.8906 438.45,261.0313 Q437.8094,261.1875 437.1063,261.1875 Q434.6063,261.1875 433.2781,259.5469 Q431.9656,257.8906 431.9656,254.7656 Q431.9656,251.6406 433.2781,249.9844 Q434.6063,248.3281 437.1063,248.3281 Q437.8094,248.3281 438.45,248.4844 Q439.1063,248.6406 439.6688,248.9375 L439.6688,251.6563 Q439.0438,251.0781 438.45,250.8125 Q437.8563,250.5313 437.2313,250.5313 Q435.8875,250.5313 435.2,251.6094 Q434.5125,252.6719 434.5125,254.7656 Q434.5125,256.8594 435.2,257.9375 Q435.8875,259 437.2313,259 Q437.8563,259 438.45,258.7344 Q439.0438,258.4531 439.6688,257.875 L439.6688,260.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="57" x="453.3" y="259.1074">Conveyor</text><line style="stroke: #383838; stroke-width: 1.5;" x1="411" x2="524" y1="270.9531" y2="270.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="32" x="416" y="285.1636">int id;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="103" x="416" y="297.9683">string Actuators[];</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="97" x="416" y="310.7729">string Sensors[];</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="85" x="416" y="323.5776">bool HasPart[];</text><line style="stroke: #383838; stroke-width: 1.5;" x1="411" x2="524" y1="330.1719" y2="330.1719"/><!--MD5=[ed5393c49cbf270376114481a1841cbc]
+class ConveyorLinear--><rect fill="#F8F8F8" filter="url(#f16r1d34tk9ivk)" height="112.0234" id="ConveyorLinear" style="stroke: #383838; stroke-width: 1.5;" width="135" x="6" y="47.9531"/><ellipse cx="24.6" cy="63.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M27.5688,69.5938 Q26.9906,69.8906 26.35,70.0313 Q25.7094,70.1875 25.0063,70.1875 Q22.5063,70.1875 21.1781,68.5469 Q19.8656,66.8906 19.8656,63.7656 Q19.8656,60.6406 21.1781,58.9844 Q22.5063,57.3281 25.0063,57.3281 Q25.7094,57.3281 26.35,57.4844 Q27.0063,57.6406 27.5688,57.9375 L27.5688,60.6563 Q26.9438,60.0781 26.35,59.8125 Q25.7563,59.5313 25.1313,59.5313 Q23.7875,59.5313 23.1,60.6094 Q22.4125,61.6719 22.4125,63.7656 Q22.4125,65.8594 23.1,66.9375 Q23.7875,68 25.1313,68 Q25.7563,68 26.35,67.7344 Q26.9438,67.4531 27.5688,66.875 L27.5688,69.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="95" x="39.4" y="68.1074">ConveyorLinear</text><line style="stroke: #383838; stroke-width: 1.5;" x1="7" x2="140" y1="79.9531" y2="79.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="32" x="12" y="94.1636">int id;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="12" y="106.9683">bool ReadyToReceive;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="12" y="119.7729">bool ReadyToSend;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="7" x2="140" y1="126.3672" y2="126.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="12" y="140.5776">void MoveFoward();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="12" y="153.3823">void MoveBackward();</text><!--MD5=[b6ba0e45efb756e4ffb198fdf3e7c5f5]
+class ConveyorRotative--><rect fill="#F8F8F8" filter="url(#f16r1d34tk9ivk)" height="137.6328" id="ConveyorRotative" style="stroke: #383838; stroke-width: 1.5;" width="188" x="176.5" y="34.9531"/><ellipse cx="213.1" cy="50.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M216.0688,56.5938 Q215.4906,56.8906 214.85,57.0313 Q214.2094,57.1875 213.5063,57.1875 Q211.0063,57.1875 209.6781,55.5469 Q208.3656,53.8906 208.3656,50.7656 Q208.3656,47.6406 209.6781,45.9844 Q211.0063,44.3281 213.5063,44.3281 Q214.2094,44.3281 214.85,44.4844 Q215.5063,44.6406 216.0688,44.9375 L216.0688,47.6563 Q215.4438,47.0781 214.85,46.8125 Q214.2563,46.5313 213.6313,46.5313 Q212.2875,46.5313 211.6,47.6094 Q210.9125,48.6719 210.9125,50.7656 Q210.9125,52.8594 211.6,53.9375 Q212.2875,55 213.6313,55 Q214.2563,55 214.85,54.7344 Q215.4438,54.4531 216.0688,53.875 L216.0688,56.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="108" x="231.9" y="55.1074">ConveyorRotative</text><line style="stroke: #383838; stroke-width: 1.5;" x1="177.5" x2="363.5" y1="66.9531" y2="66.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="32" x="182.5" y="81.1636">int id;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="182.5" y="93.9683">bool ReadyToReceive;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="182.5" y="106.7729">bool ReadyToSend;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="177.5" x2="363.5" y1="113.3672" y2="113.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="182.5" y="127.5776">void MoveFoward();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="182.5" y="140.3823">void MoveBackward();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="131" x="182.5" y="153.187">void RotateClockWise();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="176" x="182.5" y="165.9917">void RotateCounterClockWise();</text><!--MD5=[cae8121375a864f699a83be8915be89c]
+class ConveyorPusher--><rect fill="#F8F8F8" filter="url(#f16r1d34tk9ivk)" height="124.8281" id="ConveyorPusher" style="stroke: #383838; stroke-width: 1.5;" width="135" x="400" y="41.4531"/><ellipse cx="415.9" cy="57.4531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M418.8688,63.0938 Q418.2906,63.3906 417.65,63.5313 Q417.0094,63.6875 416.3063,63.6875 Q413.8063,63.6875 412.4781,62.0469 Q411.1656,60.3906 411.1656,57.2656 Q411.1656,54.1406 412.4781,52.4844 Q413.8063,50.8281 416.3063,50.8281 Q417.0094,50.8281 417.65,50.9844 Q418.3063,51.1406 418.8688,51.4375 L418.8688,54.1563 Q418.2438,53.5781 417.65,53.3125 Q417.0563,53.0313 416.4313,53.0313 Q415.0875,53.0313 414.4,54.1094 Q413.7125,55.1719 413.7125,57.2656 Q413.7125,59.3594 414.4,60.4375 Q415.0875,61.5 416.4313,61.5 Q417.0563,61.5 417.65,61.2344 Q418.2438,60.9531 418.8688,60.375 L418.8688,63.0938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="101" x="430.1" y="61.6074">ConveyorPusher</text><line style="stroke: #383838; stroke-width: 1.5;" x1="401" x2="534" y1="73.4531" y2="73.4531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="32" x="406" y="87.6636">int id;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="406" y="100.4683">bool ReadyToReceive;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="406" y="113.2729">bool ReadyToSend;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="401" x2="534" y1="119.8672" y2="119.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="406" y="134.0776">void MoveFoward();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="406" y="146.8823">void MoveBackward();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="67" x="406" y="159.687">void Push();</text><!--MD5=[82c1271f01c0b98acc84e9d65c98e5e0]
+class ConveyorSlider--><rect fill="#F8F8F8" filter="url(#f16r1d34tk9ivk)" height="73.6094" id="ConveyorSlider" style="stroke: #383838; stroke-width: 1.5;" width="135" x="570" y="66.9531"/><ellipse cx="589.95" cy="82.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M592.9188,88.5938 Q592.3406,88.8906 591.7,89.0313 Q591.0594,89.1875 590.3563,89.1875 Q587.8563,89.1875 586.5281,87.5469 Q585.2156,85.8906 585.2156,82.7656 Q585.2156,79.6406 586.5281,77.9844 Q587.8563,76.3281 590.3563,76.3281 Q591.0594,76.3281 591.7,76.4844 Q592.3563,76.6406 592.9188,76.9375 L592.9188,79.6563 Q592.2938,79.0781 591.7,78.8125 Q591.1063,78.5313 590.4813,78.5313 Q589.1375,78.5313 588.45,79.6094 Q587.7625,80.6719 587.7625,82.7656 Q587.7625,84.8594 588.45,85.9375 Q589.1375,87 590.4813,87 Q591.1063,87 591.7,86.7344 Q592.2938,86.4531 592.9188,85.875 L592.9188,88.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="92" x="605.05" y="87.1074">ConveyorSlider</text><line style="stroke: #383838; stroke-width: 1.5;" x1="571" x2="704" y1="98.9531" y2="98.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="32" x="576" y="113.1636">int id;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="576" y="125.9683">bool ReadyToReceive;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="571" x2="704" y1="132.5625" y2="132.5625"/><!--MD5=[7a051e0ebfb5a0a14e2c4e46ec781dd6]
+class ConveyorAssembly--><rect fill="#F8F8F8" filter="url(#f16r1d34tk9ivk)" height="150.4375" id="ConveyorAssembly" style="stroke: #383838; stroke-width: 1.5;" width="147" x="740" y="28.9531"/><ellipse cx="755" cy="44.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M757.9688,50.5938 Q757.3906,50.8906 756.75,51.0313 Q756.1094,51.1875 755.4063,51.1875 Q752.9063,51.1875 751.5781,49.5469 Q750.2656,47.8906 750.2656,44.7656 Q750.2656,41.6406 751.5781,39.9844 Q752.9063,38.3281 755.4063,38.3281 Q756.1094,38.3281 756.75,38.4844 Q757.4063,38.6406 757.9688,38.9375 L757.9688,41.6563 Q757.3438,41.0781 756.75,40.8125 Q756.1563,40.5313 755.5313,40.5313 Q754.1875,40.5313 753.5,41.6094 Q752.8125,42.6719 752.8125,44.7656 Q752.8125,46.8594 753.5,47.9375 Q754.1875,49 755.5313,49 Q756.1563,49 756.75,48.7344 Q757.3438,48.4531 757.9688,47.875 L757.9688,50.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="115" x="769" y="49.1074">ConveyorAssembly</text><line style="stroke: #383838; stroke-width: 1.5;" x1="741" x2="886" y1="60.9531" y2="60.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="32" x="746" y="75.1636">int id;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="88" x="746" y="87.9683">EnumTool Tool;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="746" y="100.7729">bool ReadyToReceive;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="746" y="113.5776">bool ReadyToSend;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="741" x2="886" y1="120.1719" y2="120.1719"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="746" y="134.3823">void MoveFoward();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="746" y="147.187">void MoveBackward();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="95" x="746" y="159.9917">void Assemble();</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="106" x="746" y="172.7964">void ChangeTool();</text><!--MD5=[58f3b4485e91725188737fe489e49ef3]
+link ConveyorLinear to Conveyor--><path d="M73.5,160.2131 C73.5,219.6731 73.5,304.9531 73.5,304.9531 C73.5,304.9531 389.79,304.9531 389.79,304.9531 " fill="none" id="ConveyorLinear-&gt;Conveyor" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="none" points="389.79,297.9531,409.79,304.9531,389.79,311.9531,389.79,297.9531" style="stroke: #383838; stroke-width: 1.0;"/><!--MD5=[ac8cce1aa4d15527434219b11002b0ad]
+link ConveyorRotative to Conveyor--><path d="M270.5,173.2531 C270.5,219.5331 270.5,271.9531 270.5,271.9531 C270.5,271.9531 389.99,271.9531 389.99,271.9531 " fill="none" id="ConveyorRotative-&gt;Conveyor" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="none" points="389.99,264.9531,409.99,271.9531,389.99,278.9531,389.99,264.9531" style="stroke: #383838; stroke-width: 1.0;"/><!--MD5=[788718e7bf3a9cc14aa84293a12174f9]
+link ConveyorPusher to Conveyor--><path d="M467.5,166.6731 C467.5,166.6731 467.5,218.7131 467.5,218.7131 " fill="none" id="ConveyorPusher-&gt;Conveyor" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="none" points="474.5,218.7131,467.5,238.7131,460.5,218.7131,474.5,218.7131" style="stroke: #383838; stroke-width: 1.0;"/><!--MD5=[3247505f1ebd1c814db9a2c8a576aa32]
+link ConveyorSlider to Conveyor--><path d="M637.5,141.2331 C637.5,190.7331 637.5,271.9531 637.5,271.9531 C637.5,271.9531 545.05,271.9531 545.05,271.9531 " fill="none" id="ConveyorSlider-&gt;Conveyor" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="none" points="545.05,278.9531,525.05,271.9531,545.05,264.9531,545.05,278.9531" style="stroke: #383838; stroke-width: 1.0;"/><!--MD5=[c9831afef47531d0262c6556519cf193]
+link ConveyorAssembly to Conveyor--><path d="M813.5,179.0831 C813.5,236.1731 813.5,304.9531 813.5,304.9531 C813.5,304.9531 545.02,304.9531 545.02,304.9531 " fill="none" id="ConveyorAssembly-&gt;Conveyor" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="none" points="545.02,311.9531,525.02,304.9531,545.02,297.9531,545.02,311.9531" style="stroke: #383838; stroke-width: 1.0;"/><!--MD5=[99c98d43fab0808151eb69814e16e2e2]
+@startuml
+skinparam linetype ortho
+skinparam Monochrome true
+
+title Low-Level UML
+
+
+class Conveyor {
+  int id;
+  string Actuators[];
+  string Sensors[];
+  bool HasPart[];
+}
+
+class ConveyorLinear {
+  int id;
+  bool ReadyToReceive;
+  bool ReadyToSend;
+  
+  void MoveFoward();
+  void MoveBackward();
+}
+
+class ConveyorRotative {
+  int id;
+  bool ReadyToReceive;
+  bool ReadyToSend;
+
+  void MoveFoward();
+  void MoveBackward();
+  void RotateClockWise();
+  void RotateCounterClockWise();
+}
+
+class ConveyorPusher {
+  int id;
+  bool ReadyToReceive;
+  bool ReadyToSend;
+  
+  void MoveFoward();
+  void MoveBackward();
+  void Push();
+}
+
+class ConveyorSlider {
+  int id;
+  bool ReadyToReceive;
+}
+
+class ConveyorAssembly {
+  int id;
+  EnumTool Tool;
+  bool ReadyToReceive;
+  bool ReadyToSend;  
+
+  void MoveFoward();
+  void MoveBackward();
+  void Assemble();
+  void ChangeTool();
+}
+
+ConveyorLinear - -|> Conveyor
+ConveyorRotative - -|> Conveyor
+ConveyorPusher - -|> Conveyor
+ConveyorSlider - -|> Conveyor
+ConveyorAssembly - -|> Conveyor
+
+
+
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 10:22:07 GMT 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.9+11-Ubuntu-0ubuntu1
+Operating System: Linux
+Default Encoding: ANSI_X3.4-1968
+Language: en
+Country: US
+--></g></svg>

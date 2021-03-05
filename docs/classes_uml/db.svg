@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="419px" preserveAspectRatio="none" style="width:646px;height:419px;" version="1.1" viewBox="0 0 646 419" width="646px" zoomAndPan="magnify"><defs><filter height="300%" id="fgmrlzx3hv19x" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacingAndGlyphs" textLength="72" x="291" y="16.708">DB UML</text><!--MD5=[11b747870319a085bc745183e08c5f76]
+class Storage--><rect fill="#F8F8F8" filter="url(#fgmrlzx3hv19x)" height="48" id="Storage" style="stroke: #383838; stroke-width: 1.5;" width="82" x="6" y="41.9531"/><ellipse cx="21" cy="57.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M23.9688,63.5938 Q23.3906,63.8906 22.75,64.0313 Q22.1094,64.1875 21.4063,64.1875 Q18.9063,64.1875 17.5781,62.5469 Q16.2656,60.8906 16.2656,57.7656 Q16.2656,54.6406 17.5781,52.9844 Q18.9063,51.3281 21.4063,51.3281 Q22.1094,51.3281 22.75,51.4844 Q23.4063,51.6406 23.9688,51.9375 L23.9688,54.6563 Q23.3438,54.0781 22.75,53.8125 Q22.1563,53.5313 21.5313,53.5313 Q20.1875,53.5313 19.5,54.6094 Q18.8125,55.6719 18.8125,57.7656 Q18.8125,59.8594 19.5,60.9375 Q20.1875,62 21.5313,62 Q22.1563,62 22.75,61.7344 Q23.3438,61.4531 23.9688,60.875 L23.9688,63.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="50" x="35" y="62.1074">Storage</text><line style="stroke: #383838; stroke-width: 1.5;" x1="7" x2="87" y1="73.9531" y2="73.9531"/><line style="stroke: #383838; stroke-width: 1.5;" x1="7" x2="87" y1="81.9531" y2="81.9531"/><!--MD5=[6c11516a5600b02d02bec5551b645149]
+class Part--><rect fill="#F8F8F8" filter="url(#fgmrlzx3hv19x)" height="60.8047" id="Part" style="stroke: #383838; stroke-width: 1.5;" width="58" x="18" y="188.4531"/><ellipse cx="33" cy="204.4531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M35.9688,210.0938 Q35.3906,210.3906 34.75,210.5313 Q34.1094,210.6875 33.4063,210.6875 Q30.9063,210.6875 29.5781,209.0469 Q28.2656,207.3906 28.2656,204.2656 Q28.2656,201.1406 29.5781,199.4844 Q30.9063,197.8281 33.4063,197.8281 Q34.1094,197.8281 34.75,197.9844 Q35.4063,198.1406 35.9688,198.4375 L35.9688,201.1563 Q35.3438,200.5781 34.75,200.3125 Q34.1563,200.0313 33.5313,200.0313 Q32.1875,200.0313 31.5,201.1094 Q30.8125,202.1719 30.8125,204.2656 Q30.8125,206.3594 31.5,207.4375 Q32.1875,208.5 33.5313,208.5 Q34.1563,208.5 34.75,208.2344 Q35.3438,207.9531 35.9688,207.375 L35.9688,210.0938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="26" x="47" y="208.6074">Part</text><line style="stroke: #383838; stroke-width: 1.5;" x1="19" x2="75" y1="220.4531" y2="220.4531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="45" x="24" y="234.6636">UUID id;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="19" x2="75" y1="241.2578" y2="241.2578"/><!--MD5=[bb5595fd2b00487d8279332e43ce23d4]
+class PartType--><rect fill="#F8F8F8" filter="url(#fgmrlzx3hv19x)" height="73.6094" id="PartType" style="stroke: #383838; stroke-width: 1.5;" width="121" x="340.5" y="334.9531"/><ellipse cx="370.8" cy="350.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M373.7688,356.5938 Q373.1906,356.8906 372.55,357.0313 Q371.9094,357.1875 371.2063,357.1875 Q368.7063,357.1875 367.3781,355.5469 Q366.0656,353.8906 366.0656,350.7656 Q366.0656,347.6406 367.3781,345.9844 Q368.7063,344.3281 371.2063,344.3281 Q371.9094,344.3281 372.55,344.4844 Q373.2063,344.6406 373.7688,344.9375 L373.7688,347.6563 Q373.1438,347.0781 372.55,346.8125 Q371.9563,346.5313 371.3313,346.5313 Q369.9875,346.5313 369.3,347.6094 Q368.6125,348.6719 368.6125,350.7656 Q368.6125,352.8594 369.3,353.9375 Q369.9875,355 371.3313,355 Q371.9563,355 372.55,354.7344 Q373.1438,354.4531 373.7688,353.875 L373.7688,356.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="55" x="388.2" y="355.1074">PartType</text><line style="stroke: #383838; stroke-width: 1.5;" x1="341.5" x2="460.5" y1="366.9531" y2="366.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="83" x="346.5" y="381.1636">varchar name;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="346.5" y="393.9683">enum defaultColor;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="341.5" x2="460.5" y1="400.5625" y2="400.5625"/><!--MD5=[01e93a79034c9f5cc103c48f12642706]
+class TransformOrder--><rect fill="#F8F8F8" filter="url(#fgmrlzx3hv19x)" height="112.0234" id="TransformOrder" style="stroke: #383838; stroke-width: 1.5;" width="130" x="111" y="162.9531"/><ellipse cx="126" cy="178.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M128.9688,184.5938 Q128.3906,184.8906 127.75,185.0313 Q127.1094,185.1875 126.4063,185.1875 Q123.9063,185.1875 122.5781,183.5469 Q121.2656,181.8906 121.2656,178.7656 Q121.2656,175.6406 122.5781,173.9844 Q123.9063,172.3281 126.4063,172.3281 Q127.1094,172.3281 127.75,172.4844 Q128.4063,172.6406 128.9688,172.9375 L128.9688,175.6563 Q128.3438,175.0781 127.75,174.8125 Q127.1563,174.5313 126.5313,174.5313 Q125.1875,174.5313 124.5,175.6094 Q123.8125,176.6719 123.8125,178.7656 Q123.8125,180.8594 124.5,181.9375 Q125.1875,183 126.5313,183 Q127.1563,183 127.75,182.7344 Q128.3438,182.4531 128.9688,181.875 L128.9688,184.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="98" x="140" y="183.1074">TransformOrder</text><line style="stroke: #383838; stroke-width: 1.5;" x1="112" x2="240" y1="194.9531" y2="194.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="64" x="117" y="209.1636">int orderID;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="58" x="117" y="221.9683">date date;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="67" x="117" y="234.7729">int quantity;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="70" x="117" y="247.5776">int deadline;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="63" x="117" y="260.3823">int penalty;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="112" x2="240" y1="266.9766" y2="266.9766"/><!--MD5=[78f0b34f7bfd1aff375635daa8f7e9f5]
+class UnloadOrder--><rect fill="#F8F8F8" filter="url(#fgmrlzx3hv19x)" height="99.2188" id="UnloadOrder" style="stroke: #383838; stroke-width: 1.5;" width="111" x="276.5" y="169.4531"/><ellipse cx="291.5" cy="185.4531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M294.4688,191.0938 Q293.8906,191.3906 293.25,191.5313 Q292.6094,191.6875 291.9063,191.6875 Q289.4063,191.6875 288.0781,190.0469 Q286.7656,188.3906 286.7656,185.2656 Q286.7656,182.1406 288.0781,180.4844 Q289.4063,178.8281 291.9063,178.8281 Q292.6094,178.8281 293.25,178.9844 Q293.9063,179.1406 294.4688,179.4375 L294.4688,182.1563 Q293.8438,181.5781 293.25,181.3125 Q292.6563,181.0313 292.0313,181.0313 Q290.6875,181.0313 290,182.1094 Q289.3125,183.1719 289.3125,185.2656 Q289.3125,187.3594 290,188.4375 Q290.6875,189.5 292.0313,189.5 Q292.6563,189.5 293.25,189.2344 Q293.8438,188.9531 294.4688,188.375 L294.4688,191.0938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="79" x="305.5" y="189.6074">UnloadOrder</text><line style="stroke: #383838; stroke-width: 1.5;" x1="277.5" x2="386.5" y1="201.4531" y2="201.4531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="64" x="282.5" y="215.6636">int orderID;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="83" x="282.5" y="228.4683">int conveyorId;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="58" x="282.5" y="241.2729">date date;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="67" x="282.5" y="254.0776">int quantity;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="277.5" x2="386.5" y1="260.6719" y2="260.6719"/><!--MD5=[f5d37379eda1809b3d2766e7731b195d]
+class LoadOrder--><rect fill="#F8F8F8" filter="url(#fgmrlzx3hv19x)" height="86.4141" id="LoadOrder" style="stroke: #383838; stroke-width: 1.5;" width="97" x="422.5" y="175.9531"/><ellipse cx="437.5" cy="191.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M440.4688,197.5938 Q439.8906,197.8906 439.25,198.0313 Q438.6094,198.1875 437.9063,198.1875 Q435.4063,198.1875 434.0781,196.5469 Q432.7656,194.8906 432.7656,191.7656 Q432.7656,188.6406 434.0781,186.9844 Q435.4063,185.3281 437.9063,185.3281 Q438.6094,185.3281 439.25,185.4844 Q439.9063,185.6406 440.4688,185.9375 L440.4688,188.6563 Q439.8438,188.0781 439.25,187.8125 Q438.6563,187.5313 438.0313,187.5313 Q436.6875,187.5313 436,188.6094 Q435.3125,189.6719 435.3125,191.7656 Q435.3125,193.8594 436,194.9375 Q436.6875,196 438.0313,196 Q438.6563,196 439.25,195.7344 Q439.8438,195.4531 440.4688,194.875 L440.4688,197.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="65" x="451.5" y="196.1074">LoadOrder</text><line style="stroke: #383838; stroke-width: 1.5;" x1="423.5" x2="518.5" y1="207.9531" y2="207.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="64" x="428.5" y="222.1636">int orderID;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="83" x="428.5" y="234.9683">int conveyorId;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="58" x="428.5" y="247.7729">date date;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="423.5" x2="518.5" y1="254.3672" y2="254.3672"/><!--MD5=[63645ddf87926c9bb8daf3082ac62ebb]
+class ProcessLog--><rect fill="#F8F8F8" filter="url(#fgmrlzx3hv19x)" height="73.6094" id="ProcessLog" style="stroke: #383838; stroke-width: 1.5;" width="105" x="278.5" y="28.9531"/><ellipse cx="293.95" cy="44.9531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M296.9188,50.5938 Q296.3406,50.8906 295.7,51.0313 Q295.0594,51.1875 294.3563,51.1875 Q291.8563,51.1875 290.5281,49.5469 Q289.2156,47.8906 289.2156,44.7656 Q289.2156,41.6406 290.5281,39.9844 Q291.8563,38.3281 294.3563,38.3281 Q295.0594,38.3281 295.7,38.4844 Q296.3563,38.6406 296.9188,38.9375 L296.9188,41.6563 Q296.2938,41.0781 295.7,40.8125 Q295.1063,40.5313 294.4813,40.5313 Q293.1375,40.5313 292.45,41.6094 Q291.7625,42.6719 291.7625,44.7656 Q291.7625,46.8594 292.45,47.9375 Q293.1375,49 294.4813,49 Q295.1063,49 295.7,48.7344 Q296.2938,48.4531 296.9188,47.875 L296.9188,50.5938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="72" x="308.05" y="49.1074">ProcessLog</text><line style="stroke: #383838; stroke-width: 1.5;" x1="279.5" x2="382.5" y1="60.9531" y2="60.9531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="93" x="284.5" y="75.1636">int assemblerId;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="80" x="284.5" y="87.9683">time duration;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="279.5" x2="382.5" y1="94.5625" y2="94.5625"/><!--MD5=[86ca10383d903decbf8ad9c2f056115f]
+class UnloadingBayLog--><rect fill="#F8F8F8" filter="url(#fgmrlzx3hv19x)" height="60.8047" id="UnloadingBayLog" style="stroke: #383838; stroke-width: 1.5;" width="139" x="496.5" y="35.4531"/><ellipse cx="511.5" cy="51.4531" fill="#C2C2C2" rx="11" ry="11" style="stroke: #383838; stroke-width: 1.0;"/><path d="M514.4688,57.0938 Q513.8906,57.3906 513.25,57.5313 Q512.6094,57.6875 511.9063,57.6875 Q509.4063,57.6875 508.0781,56.0469 Q506.7656,54.3906 506.7656,51.2656 Q506.7656,48.1406 508.0781,46.4844 Q509.4063,44.8281 511.9063,44.8281 Q512.6094,44.8281 513.25,44.9844 Q513.9063,45.1406 514.4688,45.4375 L514.4688,48.1563 Q513.8438,47.5781 513.25,47.3125 Q512.6563,47.0313 512.0313,47.0313 Q510.6875,47.0313 510,48.1094 Q509.3125,49.1719 509.3125,51.2656 Q509.3125,53.3594 510,54.4375 Q510.6875,55.5 512.0313,55.5 Q512.6563,55.5 513.25,55.2344 Q513.8438,54.9531 514.4688,54.375 L514.4688,57.0938 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="107" x="525.5" y="55.6074">UnloadingBayLog</text><line style="stroke: #383838; stroke-width: 1.5;" x1="497.5" x2="634.5" y1="67.4531" y2="67.4531"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="83" x="502.5" y="81.6636">int conveyorId;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="497.5" x2="634.5" y1="88.2578" y2="88.2578"/><!--MD5=[32e479a18f964188f75b54611ae5b92b]
+link Storage to Part--><path d="M32.5,90.1931 C32.5,116.7431 32.5,159.3531 32.5,188.2231 " fill="none" id="Storage-Part" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="21.7875" y="177.4389">*</text><!--MD5=[925ed837c8c6ebada38a6421aafbaf8f]
+link Part to PartType--><path d="M47,249.7831 C47,297.7931 47,384.9531 47,384.9531 C47,384.9531 238.93,384.9531 340.15,384.9531 " fill="none" id="Part-PartType" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="324.6517" y="382.6862">1</text><!--MD5=[8b4e0a0ab405096a629a19970b6e11d6]
+link TransformOrder to PartType--><path d="M176,275.0831 C176,314.4031 176,359.9531 176,359.9531 C176,359.9531 273.77,359.9531 340.41,359.9531 " fill="none" id="TransformOrder-PartType" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="324.5381" y="354.6754">2</text><!--MD5=[909e6f76989f278343663cb0520dbd5e]
+link UnloadOrder to PartType--><path d="M364,268.6231 C364,290.0931 364,314.7831 364,334.6431 " fill="none" id="UnloadOrder-PartType" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="348.6969" y="323.7749">1</text><!--MD5=[e7b9e4afbabd314ceeda4705da3e6777]
+link LoadOrder to PartType--><path d="M442,261.9831 C442,284.8731 442,312.7431 442,334.7031 " fill="none" id="LoadOrder-PartType" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="440.5906" y="323.8455">1</text><!--MD5=[86278232372c461f96304da922852c99]
+link ProcessLog to Part--><path d="M278.25,96.9531 C196.12,96.9531 47,96.9531 47,96.9531 C47,96.9531 47,152.0231 47,188.1631 " fill="none" id="ProcessLog-Part" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="38.175" y="177.3665">1</text><!--MD5=[c74ab9fd2b2bfb59e1cf02341f25c345]
+link ProcessLog to PartType--><path d="M383.7,76.9531 C392.68,76.9531 399.17,76.9531 399.17,76.9531 C399.17,76.9531 399.17,255.6631 399.17,334.8931 " fill="none" id="ProcessLog-PartType" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="390.0951" y="323.7925">2</text><!--MD5=[f838e2796d12ce62f1ec938786ccab90]
+link UnloadingBayLog to Part--><path d="M508,96.7031 C508,114.3231 508,132.9531 508,132.9531 C508,132.9531 61.5,132.9531 61.5,132.9531 C61.5,132.9531 61.5,163.6731 61.5,188.3931 " fill="none" id="UnloadingBayLog-Part" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="55.7969" y="177.1703">1</text><!--MD5=[4925dfd09af78a53872e6c161f7bb140]
+link UnloadingBayLog to PartType--><path d="M496.13,55.9531 C454.95,55.9531 410.83,55.9531 410.83,55.9531 C410.83,55.9531 410.83,251.2431 410.83,334.7731 " fill="none" id="UnloadingBayLog-PartType" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="403.8685" y="323.928">1</text><!--MD5=[8e53e5c784e6e49101c81f01551b8c3d]
+@startuml
+skinparam linetype ortho
+skinparam Monochrome true
+
+title DB UML
+
+class Storage{
+    
+}
+
+Storage - -"*" Part
+
+class Part{
+	UUID id;
+}
+
+Part - -"1" PartType
+
+class PartType {
+  varchar name;
+  enum defaultColor;
+}
+
+class TransformOrder{
+  int orderID;
+  date date;
+  int quantity;
+  int deadline;
+  int penalty;
+}
+
+TransformOrder - -"2" PartType
+
+class UnloadOrder{
+  int orderID;
+	int conveyorId;
+  date date;
+  int quantity;
+}
+
+UnloadOrder - -"1" PartType
+
+class LoadOrder{
+  int orderID;
+	int conveyorId;
+  date date;
+}
+
+LoadOrder - -"1" PartType
+
+class ProcessLog{
+	int assemblerId;
+	time duration;
+}
+
+ProcessLog - -"1" Part
+ProcessLog - -"2" PartType
+
+class UnloadingBayLog{
+	int conveyorId;
+}
+
+UnloadingBayLog - -"1" Part
+UnloadingBayLog - -"1" PartType
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 10:22:07 GMT 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.9+11-Ubuntu-0ubuntu1
+Operating System: Linux
+Default Encoding: ANSI_X3.4-1968
+Language: en
+Country: US
+--></g></svg>
