@@ -1,5 +1,4 @@
 @startuml
-
 skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
@@ -226,6 +225,30 @@ class ResponsePartData {
 }
 
 CommandResponsePartList --|> CommandResponse
+/'
+
+Routing
+
+'/
+
+class RoutingManager{
+  - Route[] routes;
+
+  + Route makeRoute(Conveyor, Conveyor)
+  + Routes[] getRoutes();
+  + Routes[] getRoutes(Conveyor);
+  + Routes[] getRoutes(Region);
+  + void initRoute(Route);
+}
+
+RoutingManager --"*" Route
+
+class Route{
+  -Conveyor[] conveyors;
+}
+
+Route --"*" Conveyor
+Route --"1" Part
 
 /'
 
@@ -233,7 +256,10 @@ Database
 
 '/
 class DatabaseManager{
-
+  
+  + void initDatabase();
+  + Database getDatabase();
+  + void closeDatabase();
 }
 
 /'
@@ -259,16 +285,6 @@ class CommsManager{
 
   + void stopServer();
   + void startServer();
-}
-
-/'
-
-Routing
-
-'/
-
-class RoutingManager{
-  
 }
 
 @enduml

@@ -1,0 +1,66 @@
+@startuml
+skinparam linetype ortho
+skinparam Monochrome true
+
+title DB UML
+
+class Storage{
+    
+}
+
+Storage --"*" Part
+
+class Part{
+	UUID id;
+}
+
+Part --"1" PartType
+
+class PartType {
+  varchar name;
+  enum defaultColor;
+}
+
+class TransformOrder{
+  int orderID;
+  date date;
+  int quantity;
+  int deadline;
+  int penalty;
+}
+
+TransformOrder --"2" PartType
+
+class UnloadOrder{
+  int orderID;
+	int conveyorId;
+  date date;
+  int quantity;
+}
+
+UnloadOrder --"1" PartType
+
+class LoadOrder{
+  int orderID;
+	int conveyorId;
+  date date;
+}
+
+LoadOrder --"1" PartType
+
+class ProcessLog{
+	int assemblerId;
+	time duration;
+}
+
+ProcessLog --"1" Part
+ProcessLog --"2" PartType
+
+class UnloadingBayLog{
+	int conveyorId;
+}
+
+UnloadingBayLog --"1" Part
+UnloadingBayLog --"1" PartType
+
+@enduml
