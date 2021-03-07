@@ -60,6 +60,7 @@ class Conveyor {
 
   + int getID();
   + Part[] getParts();
+  + bool hasPart(Part);
 }
 
 Conveyor -- Part
@@ -74,6 +75,7 @@ class RegionManager{
   + Region getRegions();
   + Region getPartRegion(Part);
   + Region getConveyorRegion(Conveyor);
+  + Region[] getConnectedRegions(Region, Region);
 }
 
 class Region {
@@ -87,6 +89,11 @@ class Region {
   + int getNumParts();
   + int getNumParts(PartType);
   + string getName();
+  + bool hasPart(Part);
+  + bool hasConveyor(Conveyor);
+  + Conveyor[] getAllConveyors();
+  + Conveyor[] getInputs();
+  + Conveyor[] getOutputs();
 }
 
 Region "1" -- "*" Conveyor
@@ -234,11 +241,14 @@ Routing
 class RoutingManager{
   - Route[] routes;
 
-  + Route makeRoute(Conveyor, Conveyor)
+  - Route traceRoute(Map<Region, Route[]>);
+  - Route[] makeRegionRoutes(Region);
+  - bool enqueueRoute(Route);
+  + Route makeRoute(Conveyor, Conveyor);
   + Routes[] getRoutes();
   + Routes[] getRoutes(Conveyor);
   + Routes[] getRoutes(Region);
-  + void initRoute(Route);
+  + bool initRoute(Route);
 }
 
 RoutingManager --"*" Route
@@ -259,6 +269,8 @@ class DatabaseManager{
   
   + void initDatabase();
   + Database getDatabase();
+  + T query(T);
+  + void update(T);
   + void closeDatabase();
 }
 

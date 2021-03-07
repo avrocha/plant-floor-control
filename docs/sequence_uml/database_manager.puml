@@ -1,7 +1,15 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+actor Actor as Actor
+actor Manager as Manager
+
+Actor -> DatabaseManager: initDatabase
+activate DatabaseManager
+
+DatabaseManager <- Manager: query
+
+DatabaseManager <- Manager: update
+
+Actor -> DatabaseManager: closeDatabase
+deactivate DatabaseManager
 @enduml

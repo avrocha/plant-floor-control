@@ -1,7 +1,38 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+actor Actor as Actor
+
+Actor -> RoutingManager: makeRoute
+activate RoutingManager
+
+RoutingManager -> RegionManager: getConveyorRegion
+note left: origin conveyor region
+
+RoutingManager -> RegionManager: getConveyorRegion
+note left: dest conveyor region
+
+RoutingManager -> RegionManager: getConnectedRegions
+
+loop connected regions
+    RoutingManager -> Region: getConveyors
+    RoutingManager -> RoutingManager: makeRegionRoutes
+end
+
+RoutingManager -> RoutingManager: traceRoute
+
+create Route
+RoutingManager -> Route: new
+
+RoutingManager -> Actor: return route
+
+deactivate RoutingManager
+
+Actor -> RoutingManager: initRoute
+activate RoutingManager
+RoutingManager -> RoutingManager: enqueueRoute
+RoutingManager -> Actor: return success
+deactivate RoutingManager
 @enduml

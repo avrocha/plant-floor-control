@@ -1,7 +1,39 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+actor Actor as Actor
+
+Actor -> RegionManager: getRegions
+
+Actor -> RegionManager: getPartRegion
+activate RegionManager
+
+loop all regions
+    RegionManager -> ":Region": hasPart
+   
+    loop all region conveyors
+        ":Region" -> ":Conveyor": hasPart
+
+        alt true
+            ":Conveyor" -> ":Region": return true
+            ":Region" -> "RegionManager": return region
+        end
+    end
+end
+
+RegionManager -> Actor: return region
+deactivate RegionManager
+
+Actor -> RegionManager: getConveyorRegion
+activate RegionManager
+
+loop all regions
+    RegionManager -> ":Region": hasConveyor
+   
+    alt true
+        ":Region" -> "RegionManager": return region
+    end
+end
+
+RegionManager -> Actor: return region
+deactivate RegionManager
 @enduml
