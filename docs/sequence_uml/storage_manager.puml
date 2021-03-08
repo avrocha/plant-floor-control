@@ -4,9 +4,9 @@ skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
 title Storage Manager Sequence Diagram
-actor actor 
+Actor Actor 
 
-actor->StorageManager: extract
+Actor->StorageManager: extract
 activate StorageManager
 
 StorageManager -> DatabaseManager: getQuantity
@@ -17,28 +17,28 @@ deactivate DatabaseManager
 alt PartNumber > 0
 StorageManager -> DatabaseManager: update
 activate DatabaseManager
-DatabaseManager -> StorageManager: return true
+DatabaseManager -> StorageManager: return success
 deactivate DatabaseManager
 
-StorageManager -> actor: return Extract
+StorageManager -> Actor: return :Part
  
 
 else else
 
-    StorageManager -> actor: return failed
+    StorageManager -> Actor: return failed
     deactivate StorageManager
     end
 
 
-actor->StorageManager: store
+Actor->StorageManager: store
 activate StorageManager
 
 StorageManager -> DatabaseManager: update
 activate DatabaseManager
-DatabaseManager -> StorageManager: return true
+DatabaseManager -> StorageManager: return success
 deactivate DatabaseManager
 
-StorageManager -> actor: return store
+StorageManager -> Actor: return success
 deactivate StorageManager
 
 

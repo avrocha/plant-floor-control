@@ -5,37 +5,46 @@ skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
 
+Actor ERP
 Actor Actor
-
-Actor -> CommandManager: request
+ERP ->CommsManager: request
+CommsManager ->CommandManager: XML request
 activate CommandManager
 
 CommandManager->CommandManager: deserializeRequest
 
-CommandManager->":requestQueue": enqueue
-activate ":requestQueue"
+CommandManager->CommandManager: enqueue
+deactivate CommandManager
 
 loop loop
-":requestQueue"->CommandManager: pollRequest
-CommandManager->CommandRequest: request
-activate CommandRequest
 
-CommandRequest->CommandRequest: onReceive
 
-alt needs Response
-    CommandRequest->CommandManager: return true
-    CommandManager->CommandResponse: getResponse
-    activate CommandResponse
-    CommandResponse->CommandManager: sendData  
-    deactivate CommandResponse
-    CommandManager->CommandManager: serializeRequest
-    CommandManager->Actor: sendResponse
+Actor->CommandManager: pollRequest
+activate CommandManager
+
+CommandManager->":CommandRequest": request
+activate ":CommandRequest"
+
+":CommandRequest"->":CommandRequest": onReceive
+
+alt  Needs Response
+    CommandManager->":CommandRequest": getResponse
+
+    Create ":CommandResponse"
+    ":CommandRequest"->":CommandResponse": new 
+    deactivate ":CommandRequest"
+
+
+
+    CommandManager->CommandManager: serializeResponse
+    CommandManager->CommsManager: sendResponse
+    CommsManager ->ERP: response
 
 
 
     else no response needed
-        CommandRequest->CommandManager: return Null
         CommandManager->Actor: return true
+        deactivate CommandManager
 
 end
 
