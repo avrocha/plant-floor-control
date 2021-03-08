@@ -6,7 +6,7 @@ skinparam classAttributeIconSize 0
 
 
 Actor ERP
-Actor Actor
+Actor Factory
 ERP ->CommsManager: request
 CommsManager ->CommandManager: XML request
 activate CommandManager
@@ -19,7 +19,7 @@ deactivate CommandManager
 loop loop
 
 
-Actor->CommandManager: pollRequest
+Factory->CommandManager: pollRequest
 activate CommandManager
 
 CommandManager->":CommandRequest": request
@@ -43,7 +43,7 @@ alt  Needs Response
 
 
     else no response needed
-        CommandManager->Actor: return true
+        CommandManager->Factory: return true
         deactivate CommandManager
 
 end

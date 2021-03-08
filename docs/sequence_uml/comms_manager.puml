@@ -5,17 +5,17 @@ skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
 title Communication Manager Sequence Diagram
-actor Actor
+actor Factory
 
 
-Actor-> CommmsManager: startServer
-activate CommmsManager
+Factory-> CommsManager: startServer
+activate CommsManager
 loop loop
 
 end
 
-Actor-> CommmsManager: stopServer
+Factory-> CommsManager: stopServer
 
-deactivate CommmsManager
+deactivate CommsManager
 
 @enduml
