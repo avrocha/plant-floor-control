@@ -3,16 +3,16 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
-actor Actor as Actor
+actor Factory as Factory
 actor Manager as Manager
 
-Actor -> DatabaseManager: initDatabase
+Factory -> DatabaseManager: initDatabase
 activate DatabaseManager
 
 DatabaseManager <- Manager: query
 
 DatabaseManager <- Manager: update
 
-Actor -> DatabaseManager: closeDatabase
+Factory -> DatabaseManager: closeDatabase
 deactivate DatabaseManager
 @enduml

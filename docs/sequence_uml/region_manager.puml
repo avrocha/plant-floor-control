@@ -3,11 +3,9 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
-actor Actor as Actor
+actor Factory as Factory
 
-Actor -> RegionManager: getRegions
-
-Actor -> RegionManager: getPartRegion
+Factory -> RegionManager: getPartRegion
 activate RegionManager
 
 loop all regions
@@ -23,10 +21,10 @@ loop all regions
     end
 end
 
-RegionManager -> Actor: return region
+RegionManager -> Factory: return region
 deactivate RegionManager
 
-Actor -> RegionManager: getConveyorRegion
+Factory -> RegionManager: getConveyorRegion
 activate RegionManager
 
 loop all regions
@@ -37,6 +35,6 @@ loop all regions
     end
 end
 
-RegionManager -> Actor: return region
+RegionManager -> Factory: return region
 deactivate RegionManager
 @enduml

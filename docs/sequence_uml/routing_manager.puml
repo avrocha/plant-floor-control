@@ -3,9 +3,9 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
-actor Actor as Actor
+actor Factory as Factory
 
-Actor -> RoutingManager: makeRoute
+Factory -> RoutingManager: makeRoute
 activate RoutingManager
 
 RoutingManager -> RegionManager: getConveyorRegion
@@ -26,13 +26,13 @@ RoutingManager -> RoutingManager: traceRoute
 create Route
 RoutingManager -> Route: new
 
-RoutingManager -> Actor: return route
+RoutingManager -> Factory: return route
 
 deactivate RoutingManager
 
-Actor -> RoutingManager: initRoute
+Factory -> RoutingManager: initRoute
 activate RoutingManager
 RoutingManager -> RoutingManager: enqueueRoute
-RoutingManager -> Actor: return success
+RoutingManager -> Factory: return success
 deactivate RoutingManager
 @enduml
