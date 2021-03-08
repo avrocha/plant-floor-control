@@ -1,7 +1,45 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+
+Actor Actor
+
+Actor -> CommandManager: request
+activate CommandManager
+
+CommandManager->CommandManager: deserializeRequest
+
+CommandManager->":requestQueue": enqueue
+activate ":requestQueue"
+
+loop loop
+":requestQueue"->CommandManager: pollRequest
+CommandManager->CommandRequest: request
+activate CommandRequest
+
+CommandRequest->CommandRequest: onReceive
+
+alt needs Response
+    CommandRequest->CommandManager: return true
+    CommandManager->CommandResponse: getResponse
+    activate CommandResponse
+    CommandResponse->CommandManager: sendData  
+    deactivate CommandResponse
+    CommandManager->CommandManager: serializeRequest
+    CommandManager->Actor: sendResponse
+
+
+
+    else no response needed
+        CommandRequest->CommandManager: return Null
+        CommandManager->Actor: return true
+
+end
+
+end
+
+
 @enduml
