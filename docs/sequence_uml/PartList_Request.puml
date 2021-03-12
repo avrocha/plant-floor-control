@@ -5,20 +5,23 @@ skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
 Actor ERP
-Actor Factory
 ERP ->CommsManager: PartList request
 CommsManager->CommandManager: 
 
-CommandManager->":CommandRequest": 
+CommandManager->":CommandRequestPartList": 
 
-CommandManager->":CommandRequest": getResponse
+CommandManager->":CommandRequestPartList": getResponse
+
+":CommandRequestPartList"->DatabaseManager: query
+note left: count all parts by type 
+DatabaseManager->":CommandRequestPartList": return quantity
 
 Create ":CommandResponse"
-":CommandRequest"->":CommandResponse": new 
+":CommandRequestPartList"->":CommandResponse": new 
 
-":CommandResponse"->":storage": countPart
-":storage"->":CommandResponse": return quantity
-
+":CommandRequestPartList"->CommandManager
+CommandManager->CommsManager
+CommsManager->ERP
 
 
 

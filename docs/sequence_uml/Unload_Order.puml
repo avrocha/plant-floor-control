@@ -4,56 +4,25 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
-Actor ERP
 Actor Factory
-ERP ->CommsManager: Unload request
+Factory ->CommsManager: Load request
 CommsManager->CommandManager: 
 
 CommandManager->":CommandRequest": 
 
-":CommandRequest"->":UnloadOrder":store order
-activate ":UnloadOrder"
+":CommandRequest"->DatabaseManager:update
 
 
-loop orderListloop
+Factory -> DatabaseManager : query(UnloadOrder)
+note left: query pending orders
 
-":CommandRequest"->":UnloadOrder":getOrder
-activate ":CommandRequest"
-":UnloadOrder"->":CommandRequest":
-deactivate ":CommandRequest"
-deactivate ":UnloadOrder"
+Factory->RoutingManager:makeRoute 
 
+Factory->StorageManager: extract
+alt success   
+    Factory -> RoutingManager: initRoute()
 
+    Factory -> DatabaseManager: update(UnloadOrder)
 end
-
-":CommandRequest"->":CommandRequestUnload":dispatchOrder
-
-":CommandRequestUnload"->":CommandRequestUnload": getOrderID | getQuantity
-
-":CommandRequestUnload"->RoutingManager:makeRoute
-    
-":CommandRequestUnload"->StorageManager: extract
-activate StorageManager
-
-alt PartNumber > 0
-
-
-StorageManager -> ":CommandRequestUnload": return :Part
-deactivate StorageManager
-":CommandRequestUnload"->RoutingManager:initRoute   
-
-":CommandRequestUnload"->":UnloadOrder":update
-else else
-
-    StorageManager -> ":CommandRequestUnload": return failed
-    deactivate StorageManager
- 
-    ":CommandRequestUnload"->":CommandRequest": noParts
-    activate ":CommandRequest"
-    ":CommandRequest"->":UnloadOrder":pushToLast
-    deactivate ":CommandRequest"
-    end
-
-
 
 @enduml
