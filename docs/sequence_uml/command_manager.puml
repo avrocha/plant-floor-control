@@ -1,7 +1,54 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+
+Actor ERP
+Actor Factory
+ERP ->CommsManager: request
+CommsManager ->CommandManager: XML request
+activate CommandManager
+
+CommandManager->CommandManager: deserializeRequest
+
+CommandManager->CommandManager: enqueue
+deactivate CommandManager
+
+loop loop
+
+
+Factory->CommandManager: pollRequest
+activate CommandManager
+
+CommandManager->":CommandRequest": request
+activate ":CommandRequest"
+
+":CommandRequest"->":CommandRequest": onReceive
+
+alt  Needs Response
+    CommandManager->":CommandRequest": getResponse
+
+    Create ":CommandResponse"
+    ":CommandRequest"->":CommandResponse": new 
+    deactivate ":CommandRequest"
+
+
+
+    CommandManager->CommandManager: serializeResponse
+    CommandManager->CommsManager: sendResponse
+    CommsManager ->ERP: response
+
+
+
+    else no response needed
+        CommandManager->Factory: return true
+        deactivate CommandManager
+
+end
+
+end
+
+
 @enduml

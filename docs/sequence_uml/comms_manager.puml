@@ -1,7 +1,21 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+title Communication Manager Sequence Diagram
+actor Factory
+
+
+Factory-> CommsManager: startServer
+activate CommsManager
+loop loop
+
+end
+
+Factory-> CommsManager: stopServer
+
+deactivate CommsManager
+
 @enduml

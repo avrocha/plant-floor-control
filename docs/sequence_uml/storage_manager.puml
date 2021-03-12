@@ -1,7 +1,45 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+title Storage Manager Sequence Diagram
+Actor Factory 
+
+Factory->StorageManager: extract
+activate StorageManager
+
+StorageManager -> DatabaseManager: getQuantity
+activate DatabaseManager
+DatabaseManager -> StorageManager: return Quantity
+deactivate DatabaseManager
+
+alt PartNumber > 0
+StorageManager -> DatabaseManager: update
+activate DatabaseManager
+DatabaseManager -> StorageManager: return success
+deactivate DatabaseManager
+
+StorageManager -> Factory: return :Part
+ 
+
+else else
+
+    StorageManager -> Factory: return failed
+    deactivate StorageManager
+    end
+
+
+Factory->StorageManager: store
+activate StorageManager
+
+StorageManager -> DatabaseManager: update
+activate DatabaseManager
+DatabaseManager -> StorageManager: return success
+deactivate DatabaseManager
+
+StorageManager -> Factory: return success
+deactivate StorageManager
+
+
 @enduml
