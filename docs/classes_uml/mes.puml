@@ -16,6 +16,7 @@ StorageManager "1"--* Factory
 RoutingManager "1"--* Factory
 RegionManager "1"--* Factory
 CommsManager "1"--* Factory
+OrderManager "1"--* Factory
 
 /'
 
@@ -150,7 +151,7 @@ class CommandManager{
   + void enqueueRequest(string);
 }
 
-class CommandRequest {
+interface CommandRequest {
   + void onReceive();
 }
 
@@ -213,7 +214,7 @@ class TransformOrder{
 
 'Responses'
 
-class CommandResponse {
+interface CommandResponse {
 }
 
 class CommandResponseOrderList {
@@ -244,6 +245,7 @@ class RoutingManager{
   - Route traceRoute(Map<Region, Route[]>);
   - Route[] makeRegionRoutes(Region);
   - bool enqueueRoute(Route);
+  
   + Route makeRoute(Conveyor, Conveyor);
   + Routes[] getRoutes();
   + Routes[] getRoutes(Conveyor);
@@ -297,6 +299,18 @@ class CommsManager{
 
   + void stopServer();
   + void startServer();
+}
+
+/' 
+
+Order Manager
+
+'/
+
+class OrderManager{
+
+  + void pollOrders();
+  + T enqueueOrders();
 }
 
 @enduml

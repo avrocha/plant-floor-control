@@ -23,10 +23,14 @@ end
 
 RoutingManager -> RoutingManager: traceRoute
 
-create Route
-RoutingManager -> Route: new
+alt success
+    create Route
+    RoutingManager -> Route: new
+    RoutingManager -> Factory: return route
+else failed
+    RoutingManager -> Factory: return NULL
+end
 
-RoutingManager -> Factory: return route
 
 deactivate RoutingManager
 
