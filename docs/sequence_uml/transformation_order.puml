@@ -1,0 +1,40 @@
+@startuml
+
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+actor ERP as ERP
+actor Factory as Factory
+
+ERP -> CommsManager
+CommsManager -> CommandManager
+
+activate CommandManager
+    
+    create TransformationOrder 
+    CommandManager -> TransformationOrder : new
+
+    CommandManager -> DatabaseManager : update(TransformationOrder)
+
+deactivate CommandManager
+
+activate Factory
+
+Factory -> DatabaseManager : query(TransformationOrder)
+note left: query pending orders
+
+Factory -> Factory : getOrderIO(TransformationOrder)
+
+Factory -> RoutingManager: makeRoute()
+
+alt success    
+    Factory -> RoutingManager: initRoute()
+
+    Factory -> DatabaseManager: update(TransformationOrder)
+end
+
+
+deactivate Factory
+
+@enduml

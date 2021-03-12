@@ -1,7 +1,18 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+actor Factory as Factory
+actor Manager as Manager
+
+Factory -> DatabaseManager: initDatabase
+activate DatabaseManager
+
+DatabaseManager <- Manager: query
+
+DatabaseManager <- Manager: update
+
+Factory -> DatabaseManager: closeDatabase
+deactivate DatabaseManager
 @enduml

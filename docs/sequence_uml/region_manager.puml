@@ -1,7 +1,40 @@
 @startuml
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: Another authentication Response
+actor Factory as Factory
+
+Factory -> RegionManager: getPartRegion
+activate RegionManager
+
+loop all regions
+    RegionManager -> ":Region": hasPart
+   
+    loop all region conveyors
+        ":Region" -> ":Conveyor": hasPart
+
+        alt true
+            ":Conveyor" -> ":Region": return true
+            ":Region" -> "RegionManager": return region
+        end
+    end
+end
+
+RegionManager -> Factory: return region
+deactivate RegionManager
+
+Factory -> RegionManager: getConveyorRegion
+activate RegionManager
+
+loop all regions
+    RegionManager -> ":Region": hasConveyor
+   
+    alt true
+        ":Region" -> "RegionManager": return region
+    end
+end
+
+RegionManager -> Factory: return region
+deactivate RegionManager
 @enduml
