@@ -1,0 +1,59 @@
+@startuml
+
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+Actor ERP
+Actor Factory
+ERP ->CommsManager: Unload request
+CommsManager->CommandManager: 
+
+CommandManager->":CommandRequest": 
+
+":CommandRequest"->":UnloadOrder":store order
+activate ":UnloadOrder"
+
+
+loop orderListloop
+
+":CommandRequest"->":UnloadOrder":getOrder
+activate ":CommandRequest"
+":UnloadOrder"->":CommandRequest":
+deactivate ":CommandRequest"
+deactivate ":UnloadOrder"
+
+
+end
+
+":CommandRequest"->":CommandRequestUnload":dispatchOrder
+
+":CommandRequestUnload"->":CommandRequestUnload": getOrderID | getQuantity
+
+":CommandRequestUnload"->RoutingManager:makeRoute
+    
+":CommandRequestUnload"->StorageManager: extract
+activate StorageManager
+
+alt PartNumber > 0
+
+
+StorageManager -> ":CommandRequestUnload": return :Part
+deactivate StorageManager
+":CommandRequestUnload"->RoutingManager:initRoute   
+
+":CommandRequestUnload"->":UnloadOrder":update
+else else
+
+    StorageManager -> ":CommandRequestUnload": return failed
+    deactivate StorageManager
+ 
+    ":CommandRequestUnload"->":CommandRequest": noParts
+    activate ":CommandRequest"
+    ":CommandRequest"->":UnloadOrder":pushToLast
+    deactivate ":CommandRequest"
+    end
+
+
+
+@enduml

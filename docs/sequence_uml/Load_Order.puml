@@ -1,0 +1,44 @@
+@startuml
+
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+Actor ERP
+Actor Factory
+ERP ->CommsManager: Load request
+CommsManager->CommandManager: 
+
+CommandManager->":CommandRequest": 
+
+":CommandRequest"->":LoadOrder":store order
+activate ":LoadOrder"
+
+
+loop orderListloop
+
+":CommandRequest"->":LoadOrder":getOrder
+activate ":CommandRequest"
+":LoadOrder"->":CommandRequest":
+deactivate ":CommandRequest"
+deactivate ":LoadOrder"
+
+
+end
+
+":CommandRequest"->":CommandRequestLoad":dispatchOrder
+activate ":CommandRequestLoad"
+":CommandRequestLoad"->":CommandRequestLoad": getOrderID | getQuantity
+
+":CommandRequestLoad"->RoutingManager:makeRoute 
+
+":CommandRequestLoad"->RoutingManager:initRoute   
+
+RoutingManager->":CommandRequestLoad": return success
+
+":CommandRequestLoad"->StorageManager: store
+
+":CommandRequestLoad"->":LoadOrder":update
+deactivate ":CommandRequestLoad"
+
+@enduml
