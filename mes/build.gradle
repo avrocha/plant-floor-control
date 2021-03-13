@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group 'ii.pfc'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    implementation group: 'org.apache.plc4x', name: 'plc4j-api', version: '0.8.0'
+    runtimeOnly group: 'org.apache.plc4x', name: 'plc4j-driver-opcua', version: '0.8.0'
+}
