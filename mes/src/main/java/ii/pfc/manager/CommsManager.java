@@ -21,8 +21,10 @@ public class CommsManager implements ICommsManager {
 
      */
 
+    @Override
     public void getPlcConnection(Consumer<PlcConnection> consumer) {
         String opcConnection = String.format("opcua://%s:%d?discovery=true", plcAddress.getHostName(), plcAddress.getPort());
+
         try (PlcConnection connection = this.plcDriverManager.getConnection(opcConnection)) {
             consumer.accept(connection);
         } catch (PlcConnectionException e) {
