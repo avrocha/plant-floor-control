@@ -4,7 +4,7 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
-
+title Command Manager Sequence Diagram
 Actor ERP
 Actor Factory
 ERP ->CommsManager: request

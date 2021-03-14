@@ -4,6 +4,7 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
+title Part List Resquest     Sequence Diagram
 Actor ERP
 ERP ->CommsManager: PartList request
 CommsManager->CommandManager: 
