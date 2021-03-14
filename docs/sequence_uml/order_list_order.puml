@@ -3,6 +3,8 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
+title Order List Sequence Diagram
+
 actor ERP as ERP
 
 ERP -> CommsManager

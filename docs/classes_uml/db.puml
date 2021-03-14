@@ -2,7 +2,7 @@
 skinparam linetype ortho
 skinparam Monochrome true
 
-title DB UML
+title Database UML
 
 class Storage{
     
