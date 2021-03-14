@@ -3,6 +3,8 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
+title Region Manager Sequence Diagram
+
 actor Factory as Factory
 
 Factory -> RegionManager: getPartRegion

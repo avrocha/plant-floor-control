@@ -4,6 +4,8 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
+ title Load Order Sequence Diagram
+
 Actor Factory
 Factory ->CommsManager: Load request
 CommsManager->CommandManager: 

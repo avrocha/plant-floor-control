@@ -3,6 +3,8 @@ skinparam linetype ortho
 skinparam Monochrome true
 skinparam classAttributeIconSize 0
 
+title Routing Manager Sequence Diagram
+
 actor Factory as Factory
 
 Factory -> RoutingManager: makeRoute
