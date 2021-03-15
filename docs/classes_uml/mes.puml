@@ -35,18 +35,20 @@ class PartType {
 class Part {
   - UUID id;
   - Color color;
+  - int orderId;
 
-  + UUID getID();
+  + UUID getId();
   + Color getColor();
+  + int getOrderId();
   + PartType getType();
+  + void setType(PartType);
 }
 
 Part -- PartType
 
 class Tool {
   - int id;
-  
-  + int getID();
+  + int getId();
 }
 
 /'
@@ -59,7 +61,7 @@ class Conveyor {
   - int id;
   - EnumConveyor type;
 
-  + int getID();
+  + int getId();
   + Part[] getParts();
   + bool hasPart(Part);
 }
@@ -164,10 +166,10 @@ TransformOrder -- "2" PartType
 
 
 class CommandRequestUnload {
-  - int orderID;
+  - int orderId;
   - int quantity;
 
-  + int getOrderID();
+  + int getOrderId();
   + int getQuantity();
 }
 
@@ -176,9 +178,9 @@ CommandRequestUnload -- "1" Conveyor
 CommandRequestUnload -- "1" PartType
 
 class CommandRequestLoad {
-  - int orderID;
+  - int orderId;
 
-  + int getOrderID();
+  + int getOrderId();
 }
 
 CommandRequestLoad --|> CommandRequest
@@ -197,7 +199,7 @@ CommandRequestPartList --|> CommandRequest
 
 'Orders'
 class TransformOrder{
-  - int orderID;
+  - int orderId;
   - Date date;
 
   - int quantity;
@@ -205,12 +207,40 @@ class TransformOrder{
   - int deadline;
   - int penalty;
 
-  + int getOrderID();
+  + int getOrderId();
   + Date getDate();
   + int getQuantity();
   + int getDayPenalty();
   + int computePenalty(Date);
 }
+
+class UnloadOrder{
+  - int orderId;
+	- int conveyorId;
+  - Date date;
+  - int quantity;
+
+  + int getOrderId();
+  + int getConveyorId();
+  + Date getDate();
+  + int getQuantity();
+}
+
+UnloadOrder --"1" PartType
+UnloadOrder "1"-- CommandRequestUnload
+
+class LoadOrder{
+  - int orderId;
+	- int conveyorId;
+  - Date date;
+
+  + int getOrderId();
+  + int getConveyorId();
+  + Date getDate();
+}
+
+LoadOrder --"1" PartType
+LoadOrder "1"-- CommandRequestLoad
 
 'Responses'
 
@@ -271,8 +301,18 @@ class DatabaseManager{
   
   + void initDatabase();
   + Database getDatabase();
-  + T query(T);
-  + void update(T);
+  + Part fetchPart(UUID);
+  + void updatePart(Part);
+  + Time fetchProcessDuration(assemblerId, PartType);
+  + void updateProcessLog(assemblerId, Process, Part);
+  + int fetchUnloadedParts(conveyorId, PartType);
+  + void updateUnloadingBayLog(conveyorId, Part);
+  + TransformOrder[] fetchPendingTransformOrders();
+  + TransformOrder[] fetchAllTransformOrders();
+  + void updateTransformOrder(TransformOrder);
+  + UnloadOrder[] fetchUnloadOrders();
+  + void updateUnloadOrder(UnloadOrder);
+  + void updateLoadOrder(LoadOrder);
   + void closeDatabase();
 }
 
