@@ -83,7 +83,7 @@ class Region {
   - String name;
   - Conveyor[] inputs;
   - Conveyor[] output;
-  - Conveyor[] internal;
+  - Conveyor[] all;
 
   + bool canReceiveFrom(Conveyor);
   + void send(Conveyor);
