@@ -12,6 +12,7 @@ Storage --"*" Part
 
 class Part{
 	UUID id;
+  int orderId;
 }
 
 Part --"1" PartType
