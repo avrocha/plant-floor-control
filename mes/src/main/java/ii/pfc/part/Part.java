@@ -7,7 +7,7 @@ public class Part {
 
     private final UUID id;
 
-    private final PartType type;
+    private PartType type;
 
     private Color color;
 
