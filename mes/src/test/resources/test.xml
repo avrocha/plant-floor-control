@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<bean>
+  <name>Hello</name>
+  <age>2</age>
+  <id>1</id>
+</bean>
