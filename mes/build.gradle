@@ -15,6 +15,9 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+
     implementation group: 'com.google.guava', name: 'guava', version: '26.0-jre'
 
     implementation group: 'org.apache.plc4x', name: 'plc4j-api', version: '0.8.0'
