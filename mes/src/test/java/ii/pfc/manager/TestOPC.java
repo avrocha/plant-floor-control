@@ -4,6 +4,8 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.plc4x.java.api.PlcConnection;
+import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteRequest;
@@ -13,11 +15,11 @@ import org.junit.Test;
 
 public class TestOPC {
 
-    private ICommsManager commsManager = new CommsManager(new InetSocketAddress("94.60.138.247", 4840));
+    private ICommsManager commsManager = new CommsManager(new InetSocketAddress("127.0.0.1", 4840));
 
     @Test
     public void testRead() {
-        this.commsManager.getPlcConnection((plcConnection) -> {
+        try (PlcConnection plcConnection = this.commsManager.getPlcConnection()) {
             // Check if this connection support reading of data.
             if (!plcConnection.getMetadata().canRead()) {
                 System.err.println("This connection doesn't support reading.");
@@ -54,12 +56,16 @@ public class TestOPC {
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 e.printStackTrace();
             }
-        });
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testWrite() {
-        this.commsManager.getPlcConnection((plcConnection) -> {
+        try (PlcConnection plcConnection = this.commsManager.getPlcConnection()) {
             // Check if this connection support reading of data.
             if (!plcConnection.getMetadata().canWrite()) {
                 System.err.println("This connection doesn't support writing.");
@@ -86,7 +92,11 @@ public class TestOPC {
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-        });
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
