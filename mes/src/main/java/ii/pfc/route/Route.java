@@ -21,6 +21,14 @@ public class Route {
 
      */
 
+    public Part getPart() {
+        return part;
+    }
+
+    /*
+
+     */
+
     public void addConveyor(Conveyor conveyor) {
         this.conveyorList.add(conveyor);
     }
