@@ -1,50 +1,39 @@
 package ii.pfc.utils;
 
+import ii.pfc.command.impl.RequestOrderWrapper;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.JAXB;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestXML {
 
-    @Test
-    public void testRead() {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("test.xml")) {
-            JAXBContext context = JAXBContext.newInstance(Bean.class);
-            Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
-            Bean bean = (Bean) jaxbUnmarshaller.unmarshal(stream);
-            System.out.println(bean);
-        } catch (IOException | JAXBException ex) {
+    @Test
+    public void testUnload() {
+
+        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("xml/unload.xml")) {
+            RequestOrderWrapper wrapper = JAXB.unmarshal(stream, RequestOrderWrapper.class);
+            wrapper.onReceive();
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
     }
 
-    @XmlRootElement
-    public static class Bean {
+    @Test
+    public void testTransform() {
 
-        @XmlElement
-        protected String name;
-
-        @XmlElement
-        protected int age;
-
-        @XmlElement
-        protected int id;
-
-        @Override
-        public String toString() {
-            return "Bean{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                ", id=" + id +
-                '}';
+        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("xml/transform.xml")) {
+            RequestOrderWrapper wrapper = JAXB.unmarshal(stream, RequestOrderWrapper.class);
+            wrapper.onReceive();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
+
     }
 
 }
