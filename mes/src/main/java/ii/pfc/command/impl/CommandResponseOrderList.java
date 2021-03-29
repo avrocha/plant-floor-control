@@ -1,12 +1,15 @@
 package ii.pfc.command.impl;
 
 import ii.pfc.command.CommandResponse;
+import ii.pfc.part.PartType;
+import ii.pfc.part.xml.PartTypeAdapter;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement(name = "Order_Schedule")
 public class CommandResponseOrderList implements CommandResponse {
@@ -22,7 +25,7 @@ public class CommandResponseOrderList implements CommandResponse {
 
      */
 
-    public void addOrder(int orderId, String sourceType, String targetType, int quantityTotal, int quantityProcessed,
+    public void addOrder(int orderId, PartType sourceType, PartType targetType, int quantityTotal, int quantityProcessed,
         int quantityProcessing, int quantityHolding, int time, int timeReceived, int deadline, int penalty, int startTime, int endTime,
         int penaltyIncurred) {
 
@@ -61,10 +64,12 @@ public class CommandResponseOrderList implements CommandResponse {
     private static class OrderTransformData {
 
         @XmlAttribute(name = "From")
-        private final String sourceType;
+        @XmlJavaTypeAdapter(PartTypeAdapter.class)
+        private final PartType sourceType;
 
         @XmlAttribute(name = "To")
-        private final String targetType;
+        @XmlJavaTypeAdapter(PartTypeAdapter.class)
+        private final PartType targetType;
 
         @XmlAttribute(name = "Quantity")
         private final int quantityTotal;
@@ -99,7 +104,7 @@ public class CommandResponseOrderList implements CommandResponse {
         @XmlAttribute(name = "PenaltyIncurred")
         private final int penaltyIncurred;
 
-        private OrderTransformData(String sourceType, String targetType, int quantityTotal, int quantityProcessed, int quantityProcessing,
+        private OrderTransformData(PartType sourceType, PartType targetType, int quantityTotal, int quantityProcessed, int quantityProcessing,
             int quantityHolding, int time, int timeReceived, int deadline, int penalty, int startTime, int endTime, int penaltyIncurred) {
 
             this.sourceType = sourceType;

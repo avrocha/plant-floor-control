@@ -3,6 +3,7 @@ package ii.pfc.utils;
 import ii.pfc.command.impl.CommandResponseOrderList;
 import ii.pfc.command.impl.CommandResponsePartList;
 import ii.pfc.command.impl.RequestOrderWrapper;
+import ii.pfc.part.PartType;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.bind.JAXB;
@@ -42,10 +43,10 @@ public class TestXML {
     public void testPartList() {
 
         CommandResponsePartList partList = new CommandResponsePartList();
-        partList.addPartList("TESTE", 25);
-        partList.addPartList("A", 15);
-        partList.addPartList("B", 35);
-        partList.addPartList("D", 4);
+        partList.addPartList(PartType.PART_1, 25);
+        partList.addPartList(PartType.PART_2, 15);
+        partList.addPartList(PartType.PART_3, 35);
+        partList.addPartList(PartType.PART_4, 4);
 
         JAXB.marshal(partList, System.out);
 
@@ -56,9 +57,9 @@ public class TestXML {
 
         CommandResponseOrderList orderList = new CommandResponseOrderList();
 
-        orderList.addOrder(1, "S1", "T1", 10, 2, 4, 4, 100, 0, 200, 20, 50, 150, 0);
-        orderList.addOrder(2, "S2", "T2", 20, 5, 4, 2, 130, 0, 200, 20, 50, 150, 0);
-        orderList.addOrder(3, "S3", "T3", 13, 2, 8, 4, 100, 0, 200, 20, 50, 150, 0);
+        orderList.addOrder(1, PartType.PART_1, PartType.PART_4, 10, 2, 4, 4, 100, 0, 200, 20, 50, 150, 0);
+        orderList.addOrder(2, PartType.PART_2, PartType.PART_3, 20, 5, 4, 2, 130, 0, 200, 20, 50, 150, 0);
+        orderList.addOrder(3, PartType.PART_2, PartType.PART_5, 13, 2, 8, 4, 100, 0, 200, 20, 50, 150, 0);
 
         JAXB.marshal(orderList, System.out);
 
