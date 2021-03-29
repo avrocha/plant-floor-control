@@ -1,11 +1,18 @@
 package ii.pfc.order;
 
-import java.util.Calendar;
+import ii.pfc.part.PartType;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
 public class TransformationOrder {
 
     private final int orderId;
+
+    private final PartType sourceType;
+
+    private final PartType targetType;
 
     private final Date date;
 
@@ -15,8 +22,10 @@ public class TransformationOrder {
 
     private final int penalty;
 
-    public TransformationOrder(int orderId, Date date, int quantity, Date deadline, int penalty) {
+    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, Date date, int quantity, Date deadline, int penalty) {
         this.orderId = orderId;
+        this.sourceType = sourceType;
+        this.targetType = targetType;
         this.date = date;
         this.quantity = quantity;
         this.deadline = deadline;
@@ -29,6 +38,14 @@ public class TransformationOrder {
 
     public int getOrderId() {
         return orderId;
+    }
+
+    public PartType getSourceType() {
+        return sourceType;
+    }
+
+    public PartType getTargetType() {
+        return targetType;
     }
 
     public Date getDate() {
@@ -48,7 +65,7 @@ public class TransformationOrder {
     }
 
     public int computePenalty(Date currentDate) {
-        if(currentDate.before(deadline)) {
+        if (currentDate.before(deadline)) {
             return 0;
         }
 

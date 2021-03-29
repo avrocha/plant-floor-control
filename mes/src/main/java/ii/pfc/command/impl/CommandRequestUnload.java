@@ -1,29 +1,32 @@
 package ii.pfc.command.impl;
 
 import ii.pfc.command.CommandRequest;
+import ii.pfc.part.PartType;
+import ii.pfc.part.xml.PartTypeAdapter;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommandRequestUnload implements CommandRequest {
 
-    private final int orderId;
-
-    private final int quantity;
-
-    public CommandRequestUnload(int orderId, int quantity) {
-        this.orderId = orderId;
-        this.quantity = quantity;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(CommandRequestTransform.class);
 
     /*
 
      */
 
-    public int getOrderId() {
-        return orderId;
-    }
+    protected int orderId;
 
-    public int getQuantity() {
-        return quantity;
-    }
+    @XmlAttribute(name = "Type")
+    @XmlJavaTypeAdapter(PartTypeAdapter.class)
+    private PartType partType;
+
+    @XmlAttribute(name = "Destination")
+    private int conveyorId;
+
+    @XmlAttribute(name = "Quantity")
+    private int quantity;
 
     /*
 
@@ -31,6 +34,20 @@ public class CommandRequestUnload implements CommandRequest {
 
     @Override
     public void onReceive() {
-        System.out.println("Received request unload");
+        logger.info("Received request: {}", this.toString());
+    }
+
+    /*
+
+     */
+
+    @Override
+    public String toString() {
+        return "CommandRequestUnload{" +
+            "orderId=" + orderId +
+            ", partType=" + partType +
+            ", conveyorId=" + conveyorId +
+            ", quantity=" + quantity +
+            '}';
     }
 }
