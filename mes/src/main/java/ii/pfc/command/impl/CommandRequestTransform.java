@@ -2,8 +2,10 @@ package ii.pfc.command.impl;
 
 import ii.pfc.command.CommandRequest;
 import ii.pfc.part.PartType;
+import ii.pfc.part.xml.PartTypeAdapter;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +20,12 @@ public class CommandRequestTransform implements CommandRequest {
     protected int orderId;
 
     @XmlAttribute(name = "From")
-    private String sourceType;
+    @XmlJavaTypeAdapter(PartTypeAdapter.class)
+    private PartType sourceType;
 
     @XmlAttribute(name = "To")
-    private String targetType;
+    @XmlJavaTypeAdapter(PartTypeAdapter.class)
+    private PartType targetType;
 
     @XmlAttribute(name = "Time")
     private int time;
