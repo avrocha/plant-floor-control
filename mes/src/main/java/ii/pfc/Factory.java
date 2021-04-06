@@ -4,8 +4,8 @@ import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.manager.CommsManager;
 import ii.pfc.manager.ICommsManager;
-import ii.pfc.manager.IRegionManager;
-import ii.pfc.manager.RegionManager;
+import ii.pfc.manager.IRoutingManager;
+import ii.pfc.manager.RoutingManager;
 import ii.pfc.route.RouteData;
 import java.net.InetSocketAddress;
 import java.util.function.Function;
@@ -14,11 +14,11 @@ public class Factory {
 
     private final ICommsManager commsManager;
     
-    private final IRegionManager regionManager;
+    private final IRoutingManager routingManager;
 
     public Factory() {
         this.commsManager = new CommsManager(new InetSocketAddress("127.0.0.1", 4840));
-        this.regionManager = RegionManager.builder()
+        this.routingManager = RoutingManager.builder()
             .bidirectional(LIN1, LIN2, DEFAULT_WEIGHT)
             .bidirectional(LIN2, LIN3, DEFAULT_WEIGHT)
             .build();

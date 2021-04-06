@@ -9,11 +9,11 @@ import org.jgrapht.graph.AsWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
-public class RegionManager implements IRegionManager {
+public class RoutingManager implements IRoutingManager {
 
     private Graph<Conveyor, ConveyorEdge> regionGraph;
 
-    private RegionManager(Graph<Conveyor, ConveyorEdge> graph) {
+    private RoutingManager(Graph<Conveyor, ConveyorEdge> graph) {
         this.regionGraph = new AsWeightedGraph<>(
             graph,
             Collections.emptyMap(),
@@ -72,8 +72,8 @@ public class RegionManager implements IRegionManager {
 
          */
 
-        public RegionManager build() {
-            return new RegionManager(this._builderGraph);
+        public RoutingManager build() {
+            return new RoutingManager(this._builderGraph);
         }
 
     }
