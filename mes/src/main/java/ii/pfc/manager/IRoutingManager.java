@@ -5,4 +5,6 @@ import ii.pfc.route.RouteData;
 
 public interface IRoutingManager {
 
+    Route traceRoute(RouteData data);
+
 }

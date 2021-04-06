@@ -1,15 +1,27 @@
 package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
+import ii.pfc.route.Route;
 import ii.pfc.route.RouteData;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.AsWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 public class RoutingManager implements IRoutingManager {
+
+    public static final int PATH_MAX_WEIGHT = 100000;
+
+    /*
+
+     */
 
     private Graph<Conveyor, ConveyorEdge> regionGraph;
 
@@ -24,6 +36,32 @@ public class RoutingManager implements IRoutingManager {
                 return testEdge.getWeight();
             }
         };
+    }
+
+    /*
+
+     */
+
+    @Override
+    public Route traceRoute(RouteData data) {
+        synchronized (ConveyorEdge.LOCK) {
+            ConveyorEdge.currentRouteData = data;
+            GraphPath<Conveyor, ConveyorEdge> path = DijkstraShortestPath.findPathBetween(this.regionGraph, data.getStart(), data.getEnd());
+            ConveyorEdge.currentRouteData = null;
+
+            if (path == null || path.getWeight() > PATH_MAX_WEIGHT) {
+                return null;
+            }
+
+            Route route = new Route(data.getPart());
+            route.addConveyor(data.getStart());
+
+            for(ConveyorEdge edge : path.getEdgeList()) {
+                route.addConveyor(this.regionGraph.getEdgeTarget(edge));
+            }
+
+            return route;
+        }
     }
 
     /*
@@ -83,6 +121,8 @@ public class RoutingManager implements IRoutingManager {
      */
 
     private static class ConveyorEdge extends DefaultWeightedEdge {
+
+        private static final Object LOCK = new Object();
 
         private static RouteData currentRouteData;
 
