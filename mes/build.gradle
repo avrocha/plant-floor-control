@@ -31,5 +31,7 @@ dependencies {
     implementation group: 'org.apache.plc4x', name: 'plc4j-api', version: '0.8.0'
     runtimeOnly group: 'org.apache.plc4x', name: 'plc4j-driver-opcua', version: '0.8.0'
 
+    implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.1'
+
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
 }
