@@ -19,8 +19,56 @@ public class Factory {
     public Factory() {
         this.commsManager = new CommsManager(new InetSocketAddress("127.0.0.1", 4840));
         this.routingManager = RoutingManager.builder()
-            .bidirectional(LIN1, LIN2, DEFAULT_WEIGHT)
-            .bidirectional(LIN2, LIN3, DEFAULT_WEIGHT)
+
+             /*unidirectional right side edges*/
+            .unidirectional(LIN1, ROT31, DEFAULT_WEIGHT)
+            .unidirectional(ROT31, LIN12, DEFAULT_WEIGHT)
+            .unidirectional(LIN12, PSH51, DEFAULT_WEIGHT)
+            .unidirectional(PSH51, SLD63, DEFAULT_WEIGHT)
+            .unidirectional(PSH51, PSH52, DEFAULT_WEIGHT)
+            .unidirectional(PSH52, SLD62, DEFAULT_WEIGHT)
+            .unidirectional(PSH52, PSH53, DEFAULT_WEIGHT)
+            .unidirectional(PSH53, SLD61, DEFAULT_WEIGHT)
+            .unidirectional(PSH53, LIN11, DEFAULT_WEIGHT)
+            .unidirectional(LIN8, ROT33, DEFAULT_WEIGHT)
+            .unidirectional(LIN11, ROT33, DEFAULT_WEIGHT)
+            .unidirectional(ROT33, LIN9, DEFAULT_WEIGHT)
+            .unidirectional(LIN9, ROT34, DEFAULT_WEIGHT)
+            .unidirectional(ROT34, LIN10, DEFAULT_WEIGHT)
+            .unidirectional(LIN13, LIN14, DEFAULT_WEIGHT)
+            .unidirectional(LIN14, LIN3, DEFAULT_WEIGHT)
+            .unidirectional(LIN3, ROT32, DEFAULT_WEIGHT)
+            .unidirectional(ROT32, LIN4, DEFAULT_WEIGHT)
+            .unidirectional(LIN4, LIN5, DEFAULT_WEIGHT)
+            .unidirectional(LIN5, LIN6, DEFAULT_WEIGHT)
+            .unidirectional(LIN6, LIN7, DEFAULT_WEIGHT)
+            .unidirectional(LIN7, ROT34, DEFAULT_WEIGHT)
+
+
+            /*unidirectional left side edges*/
+            .unidirectional(LIN15, LIN16, DEFAULT_WEIGHT)
+            .unidirectional(LIN16, ROT36, DEFAULT_WEIGHT)
+            .unidirectional(ROT36, ROT37, DEFAULT_WEIGHT)
+            .unidirectional(ROT37, LIN17, DEFAULT_WEIGHT)
+            .unidirectional(LIN17, LIN18, DEFAULT_WEIGHT)
+            .unidirectional(LIN18, LIN19, DEFAULT_WEIGHT)
+            .unidirectional(LIN19, LIN20, DEFAULT_WEIGHT)
+            .unidirectional(LIN20, ROT35, DEFAULT_WEIGHT)
+            .unidirectional(ROT35, LIN21, DEFAULT_WEIGHT)
+
+            /*bidirectional right side edges*/
+            .bidirectional(LIN7, ASM104, DEFAULT_WEIGHT)
+            .bidirectional(LIN6, ASM103, DEFAULT_WEIGHT)
+            .bidirectional(LIN5, ASM102, DEFAULT_WEIGHT)
+            .bidirectional(LIN4, ASM101, DEFAULT_WEIGHT)
+            .bidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
+            .bidirectional(ROT31, LIN2, DEFAULT_WEIGHT)
+
+            /*bidirectional left side edges*/
+            .bidirectional(LIN17, ASM105, DEFAULT_WEIGHT)
+            .bidirectional(LIN18, ASM106, DEFAULT_WEIGHT)
+            .bidirectional(LIN19, ASM107, DEFAULT_WEIGHT)
+            .bidirectional(LIN20, ASM108, DEFAULT_WEIGHT)
             .build();
     }
 
