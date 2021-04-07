@@ -3,6 +3,7 @@ package ii.pfc.command.impl;
 import ii.pfc.command.CommandRequest;
 import ii.pfc.part.PartType;
 import ii.pfc.part.xml.PartTypeAdapter;
+import java.net.InetSocketAddress;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class CommandRequestUnload implements CommandRequest {
      */
 
     @Override
-    public void onReceive() {
+    public void onReceive(InetSocketAddress source) {
         logger.info("Received request: {}", this.toString());
     }
 
