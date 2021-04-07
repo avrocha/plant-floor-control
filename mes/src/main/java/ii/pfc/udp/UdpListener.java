@@ -2,7 +2,7 @@ package ii.pfc.udp;
 
 import java.net.InetSocketAddress;
 
-public interface UDPListener {
+public interface UdpListener {
 
     void onReceive(String data, InetSocketAddress source);
 

@@ -1,27 +1,25 @@
 package ii.pfc.udp;
 
 import com.google.common.base.Charsets;
-import ii.pfc.command.impl.CommandRequestTransform;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class UDPServer {
+public class UdpServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(UDPServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(UdpServer.class);
 
     //
 
     private final int port;
+
+    private final List<UdpListener> udpListeners = new ArrayList<>();
 
     //
 
@@ -29,9 +27,9 @@ public abstract class UDPServer {
 
     private boolean running = false;
 
-    private byte[] buffer = new byte[2046];
+    private byte[] buffer = new byte[2048];
 
-    public UDPServer(int port) {
+    public UdpServer(int port) {
         this.port = port;
     }
 
@@ -63,10 +61,12 @@ public abstract class UDPServer {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
 
-                String string = new String(buffer, packet.getOffset(), packet.getLength());
+                String data = new String(buffer, packet.getOffset(), packet.getLength());
                 InetSocketAddress address = new InetSocketAddress(packet.getAddress(), packet.getPort());
 
-                this.onReceive(string, address);
+                for (UdpListener udpListener : this.udpListeners) {
+                    udpListener.onReceive(data, address);
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -95,6 +95,8 @@ public abstract class UDPServer {
 
      */
 
-    public abstract void onReceive(String data, InetSocketAddress address);
+    public void addListener(UdpListener listener) {
+        this.udpListeners.add(listener);
+    }
 
 }

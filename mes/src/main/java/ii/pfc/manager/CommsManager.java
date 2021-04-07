@@ -2,14 +2,9 @@ package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.route.Route;
-import ii.pfc.udp.UDPListener;
-import ii.pfc.udp.UDPServer;
+import ii.pfc.udp.UdpListener;
+import ii.pfc.udp.UdpServer;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
@@ -21,13 +16,9 @@ public class CommsManager implements ICommsManager {
 
     private static final Logger logger = LoggerFactory.getLogger(CommsManager.class);
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
     //
 
-    private final UDPServer server;
-
-    private final List<UDPListener> udpListeners = new ArrayList<>();
+    private final UdpServer server;
 
     //
 
@@ -37,14 +28,7 @@ public class CommsManager implements ICommsManager {
 
     public CommsManager(int udpPort, InetSocketAddress plcAddress) {
 
-        this.server = new UDPServer(udpPort) {
-            @Override
-            public void onReceive(String data, InetSocketAddress address) {
-                for (UDPListener udpListener : udpListeners) {
-                    udpListener.onReceive(data, address);
-                }
-            }
-        };
+        this.server = new UdpServer(udpPort);
 
         this.plcAddress = plcAddress;
         this.plcDriverManager = new PlcDriverManager();
@@ -55,34 +39,23 @@ public class CommsManager implements ICommsManager {
      */
 
     @Override
-    public void startServer() {
-        executor.submit(this.server::bind);
+    public void startUdpServer() {
+        this.server.bind();
     }
 
     @Override
-    public void stopServer() {
+    public void stopUdpServer() {
         this.server.close();
-
-        try {
-            executor.shutdown();
-            executor.awaitTermination(1, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-        } finally {
-            if (!executor.isTerminated()) {
-                executor.shutdownNow();
-            }
-        }
-
     }
 
     @Override
-    public void sendUDPData(InetSocketAddress target, String data) {
+    public void sendUdpData(InetSocketAddress target, String data) {
         this.server.send(target, data);
     }
 
     @Override
-    public void addUDPListener(UDPListener listener) {
-        this.udpListeners.add(listener);
+    public void addUdpListener(UdpListener listener) {
+        this.server.addListener(listener);
     }
 
     /*

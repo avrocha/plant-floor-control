@@ -11,12 +11,26 @@ public class BatchRequestOrderWrapper {
     @XmlElement(name = "Order")
     private RequestOrderWrapper[] orders;
 
+    @XmlElement(name = "Request_Orders")
+    private CommandRequestOrderList[] orderList;
+
+    @XmlElement(name = "Request_Stores")
+    private CommandRequestPartList[] partList;
+
     /*
 
      */
 
     public RequestOrderWrapper[] getOrders() {
         return orders;
+    }
+
+    public CommandRequestOrderList[] getOrderList() {
+        return orderList;
+    }
+
+    public CommandRequestPartList[] getPartList() {
+        return partList;
     }
 
     /*
@@ -27,6 +41,8 @@ public class BatchRequestOrderWrapper {
     public String toString() {
         return "BatchRequestOrderWrapper{" +
             "orders=" + Arrays.toString(orders) +
+            ", orderList=" + Arrays.toString(orderList) +
+            ", partList=" + Arrays.toString(partList) +
             '}';
     }
 }

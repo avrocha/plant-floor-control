@@ -1,6 +1,7 @@
 package ii.pfc.command.impl;
 
 import ii.pfc.command.CommandRequest;
+import ii.pfc.manager.ICommandManager;
 import ii.pfc.part.PartType;
 import ii.pfc.part.xml.PartTypeAdapter;
 import java.net.InetSocketAddress;
@@ -34,7 +35,7 @@ public class CommandRequestUnload implements CommandRequest {
      */
 
     @Override
-    public void onReceive(InetSocketAddress source) {
+    public void onReceive(ICommandManager commandManager, InetSocketAddress source) {
         logger.info("Received request: {}", this.toString());
     }
 

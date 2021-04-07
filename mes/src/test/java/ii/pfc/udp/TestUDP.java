@@ -5,7 +5,6 @@ import ii.pfc.manager.CommsManager;
 import ii.pfc.manager.ICommandManager;
 import ii.pfc.manager.ICommsManager;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -23,7 +22,7 @@ public class TestUDP extends TestCase {
 
     @Test
     public void testUDP() {
-        this.commsManager.startServer();
+        this.commsManager.startUdpServer();
 
         while(true) { }
     }

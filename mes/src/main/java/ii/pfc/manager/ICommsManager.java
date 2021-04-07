@@ -1,21 +1,20 @@
 package ii.pfc.manager;
 
 import ii.pfc.route.Route;
-import ii.pfc.udp.UDPListener;
+import ii.pfc.udp.UdpListener;
 import java.net.InetSocketAddress;
-import java.util.function.Consumer;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 
 public interface ICommsManager {
 
-    void startServer();
+    void startUdpServer();
 
-    void stopServer();
+    void stopUdpServer();
 
-    void sendUDPData(InetSocketAddress target, String data);
+    void sendUdpData(InetSocketAddress target, String data);
 
-    void addUDPListener(UDPListener listener);
+    void addUdpListener(UdpListener listener);
 
     /*
 
