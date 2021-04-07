@@ -2,15 +2,10 @@ package ii.pfc.manager;
 
 import com.google.common.collect.Sets;
 import ii.pfc.conveyor.Conveyor;
+import ii.pfc.part.Part;
 import ii.pfc.route.Route;
-import ii.pfc.route.RouteData;
-
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ManyToManyShortestPathsAlgorithm;
@@ -48,18 +43,18 @@ public class RoutingManager implements IRoutingManager {
      */
 
     @Override
-    public Route traceRoute(RouteData data) {
+    public Route traceRoute(Part part, Conveyor source, Conveyor target) {
         synchronized (ConveyorEdge.LOCK) {
-            ConveyorEdge.currentRouteData = data;
-            GraphPath<Conveyor, ConveyorEdge> path = DijkstraShortestPath.findPathBetween(this.regionGraph, data.getStart(), data.getEnd());
+            ConveyorEdge.currentRouteData = new RouteData(part, source, target);
+            GraphPath<Conveyor, ConveyorEdge> path = DijkstraShortestPath.findPathBetween(this.regionGraph, source, target);
             ConveyorEdge.currentRouteData = null;
 
             if (path == null || path.getWeight() > PATH_MAX_WEIGHT) {
                 return null;
             }
 
-            Route route = new Route(data.getPart());
-            route.addConveyor(data.getStart());
+            Route route = new Route(part);
+            route.addConveyor(source);
 
             for (ConveyorEdge edge : path.getEdgeList()) {
                 route.addConveyor(this.regionGraph.getEdgeTarget(edge));
@@ -70,10 +65,10 @@ public class RoutingManager implements IRoutingManager {
     }
 
     @Override
-    public Route[] traceRoutes(Conveyor source, Conveyor[] targets) {
+    public Route[] traceRoutes(Part part, Conveyor source, Conveyor[] targets) {
         synchronized (ConveyorEdge.LOCK) {
-            ConveyorEdge.currentRouteData = new RouteData(null, source, source);
-            ManyToManyShortestPathsAlgorithm.ManyToManyShortestPaths<Conveyor, ConveyorEdge> many = new DijkstraManyToManyShortestPaths<>(this.regionGraph).getManyToManyPaths(Sets.newHashSet(source), Sets.newHashSet(targets));
+            ConveyorEdge.currentRouteData = new RouteData(part, source, targets);
+            ManyToManyShortestPathsAlgorithm.ManyToManyShortestPaths<Conveyor, ConveyorEdge> many = new DijkstraManyToManyShortestPaths<>(this.regionGraph).getManyToManyPaths(Collections.singleton(source), Sets.newHashSet(targets));
 
             Route[] routes = new Route[targets.length];
             for (int i = 0; i < targets.length; i++) {
@@ -98,6 +93,53 @@ public class RoutingManager implements IRoutingManager {
             ConveyorEdge.currentRouteData = null;
 
             return routes;
+        }
+    }
+
+    /*
+
+     */
+
+    public static class RouteData {
+
+        private final Part part;
+
+        private final Conveyor source;
+
+        private final Conveyor[] targets;
+
+        /*
+
+         */
+
+        public RouteData(Part part, Conveyor source, Conveyor target) {
+            this(part, source, new Conveyor[] {target});
+        }
+
+        public RouteData(Part part, Conveyor source, Conveyor[] targets) {
+            this.part = part;
+            this.source = source;
+            this.targets = targets;
+        }
+
+        /*
+
+         */
+
+        public Part getPart() {
+            return part;
+        }
+
+        public Conveyor getSource() {
+            return source;
+        }
+
+        public Conveyor getTarget() {
+            return targets[0];
+        }
+
+        public Conveyor[] getTargets() {
+            return targets;
         }
     }
 

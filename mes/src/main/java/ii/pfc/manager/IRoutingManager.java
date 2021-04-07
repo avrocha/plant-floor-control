@@ -1,13 +1,13 @@
 package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
+import ii.pfc.part.Part;
 import ii.pfc.route.Route;
-import ii.pfc.route.RouteData;
 
 public interface IRoutingManager {
 
-    Route traceRoute(RouteData data);
+    Route traceRoute(Part part, Conveyor source, Conveyor target);
 
-    Route[] traceRoutes(Conveyor source, Conveyor[] targets);
+    Route[] traceRoutes(Part part, Conveyor source, Conveyor[] targets);
 
 }

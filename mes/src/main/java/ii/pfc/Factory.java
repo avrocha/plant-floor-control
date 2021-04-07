@@ -6,7 +6,6 @@ import ii.pfc.manager.CommsManager;
 import ii.pfc.manager.ICommsManager;
 import ii.pfc.manager.IRoutingManager;
 import ii.pfc.manager.RoutingManager;
-import ii.pfc.route.RouteData;
 import java.net.InetSocketAddress;
 import java.util.function.Function;
 
@@ -84,7 +83,7 @@ public class Factory {
 
      */
 
-    public Function<RouteData, Double> DEFAULT_WEIGHT = (routeData) -> 1.0;
+    public Function<RoutingManager.RouteData, Double> DEFAULT_WEIGHT = (routeData) -> 1.0;
 
     /* LINEAR*/
     public Conveyor LIN1 = new Conveyor(1, EnumConveyorType.LINEAR);
@@ -117,7 +116,6 @@ public class Factory {
     public Conveyor ROT35 = new Conveyor(35, EnumConveyorType.ROTATIVE);
     public Conveyor ROT36 = new Conveyor(36, EnumConveyorType.ROTATIVE);
     public Conveyor ROT37 = new Conveyor(37, EnumConveyorType.ROTATIVE);
-    public Conveyor ROT38 = new Conveyor(38, EnumConveyorType.ROTATIVE);
 
     /*PUSHER*/
     public Conveyor PSH51 = new Conveyor(51, EnumConveyorType.PUSHER);

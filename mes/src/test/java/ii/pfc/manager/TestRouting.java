@@ -1,10 +1,7 @@
 package ii.pfc.manager;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import ii.pfc.Factory;
 import ii.pfc.route.Route;
-import ii.pfc.route.RouteData;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -19,7 +16,7 @@ public class TestRouting extends TestCase {
 
     @Test
     public void testRoutes() {
-        Route route = this.factory.routingManager.traceRoute(new RouteData(null, this.factory.LIN13, this.factory.LIN10));
+        Route route = this.factory.routingManager.traceRoute(null, this.factory.LIN13, this.factory.LIN10);
         System.out.println(route.toString());
 
         //Route[] routes = this.factory.routingManager.traceRoutes(this.factory.LIN13, this.factory.ASM);
