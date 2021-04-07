@@ -47,4 +47,19 @@ public class UnloadOrder {
     public int getQuantity() {
         return quantity;
     }
+
+    /*
+
+     */
+
+    @Override
+    public String toString() {
+        return "UnloadOrder{" +
+                "orderId=" + orderId +
+                ", partType=" + partType +
+                ", conveyorId=" + conveyorId +
+                ", date=" + date +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

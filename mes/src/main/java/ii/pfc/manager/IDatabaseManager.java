@@ -1,7 +1,10 @@
 package ii.pfc.manager;
 
+import ii.pfc.order.UnloadOrder;
+
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 
 public interface IDatabaseManager {
 
@@ -11,4 +14,9 @@ public interface IDatabaseManager {
 
     void closeConnection();
 
+    /*
+
+     */
+
+    Collection<UnloadOrder> fetchUnloadOrders();
 }

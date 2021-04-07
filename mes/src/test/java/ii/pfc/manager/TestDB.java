@@ -16,7 +16,7 @@ public class TestDB extends TestCase {
     public void testDB() {
         databaseManager.openConnection();
 
-
+        System.out.println(databaseManager.fetchUnloadOrders().toString());
 
         databaseManager.closeConnection();
     }

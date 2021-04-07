@@ -1,9 +1,12 @@
 package ii.pfc.manager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import ii.pfc.order.UnloadOrder;
+import ii.pfc.part.PartType;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,5 +57,38 @@ public class DatabaseManager implements IDatabaseManager{
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+
+    /*
+
+     */
+
+
+    @Override
+    public Collection<UnloadOrder> fetchUnloadOrders() {
+        List<UnloadOrder>orders = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order;")) {
+                ResultSet result = sql.executeQuery();
+                while(result.next()) {
+                    UnloadOrder order = new UnloadOrder(
+                            result.getInt("order_id"),
+                            PartType.getType(result.getString("type")),
+                            result.getInt("conveyor_id"),
+                            result.getDate("date"),
+                            result.getInt("quantity")
+                            );
+                    orders.add(order);
+                }
+            }
+
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return orders;
     }
 }
