@@ -1,15 +1,20 @@
 package ii.pfc.manager;
 
+import com.google.common.collect.Sets;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.route.Route;
 import ii.pfc.route.RouteData;
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.alg.interfaces.ManyToManyShortestPathsAlgorithm;
+import org.jgrapht.alg.shortestpath.DijkstraManyToManyShortestPaths;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.AsWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -27,9 +32,9 @@ public class RoutingManager implements IRoutingManager {
 
     private RoutingManager(Graph<Conveyor, ConveyorEdge> graph) {
         this.regionGraph = new AsWeightedGraph<>(
-            graph,
-            Collections.emptyMap(),
-            false
+                graph,
+                Collections.emptyMap(),
+                false
         ) {
             @Override
             public double getEdgeWeight(ConveyorEdge testEdge) {
@@ -56,11 +61,43 @@ public class RoutingManager implements IRoutingManager {
             Route route = new Route(data.getPart());
             route.addConveyor(data.getStart());
 
-            for(ConveyorEdge edge : path.getEdgeList()) {
+            for (ConveyorEdge edge : path.getEdgeList()) {
                 route.addConveyor(this.regionGraph.getEdgeTarget(edge));
             }
 
             return route;
+        }
+    }
+
+    @Override
+    public Route[] traceRoutes(Conveyor source, Conveyor[] targets) {
+        synchronized (ConveyorEdge.LOCK) {
+            ConveyorEdge.currentRouteData = new RouteData(null, source, source);
+            ManyToManyShortestPathsAlgorithm.ManyToManyShortestPaths<Conveyor, ConveyorEdge> many = new DijkstraManyToManyShortestPaths<>(this.regionGraph).getManyToManyPaths(Sets.newHashSet(source), Sets.newHashSet(targets));
+
+            Route[] routes = new Route[targets.length];
+            for (int i = 0; i < targets.length; i++) {
+                Conveyor target = targets[i];
+                if (many.getWeight(source, target) > PATH_MAX_WEIGHT) {
+                    routes[i] = null;
+                    continue;
+                }
+
+                GraphPath<Conveyor, ConveyorEdge> path = many.getPath(source, target);
+
+                Route route = new Route(null);
+                route.addConveyor(source);
+
+                for (ConveyorEdge edge : path.getEdgeList()) {
+                    route.addConveyor(this.regionGraph.getEdgeTarget(edge));
+                }
+
+                routes[i] = route;
+            }
+
+            ConveyorEdge.currentRouteData = null;
+
+            return routes;
         }
     }
 
@@ -89,6 +126,9 @@ public class RoutingManager implements IRoutingManager {
          */
 
         public Builder unidirectional(Conveyor a, Conveyor b, Function<RouteData, Double> weightFunction) {
+            this._builderGraph.addVertex(a);
+            this._builderGraph.addVertex(b);
+
             this._builderGraph.addEdge(a, b, new ConveyorEdge(weightFunction));
             return this;
         }

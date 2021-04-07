@@ -36,4 +36,16 @@ public class Route {
     public List<Conveyor> getConveyors() {
         return Collections.unmodifiableList(this.conveyorList);
     }
+
+    /*
+
+     */
+
+    @Override
+    public String toString() {
+        return "Route{" +
+                "part=" + part +
+                ", conveyorList=" + conveyorList +
+                '}';
+    }
 }

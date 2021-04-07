@@ -43,4 +43,13 @@ public class Conveyor {
     public boolean hasPart(Part part) {
         return partList.contains(part);
     }
+
+    /*
+
+     */
+
+    @Override
+    public String toString() {
+        return String.valueOf(id);
+    }
 }
