@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public class Factory {
 
-    private final ICommsManager commsManager;
+    public final ICommsManager commsManager;
     
     public final IRoutingManager routingManager;
 
