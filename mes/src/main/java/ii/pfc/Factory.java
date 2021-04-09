@@ -21,53 +21,53 @@ public class Factory {
 
              /*unidirectional right side edges*/
             .unidirectional(LIN1, ROT31, DEFAULT_WEIGHT)
-            .unidirectional(ROT31, LIN12, DEFAULT_WEIGHT)
-            .unidirectional(LIN12, PSH51, DEFAULT_WEIGHT)
+            .unidirectional(ROT31, LIN3, DEFAULT_WEIGHT)
+            .unidirectional(LIN3, PSH51, DEFAULT_WEIGHT)
             .unidirectional(PSH51, SLD63, DEFAULT_WEIGHT)
             .unidirectional(PSH51, PSH52, DEFAULT_WEIGHT)
             .unidirectional(PSH52, SLD62, DEFAULT_WEIGHT)
             .unidirectional(PSH52, PSH53, DEFAULT_WEIGHT)
             .unidirectional(PSH53, SLD61, DEFAULT_WEIGHT)
-            .unidirectional(PSH53, LIN11, DEFAULT_WEIGHT)
-            .unidirectional(LIN8, ROT33, DEFAULT_WEIGHT)
-            .unidirectional(LIN11, ROT33, DEFAULT_WEIGHT)
-            .unidirectional(ROT33, LIN9, DEFAULT_WEIGHT)
-            .unidirectional(LIN9, ROT34, DEFAULT_WEIGHT)
-            .unidirectional(ROT34, LIN10, DEFAULT_WEIGHT)
-            .unidirectional(LIN13, LIN14, DEFAULT_WEIGHT)
-            .unidirectional(LIN14, LIN3, DEFAULT_WEIGHT)
-            .unidirectional(LIN3, ROT32, DEFAULT_WEIGHT)
-            .unidirectional(ROT32, LIN4, DEFAULT_WEIGHT)
-            .unidirectional(LIN4, LIN5, DEFAULT_WEIGHT)
-            .unidirectional(LIN5, LIN6, DEFAULT_WEIGHT)
-            .unidirectional(LIN6, LIN7, DEFAULT_WEIGHT)
-            .unidirectional(LIN7, ROT34, DEFAULT_WEIGHT)
+            .unidirectional(PSH53, LIN4, DEFAULT_WEIGHT)
+            .unidirectional(LIN4, ROT38, DEFAULT_WEIGHT)
+            .unidirectional(LIN5, ROT38, DEFAULT_WEIGHT)
+            .unidirectional(ROT38, LIN6, DEFAULT_WEIGHT)
+            .unidirectional(LIN6, ROT39, DEFAULT_WEIGHT)
+            .unidirectional(ROT39, LIN7, DEFAULT_WEIGHT)
+            .unidirectional(LIN8, LIN9, DEFAULT_WEIGHT)
+            .unidirectional(LIN9, ROT33, DEFAULT_WEIGHT)
+            .unidirectional(ROT33, ROT32, DEFAULT_WEIGHT)
+            .unidirectional(ROT32, ROT34, DEFAULT_WEIGHT)
+            .unidirectional(ROT34, ROT35, DEFAULT_WEIGHT)
+            .unidirectional(ROT35, ROT36, DEFAULT_WEIGHT)
+            .unidirectional(ROT36, ROT37, DEFAULT_WEIGHT)
+            .unidirectional(ROT37, ROT39, DEFAULT_WEIGHT)
 
 
             /*unidirectional left side edges*/
-            .unidirectional(LIN15, LIN16, DEFAULT_WEIGHT)
-            .unidirectional(LIN16, ROT36, DEFAULT_WEIGHT)
-            .unidirectional(ROT36, ROT37, DEFAULT_WEIGHT)
-            .unidirectional(ROT37, LIN17, DEFAULT_WEIGHT)
-            .unidirectional(LIN17, LIN18, DEFAULT_WEIGHT)
-            .unidirectional(LIN18, LIN19, DEFAULT_WEIGHT)
-            .unidirectional(LIN19, LIN20, DEFAULT_WEIGHT)
-            .unidirectional(LIN20, ROT35, DEFAULT_WEIGHT)
-            .unidirectional(ROT35, LIN21, DEFAULT_WEIGHT)
+            .unidirectional(LIN10, LIN11, DEFAULT_WEIGHT)
+            .unidirectional(LIN11, ROT46, DEFAULT_WEIGHT)
+            .unidirectional(ROT46, ROT45, DEFAULT_WEIGHT)
+            .unidirectional(ROT45, ROT44, DEFAULT_WEIGHT)
+            .unidirectional(ROT44, ROT43, DEFAULT_WEIGHT)
+            .unidirectional(ROT43, ROT42, DEFAULT_WEIGHT)
+            .unidirectional(ROT42, ROT41, DEFAULT_WEIGHT)
+            .unidirectional(ROT41, ROT40, DEFAULT_WEIGHT)
+            .unidirectional(ROT40, LIN12, DEFAULT_WEIGHT)
 
             /*bidirectional right side edges*/
-            .bidirectional(LIN7, ASM104, DEFAULT_WEIGHT)
-            .bidirectional(LIN6, ASM103, DEFAULT_WEIGHT)
-            .bidirectional(LIN5, ASM102, DEFAULT_WEIGHT)
-            .bidirectional(LIN4, ASM101, DEFAULT_WEIGHT)
+            .bidirectional(ROT37, ASM104, DEFAULT_WEIGHT)
+            .bidirectional(ROT36, ASM103, DEFAULT_WEIGHT)
+            .bidirectional(ROT35, ASM102, DEFAULT_WEIGHT)
+            .bidirectional(ROT34, ASM101, DEFAULT_WEIGHT)
             .bidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
             .bidirectional(ROT31, LIN2, DEFAULT_WEIGHT)
 
             /*bidirectional left side edges*/
-            .bidirectional(LIN17, ASM105, DEFAULT_WEIGHT)
-            .bidirectional(LIN18, ASM106, DEFAULT_WEIGHT)
-            .bidirectional(LIN19, ASM107, DEFAULT_WEIGHT)
-            .bidirectional(LIN20, ASM108, DEFAULT_WEIGHT)
+            .bidirectional(ROT44, ASM105, DEFAULT_WEIGHT)
+            .bidirectional(ROT43, ASM106, DEFAULT_WEIGHT)
+            .bidirectional(ROT42, ASM107, DEFAULT_WEIGHT)
+            .bidirectional(ROT41, ASM108, DEFAULT_WEIGHT)
             .build();
     }
 
@@ -98,15 +98,6 @@ public class Factory {
     public Conveyor LIN10 = new Conveyor(10, EnumConveyorType.LINEAR);
     public Conveyor LIN11 = new Conveyor(11, EnumConveyorType.LINEAR);
     public Conveyor LIN12 = new Conveyor(12, EnumConveyorType.LINEAR);
-    public Conveyor LIN13 = new Conveyor(13, EnumConveyorType.LINEAR);
-    public Conveyor LIN14 = new Conveyor(14, EnumConveyorType.LINEAR);
-    public Conveyor LIN15 = new Conveyor(15, EnumConveyorType.LINEAR);
-    public Conveyor LIN16 = new Conveyor(16, EnumConveyorType.LINEAR);
-    public Conveyor LIN17 = new Conveyor(17, EnumConveyorType.LINEAR);
-    public Conveyor LIN18 = new Conveyor(18, EnumConveyorType.LINEAR);
-    public Conveyor LIN19 = new Conveyor(19, EnumConveyorType.LINEAR);
-    public Conveyor LIN20 = new Conveyor(20, EnumConveyorType.LINEAR);
-    public Conveyor LIN21 = new Conveyor(21, EnumConveyorType.LINEAR);
 
     /*ROTATIVE*/
     public Conveyor ROT31 = new Conveyor(31, EnumConveyorType.ROTATIVE);
@@ -116,6 +107,15 @@ public class Factory {
     public Conveyor ROT35 = new Conveyor(35, EnumConveyorType.ROTATIVE);
     public Conveyor ROT36 = new Conveyor(36, EnumConveyorType.ROTATIVE);
     public Conveyor ROT37 = new Conveyor(37, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT38 = new Conveyor(38, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT39 = new Conveyor(39, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT40 = new Conveyor(40, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT41 = new Conveyor(41, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT42 = new Conveyor(42, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT43 = new Conveyor(43, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT44 = new Conveyor(44, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT45 = new Conveyor(45, EnumConveyorType.ROTATIVE);
+    public Conveyor ROT46 = new Conveyor(46, EnumConveyorType.ROTATIVE);
 
     /*PUSHER*/
     public Conveyor PSH51 = new Conveyor(51, EnumConveyorType.PUSHER);
