@@ -3,7 +3,10 @@ package ii.pfc.manager;
 import ii.pfc.Factory;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.part.Part;
+import ii.pfc.part.PartType;
 import ii.pfc.route.Route;
+
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -28,7 +31,8 @@ public class TestRouting extends TestCase {
 
     @Test
     public void testRoutes() {
-        Route route = this.factory.routingManager.traceRoute(null, this.factory.LIN13, this.factory.LIN10);
+        Part part = new Part(UUID.randomUUID(), PartType.PART_1);
+        Route route = this.factory.routingManager.traceRoute(null, this.factory.LIN8, this.factory.LIN7);
 
         try (PlcConnection plcConnection = this.factory.commsManager.getPlcConnection()) {
             // Check if this connection support reading of data.
@@ -38,13 +42,13 @@ public class TestRouting extends TestCase {
             }
 
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
-            builder.addItem("ID", "ns=4;s=|var|GVL.RouteData.Id", 2);
 
-            int i = 0;
+            int i = 1;
             for (Conveyor conveyor : route.getConveyors()) {
-                builder.addItem(String.format("Conveyor[%d]", i), String.format("ns=4;s=|var|GVL.RouteData.ConveyorParts[%d]", i), conveyor.getId());
+                builder.addItem(String.format("Conveyor[%d]", i), String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RoutePart.route[%d]", i), conveyor.getId());
                 i++;
             }
+            builder.addItem("ID", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RoutePart.id", part.getId().toString());
 
             PlcWriteRequest writeRequest = builder.build();
 
