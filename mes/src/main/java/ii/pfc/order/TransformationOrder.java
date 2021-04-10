@@ -74,4 +74,17 @@ public class TransformationOrder {
 
         return penalty * days;
     }
+
+    @Override
+    public String toString() {
+        return "TransformationOrder{" +
+                "orderId=" + orderId +
+                ", sourceType=" + sourceType +
+                ", targetType=" + targetType +
+                ", date=" + date +
+                ", quantity=" + quantity +
+                ", deadline=" + deadline +
+                ", penalty=" + penalty +
+                '}';
+    }
 }
