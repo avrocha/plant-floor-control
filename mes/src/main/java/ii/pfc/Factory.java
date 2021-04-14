@@ -56,18 +56,18 @@ public class Factory {
             .unidirectional(ROT40, LIN12, DEFAULT_WEIGHT)
 
             /*bidirectional right side edges*/
-            .bidirectional(ROT37, ASM104, DEFAULT_WEIGHT)
-            .bidirectional(ROT36, ASM103, DEFAULT_WEIGHT)
-            .bidirectional(ROT35, ASM102, DEFAULT_WEIGHT)
-            .bidirectional(ROT34, ASM101, DEFAULT_WEIGHT)
+            .bidirectional(ROT37, ASM24, DEFAULT_WEIGHT)
+            .bidirectional(ROT36, ASM23, DEFAULT_WEIGHT)
+            .bidirectional(ROT35, ASM22, DEFAULT_WEIGHT)
+            .bidirectional(ROT34, ASM21, DEFAULT_WEIGHT)
             .bidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
             .bidirectional(ROT31, LIN2, DEFAULT_WEIGHT)
 
             /*bidirectional left side edges*/
-            .bidirectional(ROT44, ASM105, DEFAULT_WEIGHT)
-            .bidirectional(ROT43, ASM106, DEFAULT_WEIGHT)
-            .bidirectional(ROT42, ASM107, DEFAULT_WEIGHT)
-            .bidirectional(ROT41, ASM108, DEFAULT_WEIGHT)
+            .bidirectional(ROT44, ASM25, DEFAULT_WEIGHT)
+            .bidirectional(ROT43, ASM26, DEFAULT_WEIGHT)
+            .bidirectional(ROT42, ASM27, DEFAULT_WEIGHT)
+            .bidirectional(ROT41, ASM28, DEFAULT_WEIGHT)
             .build();
     }
 
@@ -128,13 +128,13 @@ public class Factory {
     public Conveyor SLD63 = new Conveyor(63, EnumConveyorType.SLIDER);
 
     /*ASSEMBLEY*/
-    public Conveyor ASM101 = new Conveyor(101, EnumConveyorType.ASSEMBLY);
-    public Conveyor ASM102 = new Conveyor(102, EnumConveyorType.ASSEMBLY);
-    public Conveyor ASM103 = new Conveyor(103, EnumConveyorType.ASSEMBLY);
-    public Conveyor ASM104 = new Conveyor(104, EnumConveyorType.ASSEMBLY);
-    public Conveyor ASM105 = new Conveyor(105, EnumConveyorType.ASSEMBLY);
-    public Conveyor ASM106 = new Conveyor(106, EnumConveyorType.ASSEMBLY);
-    public Conveyor ASM107 = new Conveyor(107, EnumConveyorType.ASSEMBLY);
-    public Conveyor ASM108 = new Conveyor(108, EnumConveyorType.ASSEMBLY);
+    public Conveyor ASM21 = new Conveyor(21, EnumConveyorType.ASSEMBLY);
+    public Conveyor ASM22 = new Conveyor(22, EnumConveyorType.ASSEMBLY);
+    public Conveyor ASM23 = new Conveyor(23, EnumConveyorType.ASSEMBLY);
+    public Conveyor ASM24 = new Conveyor(24, EnumConveyorType.ASSEMBLY);
+    public Conveyor ASM25 = new Conveyor(25, EnumConveyorType.ASSEMBLY);
+    public Conveyor ASM26 = new Conveyor(26, EnumConveyorType.ASSEMBLY);
+    public Conveyor ASM27 = new Conveyor(27, EnumConveyorType.ASSEMBLY);
+    public Conveyor ASM28 = new Conveyor(28, EnumConveyorType.ASSEMBLY);
 
 }
