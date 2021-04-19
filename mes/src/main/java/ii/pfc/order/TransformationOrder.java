@@ -2,8 +2,6 @@ package ii.pfc.order;
 
 import ii.pfc.part.PartType;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
 public class TransformationOrder {
@@ -22,7 +20,9 @@ public class TransformationOrder {
 
     private final int penalty;
 
-    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, Date date, int quantity, Date deadline, int penalty) {
+    private final TransformationState state;
+
+    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, Date date, int quantity, Date deadline, int penalty, TransformationState state) {
         this.orderId = orderId;
         this.sourceType = sourceType;
         this.targetType = targetType;
@@ -30,6 +30,7 @@ public class TransformationOrder {
         this.quantity = quantity;
         this.deadline = deadline;
         this.penalty = penalty;
+        this.state = state;
     }
 
     /*
@@ -75,6 +76,10 @@ public class TransformationOrder {
         return penalty * days;
     }
 
+    public TransformationState getState() {
+        return state;
+    }
+
     @Override
     public String toString() {
         return "TransformationOrder{" +
@@ -87,4 +92,13 @@ public class TransformationOrder {
                 ", penalty=" + penalty +
                 '}';
     }
+    /*
+
+     */
+
+    public static enum TransformationState {
+        PENDING, IN_PROGRESS, COMPLETED
+    }
 }
+
+

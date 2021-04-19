@@ -9,7 +9,9 @@ import ii.pfc.part.Process;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.Collection;
+import java.util.UUID;
 
 public interface IDatabaseManager {
 
@@ -25,11 +27,12 @@ public interface IDatabaseManager {
 
     Collection<UnloadOrder> fetchUnloadOrders();
     Collection<TransformationOrder> fetchAllTransformOrders();
-    Collection<Part> fetchPart();
+    Collection<TransformationOrder> fetchPendingTransformOrders();
+    Part fetchPart(UUID id);
     Collection<Part> fetchUnloadedParts();
-    /*Collection<Process> fetchProcessDuration();*/
+    Duration fetchProcessDuration(int assemblerId, PartType type);
     void updateProcessLog(Process process, Conveyor assembler, Part part);
-    //void updatePart();
+    void updatePart(Part);
     void updateUnloadingBayLog(UnloadOrder unloadingOrder, Part part);
     void updateTransformOrder(TransformationOrder transformationOrder);
     void updateUnloadOrder(UnloadOrder unloadOrder);
