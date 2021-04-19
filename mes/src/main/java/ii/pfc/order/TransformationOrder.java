@@ -2,6 +2,8 @@ package ii.pfc.order;
 
 import ii.pfc.part.PartType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class TransformationOrder {
@@ -12,17 +14,17 @@ public class TransformationOrder {
 
     private final PartType targetType;
 
-    private final Date date;
+    private final LocalDateTime date;
 
     private final int quantity;
 
-    private final Date deadline;
+    private final LocalDateTime deadline;
 
     private final int penalty;
 
     private final TransformationState state;
 
-    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, Date date, int quantity, Date deadline, int penalty, TransformationState state) {
+    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, LocalDateTime date, int quantity, LocalDateTime deadline, int penalty, TransformationState state) {
         this.orderId = orderId;
         this.sourceType = sourceType;
         this.targetType = targetType;
@@ -49,7 +51,7 @@ public class TransformationOrder {
         return targetType;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
@@ -57,7 +59,7 @@ public class TransformationOrder {
         return quantity;
     }
 
-    public Date getDeadline() {
+    public LocalDateTime getDeadline() {
         return deadline;
     }
 
@@ -65,15 +67,13 @@ public class TransformationOrder {
         return penalty;
     }
 
-    public int computePenalty(Date currentDate) {
-        if (currentDate.before(deadline)) {
+    public int computePenalty(LocalDateTime currentDate) {
+        if (currentDate.isBefore(deadline)) {
             return 0;
         }
 
-        // TODO calculate days
-        int days = 1;
-
-        return penalty * days;
+        Duration duration = Duration.between(deadline, currentDate);
+        return (int) (penalty * duration.toDays());
     }
 
     public TransformationState getState() {

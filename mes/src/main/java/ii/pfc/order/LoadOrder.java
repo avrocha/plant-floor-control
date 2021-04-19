@@ -1,5 +1,6 @@
 package ii.pfc.order;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class LoadOrder {
@@ -8,9 +9,9 @@ public class LoadOrder {
 
     private final int conveyorId;
 
-    private final Date date;
+    private final LocalDateTime date;
 
-    public LoadOrder(int orderId, int conveyorId, Date date){
+    public LoadOrder(int orderId, int conveyorId, LocalDateTime date){
         this.orderId = orderId;
         this.conveyorId = conveyorId;
         this.date = date;
@@ -28,7 +29,7 @@ public class LoadOrder {
         return conveyorId;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 }

@@ -2,6 +2,8 @@ package ii.pfc.order;
 
 
 import ii.pfc.part.PartType;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class UnloadOrder {
@@ -12,11 +14,11 @@ public class UnloadOrder {
 
     private final int conveyorId;
 
-    private final Date date;
+    private final LocalDateTime date;
 
     private final int quantity;
 
-    public UnloadOrder(int orderId, PartType partType, int conveyorId, Date date, int quantity) {
+    public UnloadOrder(int orderId, PartType partType, int conveyorId, LocalDateTime date, int quantity) {
         this.orderId = orderId;
         this.partType = partType;
         this.conveyorId = conveyorId;
@@ -40,7 +42,7 @@ public class UnloadOrder {
         return conveyorId;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 

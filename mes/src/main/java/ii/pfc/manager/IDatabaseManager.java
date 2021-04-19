@@ -5,6 +5,7 @@ import ii.pfc.order.LoadOrder;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
 import ii.pfc.part.Part;
+import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
 
 import java.sql.Connection;
@@ -26,15 +27,26 @@ public interface IDatabaseManager {
      */
 
     Collection<UnloadOrder> fetchUnloadOrders();
+
+    Collection<TransformationOrder> fetchTransformOrders(TransformationOrder.TransformationState state);
+
     Collection<TransformationOrder> fetchAllTransformOrders();
-    Collection<TransformationOrder> fetchPendingTransformOrders();
+
     Part fetchPart(UUID id);
+
     Collection<Part> fetchUnloadedParts();
+
     Duration fetchProcessDuration(int assemblerId, PartType type);
+
     void updateProcessLog(Process process, Conveyor assembler, Part part);
-    void updatePart(Part);
+
+    void updatePartType(UUID partId, PartType type);
+
     void updateUnloadingBayLog(UnloadOrder unloadingOrder, Part part);
+
     void updateTransformOrder(TransformationOrder transformationOrder);
+
     void updateUnloadOrder(UnloadOrder unloadOrder);
+
     void updateLoadOrder(LoadOrder loadOrder, Part part);
 }
