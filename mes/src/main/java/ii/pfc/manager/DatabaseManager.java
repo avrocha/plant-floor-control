@@ -16,8 +16,6 @@ import org.postgresql.util.PGInterval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.crypto.dsig.Transform;
-
 public class DatabaseManager implements IDatabaseManager {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
@@ -71,37 +69,113 @@ public class DatabaseManager implements IDatabaseManager {
 
      */
 
-    @Override
-    public Collection<UnloadOrder> fetchUnloadOrders() {
-        List<UnloadOrder> orders = new ArrayList<>();
+    private Collection<LoadOrder> _extractLoadOrders(ResultSet result) throws SQLException {
+        List<LoadOrder> orders = new ArrayList<>();
 
+        while (result.next()) {
+            orders.add(new LoadOrder(
+                    result.getInt("order_id"),
+                    PartType.getType(result.getString("order_type")),
+                    result.getInt("conveyor_id"),
+                    result.getTimestamp("date").toLocalDateTime(),
+                    LoadOrder.LoadState.valueOf(result.getString("state"))
+            ));
+        }
+
+        return orders;
+    }
+
+    @Override
+    public Collection<LoadOrder> fetchLoadOrders(LoadOrder.LoadState state) {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order;")) {
-                ResultSet result = sql.executeQuery();
-                while (result.next()) {
-                    orders.add(new UnloadOrder(
-                            result.getInt("order_id"),
-                            PartType.getType(result.getString("type")),
-                            result.getInt("conveyor_id"),
-                            result.getTimestamp("date").toLocalDateTime(),
-                            result.getInt("quantity")
-                    ));
-                }
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM load_order WHERE state=?;")) {
+                sql.setString(1, state.name());
+
+                return _extractLoadOrders(sql.executeQuery());
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Collection<LoadOrder> fetchAllLoadOrders() {
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM load_order;")) {
+                return _extractLoadOrders(sql.executeQuery());
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return Collections.emptySet();
+    }
+
+
+    /*
+
+     */
+
+    private Collection<UnloadOrder> _extractUnloadOrders(ResultSet result) throws SQLException {
+        List<UnloadOrder> orders = new ArrayList<>();
+
+        while (result.next()) {
+            orders.add(new UnloadOrder(
+                    result.getInt("order_id"),
+                    PartType.getType(result.getString("type")),
+                    result.getInt("conveyor_id"),
+                    result.getTimestamp("date").toLocalDateTime(),
+                    result.getInt("quantity"),
+                    UnloadOrder.UnloadState.valueOf(result.getString("state"))
+            ));
+        }
+
         return orders;
+    }
+
+    @Override
+    public Collection<UnloadOrder> fetchUnloadOrders(UnloadOrder.UnloadState state) {
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order WHERE state=?;")) {
+                sql.setString(1, state.name());
+
+                return _extractUnloadOrders(sql.executeQuery());
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Collection<UnloadOrder> fetchAllUnloadOrders() {
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order;")) {
+                return _extractUnloadOrders(sql.executeQuery());
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return Collections.emptySet();
     }
 
     /*
 
      */
 
-    private Collection<TransformationOrder> _extractOrders(ResultSet result) throws SQLException {
+    private Collection<TransformationOrder> _extractTransformationOrders(ResultSet result) throws SQLException {
         List<TransformationOrder> orders = new ArrayList<>();
 
         while (result.next()) {
@@ -121,11 +195,12 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public Collection<TransformationOrder> fetchAllTransformOrders() {
+    public Collection<TransformationOrder> fetchTransformOrders(TransformationOrder.TransformationState state) {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order;")) {
-                return _extractOrders(sql.executeQuery());
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order WHERE state=?;")) {
+                sql.setString(1, state.name());
+                return _extractTransformationOrders(sql.executeQuery());
             }
 
         } catch (SQLException ex) {
@@ -136,12 +211,11 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public Collection<TransformationOrder> fetchTransformOrders(TransformationOrder.TransformationState state) {
+    public Collection<TransformationOrder> fetchAllTransformOrders() {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order WHERE state=?;")) {
-                sql.setString(1, state.name());
-                return _extractOrders(sql.executeQuery());
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order;")) {
+                return _extractTransformationOrders(sql.executeQuery());
             }
 
         } catch (SQLException ex) {
@@ -179,6 +253,10 @@ public class DatabaseManager implements IDatabaseManager {
         return null;
     }
 
+    /*
+
+     */
+
     @Override
     public Collection<Part> fetchUnloadedParts() {
         List<Part> parts = new ArrayList<>();
@@ -202,6 +280,34 @@ public class DatabaseManager implements IDatabaseManager {
         return parts;
     }
 
+    /*
+
+     */
+
+    @Override
+    public Duration fetchProcessDuration(int assemblerId, PartType type) {
+        Duration duration = Duration.ofSeconds(0);
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("SELECT duration FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
+                ResultSet result = sql.executeQuery();
+                while (result.next()) {
+                    PGInterval interval = (PGInterval) result.getObject("duration");
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return duration;
+    }
+
+    /*
+
+     */
+
     @Override
     public void updatePartType(UUID partId, PartType type) {
 
@@ -218,7 +324,7 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public void updateProcessLog(Process process, Conveyor assembler, Part part) {
+    public void insertProcessLog(Process process, Conveyor assembler, Part part) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -240,7 +346,7 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public void updateUnloadingBayLog(UnloadOrder unloadingOrder, Part part) {
+    public void insertUnloadingBayLog(UnloadOrder order, Part part) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -248,9 +354,9 @@ public class DatabaseManager implements IDatabaseManager {
                     "INSERT INTO unloading_bay_log (conveyor_id, unloading_part, unloading_type) " +
                     "VALUES (?, ?, ?) "
             )) {
-                sql.setInt(1, unloadingOrder.getConveyorId());
+                sql.setInt(1, order.getConveyorId());
                 sql.setString(2, part.getId().toString());
-                sql.setString(3, unloadingOrder.getPartType().getName());
+                sql.setString(3, order.getPartType().getName());
             }
 
         } catch (SQLException ex) {
@@ -259,8 +365,12 @@ public class DatabaseManager implements IDatabaseManager {
 
     }
 
+    /*
+
+     */
+
     @Override /*VERIFICAR*/
-    public void updateTransformOrder(TransformationOrder transformationOrder) {
+    public void insertTransformOrder(TransformationOrder transformationOrder) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -281,8 +391,27 @@ public class DatabaseManager implements IDatabaseManager {
 
     }
 
+    @Override
+    public void updateTransformOrderState(int orderId, TransformationOrder.TransformationState newState) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE transform_order SET state=? where order_id=?;")) {
+                sql.setInt(1, orderId);
+                sql.setString(2, newState.name());
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /*
+
+     */
+
     @Override /*VERIFICAR*/
-    public void updateUnloadOrder(UnloadOrder unloadOrder) {
+    public void insertUnloadOrder(UnloadOrder unloadOrder) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -301,8 +430,27 @@ public class DatabaseManager implements IDatabaseManager {
 
     }
 
+    @Override
+    public void updateUnloadOrderState(int orderId, UnloadOrder.UnloadState newState) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE unload_order SET state=? where order_id=?;")) {
+                sql.setInt(1, orderId);
+                sql.setString(2, newState.name());
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /*
+
+     */
+
     @Override /*VERIFICAR*/
-    public void updateLoadOrder(LoadOrder loadOrder, Part part) {
+    public void insertLoadOrder(LoadOrder loadOrder, Part part) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -321,22 +469,17 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public Duration fetchProcessDuration(int assemblerId, PartType type) {
-        Duration duration = Duration.ofSeconds(0);
+    public void updateLoadOrderState(int orderId, LoadOrder.LoadState newState) {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT duration FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
-                ResultSet result = sql.executeQuery();
-                while (result.next()) {
-                    PGInterval interval = (PGInterval) result.getObject("duration");
-                }
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE load_order SET state=? where order_id=?;")) {
+                sql.setInt(1, orderId);
+                sql.setString(2, newState.name());
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
-        return duration;
     }
 }

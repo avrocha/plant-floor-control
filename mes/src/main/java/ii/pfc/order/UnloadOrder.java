@@ -4,7 +4,6 @@ package ii.pfc.order;
 import ii.pfc.part.PartType;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class UnloadOrder {
 
@@ -18,12 +17,15 @@ public class UnloadOrder {
 
     private final int quantity;
 
-    public UnloadOrder(int orderId, PartType partType, int conveyorId, LocalDateTime date, int quantity) {
+    private final UnloadState state;
+
+    public UnloadOrder(int orderId, PartType partType, int conveyorId, LocalDateTime date, int quantity, UnloadState state) {
         this.orderId = orderId;
         this.partType = partType;
         this.conveyorId = conveyorId;
         this.date = date;
         this.quantity = quantity;
+        this.state = state;
     }
 
     /*
@@ -50,6 +52,10 @@ public class UnloadOrder {
         return quantity;
     }
 
+    public UnloadState getState() {
+        return state;
+    }
+
     /*
 
      */
@@ -63,5 +69,13 @@ public class UnloadOrder {
                 ", date=" + date +
                 ", quantity=" + quantity +
                 '}';
+    }
+
+    /*
+
+     */
+
+    public static enum UnloadState {
+        PENDING, IN_PROGRESS, COMPLETED
     }
 }

@@ -26,27 +26,59 @@ public interface IDatabaseManager {
 
      */
 
-    Collection<UnloadOrder> fetchUnloadOrders();
+    Collection<LoadOrder> fetchLoadOrders(LoadOrder.LoadState state);
+
+    Collection<LoadOrder> fetchAllLoadOrders();
+
+    //
+
+    Collection<UnloadOrder> fetchUnloadOrders(UnloadOrder.UnloadState state);
+
+    Collection<UnloadOrder> fetchAllUnloadOrders();
+
+    //
 
     Collection<TransformationOrder> fetchTransformOrders(TransformationOrder.TransformationState state);
 
     Collection<TransformationOrder> fetchAllTransformOrders();
 
+    //
+
     Part fetchPart(UUID id);
 
     Collection<Part> fetchUnloadedParts();
 
+    //
+
     Duration fetchProcessDuration(int assemblerId, PartType type);
 
-    void updateProcessLog(Process process, Conveyor assembler, Part part);
+    /*
+
+     */
 
     void updatePartType(UUID partId, PartType type);
 
-    void updateUnloadingBayLog(UnloadOrder unloadingOrder, Part part);
+    //
 
-    void updateTransformOrder(TransformationOrder transformationOrder);
+    void insertProcessLog(Process process, Conveyor assembler, Part part);
 
-    void updateUnloadOrder(UnloadOrder unloadOrder);
+    void insertUnloadingBayLog(UnloadOrder order, Part part);
 
-    void updateLoadOrder(LoadOrder loadOrder, Part part);
+    //
+
+    void insertUnloadOrder(UnloadOrder unloadOrder);
+
+    void updateUnloadOrderState(int orderId, UnloadOrder.UnloadState newState);
+
+    //
+
+    void insertLoadOrder(LoadOrder loadOrder, Part part);
+
+    void updateLoadOrderState(int orderId, LoadOrder.LoadState newState);
+
+    //
+
+    void insertTransformOrder(TransformationOrder transformationOrder);
+
+    void updateTransformOrderState(int orderId, TransformationOrder.TransformationState newState);
 }
