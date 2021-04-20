@@ -7,14 +7,14 @@ import java.util.List;
 
 public class Conveyor {
 
-    private final int id;
+    private final short id;
 
     private final EnumConveyorType type;
 
     private final List<Part> partList;
 
     public Conveyor(int id, EnumConveyorType type) {
-        this.id = id;
+        this.id = (short) id;
         this.type = type;
 
         this.partList = new ArrayList<>();
@@ -24,7 +24,7 @@ public class Conveyor {
 
      */
 
-    public int getId() {
+    public short getId() {
         return id;
     }
 
@@ -42,5 +42,14 @@ public class Conveyor {
 
     public boolean hasPart(Part part) {
         return partList.contains(part);
+    }
+
+    /*
+
+     */
+
+    @Override
+    public String toString() {
+        return String.valueOf(id);
     }
 }
