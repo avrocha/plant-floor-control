@@ -36,4 +36,17 @@ public class Part {
     public Color getColor() {
         return color;
     }
+
+    /*
+
+     */
+
+    @Override
+    public String toString() {
+        return "Part{" +
+                "id=" + id +
+                ", type=" + type +
+                ", color=" + color +
+                '}';
+    }
 }
