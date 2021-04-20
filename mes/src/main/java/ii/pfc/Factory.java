@@ -1,8 +1,10 @@
 package ii.pfc;
 
+import ii.pfc.manager.CommandManager;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.manager.CommsManager;
+import ii.pfc.manager.ICommandManager;
 import ii.pfc.manager.ICommsManager;
 import ii.pfc.manager.IRoutingManager;
 import ii.pfc.manager.RoutingManager;
@@ -15,8 +17,12 @@ public class Factory {
     
     public final IRoutingManager routingManager;
 
+    private final ICommandManager commandManager;
+
+    private boolean running = false;
+
     public Factory() {
-        this.commsManager = new CommsManager(new InetSocketAddress("127.0.0.1", 4840));
+        this.commsManager = new CommsManager(54321, new InetSocketAddress("127.0.0.1", 4840));
         this.routingManager = RoutingManager.builder()
 
              /*unidirectional right side edges*/
@@ -76,7 +82,27 @@ public class Factory {
      */
 
     public void start() {
+        this.executor.submit(this.commsManager::startUdpServer);
 
+        this.running = true;
+        while(running) {
+            commandManager.pollRequests();
+        }
+    }
+
+    public void stop() {
+        this.running = false;
+        this.commsManager.stopUdpServer();
+
+        try {
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+        } finally {
+            if (!executor.isTerminated()) {
+                executor.shutdownNow();
+            }
+        }
     }
 
     /*
