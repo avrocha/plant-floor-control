@@ -1,11 +1,10 @@
 package ii.pfc.command.impl;
 
-import ii.pfc.command.impl.CommandRequestUnload;
+import ii.pfc.command.CommandRequest;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "Order")
 public class RequestOrderWrapper {
 
     @XmlAttribute(name = "Number")
@@ -21,16 +20,18 @@ public class RequestOrderWrapper {
 
      */
 
-    public void onReceive() {
+    public CommandRequest getRequest() {
         if (unload != null) {
             unload.orderId = orderId;
-            unload.onReceive();
+            return unload;
         }
 
         if (transform != null) {
             transform.orderId = orderId;
-            transform.onReceive();
+            return transform;
         }
+
+        return null;
     }
 
     /*

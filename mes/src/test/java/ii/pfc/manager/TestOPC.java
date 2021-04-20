@@ -15,7 +15,7 @@ import org.junit.Test;
 
 public class TestOPC {
 
-    private ICommsManager commsManager = new CommsManager(new InetSocketAddress("127.0.0.1", 4840));
+    private ICommsManager commsManager = new CommsManager(54321, new InetSocketAddress("127.0.0.1", 4840));
 
     @Test
     public void testRead() {

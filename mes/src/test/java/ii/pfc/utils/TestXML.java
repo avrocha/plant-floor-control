@@ -20,7 +20,7 @@ public class TestXML {
 
         try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("xml/unload.xml")) {
             RequestOrderWrapper wrapper = JAXB.unmarshal(stream, RequestOrderWrapper.class);
-            wrapper.onReceive();
+            logger.info(wrapper.getRequest().toString());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -32,7 +32,7 @@ public class TestXML {
 
         try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("xml/transform.xml")) {
             RequestOrderWrapper wrapper = JAXB.unmarshal(stream, RequestOrderWrapper.class);
-            wrapper.onReceive();
+            logger.info(wrapper.getRequest().toString());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
