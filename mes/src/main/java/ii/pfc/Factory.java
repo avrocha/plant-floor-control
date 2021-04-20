@@ -9,9 +9,16 @@ import ii.pfc.manager.ICommsManager;
 import ii.pfc.manager.IRoutingManager;
 import ii.pfc.manager.RoutingManager;
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public class Factory {
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    //
 
     public final ICommsManager commsManager;
     
@@ -19,10 +26,15 @@ public class Factory {
 
     private final ICommandManager commandManager;
 
+    //
+
     private boolean running = false;
+
+    //
 
     public Factory() {
         this.commsManager = new CommsManager(54321, new InetSocketAddress("127.0.0.1", 4840));
+        this.commandManager = new CommandManager(commsManager);
         this.routingManager = RoutingManager.builder()
 
              /*unidirectional right side edges*/
