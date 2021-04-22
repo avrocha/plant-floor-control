@@ -450,7 +450,7 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     @Override /*VERIFICAR*/
-    public void insertLoadOrder(LoadOrder loadOrder, Part part) {
+    public void insertLoadOrder(LoadOrder loadOrder) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -459,7 +459,7 @@ public class DatabaseManager implements IDatabaseManager {
                 sql.setInt(1, loadOrder.getOrderId());
                 sql.setInt(2, loadOrder.getConveyorId());
                 sql.setTimestamp(3, Timestamp.valueOf(loadOrder.getDate()));
-                sql.setString(4, part.getType().getName());
+                sql.setString(4, loadOrder.getType().getName());
             }
 
         } catch (SQLException ex) {

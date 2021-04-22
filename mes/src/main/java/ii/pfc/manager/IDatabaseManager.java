@@ -72,7 +72,7 @@ public interface IDatabaseManager {
 
     //
 
-    void insertLoadOrder(LoadOrder loadOrder, Part part);
+    void insertLoadOrder(LoadOrder loadOrder);
 
     void updateLoadOrderState(int orderId, LoadOrder.LoadState newState);
 
