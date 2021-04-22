@@ -4,9 +4,13 @@ import ii.pfc.manager.CommandManager;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.manager.CommsManager;
+import ii.pfc.manager.DatabaseManager;
 import ii.pfc.manager.ICommandManager;
 import ii.pfc.manager.ICommsManager;
+import ii.pfc.manager.IDatabaseManager;
+import ii.pfc.manager.IOrderManager;
 import ii.pfc.manager.IRoutingManager;
+import ii.pfc.manager.OrderManager;
 import ii.pfc.manager.RoutingManager;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
@@ -16,13 +20,17 @@ import java.util.function.Function;
 
 public class Factory {
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
     //
 
     public final ICommsManager commsManager;
+
+    private final IDatabaseManager databaseManager;
     
     public final IRoutingManager routingManager;
+
+    private final IOrderManager orderManager;
 
     private final ICommandManager commandManager;
 
@@ -34,7 +42,8 @@ public class Factory {
 
     public Factory() {
         this.commsManager = new CommsManager(54321, new InetSocketAddress("127.0.0.1", 4840));
-        this.commandManager = new CommandManager(commsManager);
+        this.databaseManager = new DatabaseManager();
+
         this.routingManager = RoutingManager.builder()
 
              /*unidirectional right side edges*/
@@ -87,24 +96,44 @@ public class Factory {
             .bidirectional(ROT42, ASM27, DEFAULT_WEIGHT)
             .bidirectional(ROT41, ASM28, DEFAULT_WEIGHT)
             .build();
+
+        this.orderManager = new OrderManager(this.databaseManager, this.routingManager);
+        this.commandManager = new CommandManager(commsManager, this.orderManager, this.databaseManager);
     }
 
     /*
 
      */
 
-    public void start() {
-        this.executor.submit(this.commsManager::startUdpServer);
+    private void mainTask() {
+        this.databaseManager.openConnection();
 
         this.running = true;
+        long lastDbPolls = 0;
+
         while(running) {
             commandManager.pollRequests();
+
+            if (System.currentTimeMillis() - lastDbPolls > 1000) {
+                lastDbPolls = System.currentTimeMillis();
+
+                orderManager.pollLoadOrders();
+                orderManager.pollUnloadOrders();
+                orderManager.pollTransformOrders();
+            }
         }
+    }
+
+    public void start() {
+        this.executor.submit(this.commsManager::startUdpServer);
+        this.executor.submit(this::mainTask);
     }
 
     public void stop() {
         this.running = false;
+
         this.commsManager.stopUdpServer();
+        this.databaseManager.closeConnection();
 
         try {
             executor.shutdown();

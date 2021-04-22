@@ -3,30 +3,41 @@ package ii.pfc.manager;
 import ii.pfc.order.LoadOrder;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
-
 import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class OrderManager implements IOrderManager{
+public class OrderManager implements IOrderManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderManager.class);
+
+    //
 
     private final IDatabaseManager databaseManager;
 
-    public OrderManager(IDatabaseManager databaseManager) {
+    private final IRoutingManager routingManager;
+
+    public OrderManager(IDatabaseManager databaseManager, IRoutingManager routingManager) {
         this.databaseManager = databaseManager;
+        this.routingManager = routingManager;
     }
 
     @Override
-    public Collection<LoadOrder> pollLoadOrders() {
-        return databaseManager.fetchLoadOrders(LoadOrder.LoadState.PENDING);
+    public void pollLoadOrders() {
+        Collection<LoadOrder> orders = databaseManager.fetchLoadOrders(LoadOrder.LoadState.PENDING);
+        logger.info("Load: {}", orders.toString());
     }
 
     @Override
-    public Collection<UnloadOrder> pollUnloadOrders() {
-        return databaseManager.fetchUnloadOrders(UnloadOrder.UnloadState.PENDING);
+    public void pollUnloadOrders() {
+        Collection<UnloadOrder> orders = databaseManager.fetchUnloadOrders(UnloadOrder.UnloadState.PENDING);
+        logger.info("Unload: {}", orders.toString());
     }
 
     @Override
-    public Collection<TransformationOrder> pollTransformOrders() {
-        return databaseManager.fetchTransformOrders(TransformationOrder.TransformationState.PENDING);
+    public void pollTransformOrders() {
+        Collection<TransformationOrder> orders = databaseManager.fetchTransformOrders(TransformationOrder.TransformationState.PENDING);
+        logger.info("Transformation: {}", orders.toString());
     }
 
     /*

@@ -2,6 +2,8 @@ package ii.pfc.command.impl;
 
 import ii.pfc.command.CommandRequest;
 import ii.pfc.manager.ICommandManager;
+import ii.pfc.manager.IDatabaseManager;
+import ii.pfc.manager.IOrderManager;
 import ii.pfc.order.UnloadOrder;
 import ii.pfc.part.PartType;
 import ii.pfc.part.xml.PartTypeAdapter;
@@ -37,7 +39,8 @@ public class CommandRequestUnload implements CommandRequest {
      */
 
     @Override
-    public void onReceive(ICommandManager commandManager, InetSocketAddress source) {
+    public void onReceive(ICommandManager commandManager, IOrderManager orderManager, IDatabaseManager databaseManager,
+        InetSocketAddress source) {
         UnloadOrder order = new UnloadOrder(
                 orderId,
                 partType,
@@ -47,7 +50,7 @@ public class CommandRequestUnload implements CommandRequest {
                 UnloadOrder.UnloadState.PENDING
         );
 
-        
+        orderManager.enqueueUnloadOrder(order);
     }
 
     /*

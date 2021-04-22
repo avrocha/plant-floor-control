@@ -89,7 +89,7 @@ public class DatabaseManager implements IDatabaseManager {
     public Collection<LoadOrder> fetchLoadOrders(LoadOrder.LoadState state) {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM load_order WHERE state=?;")) {
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM load_order WHERE state=?::load_order_state;")) {
                 sql.setString(1, state.name());
 
                 return _extractLoadOrders(sql.executeQuery());
@@ -143,7 +143,7 @@ public class DatabaseManager implements IDatabaseManager {
     public Collection<UnloadOrder> fetchUnloadOrders(UnloadOrder.UnloadState state) {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order WHERE state=?;")) {
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order WHERE state=?::unload_order_state;")) {
                 sql.setString(1, state.name());
 
                 return _extractUnloadOrders(sql.executeQuery());
@@ -198,7 +198,7 @@ public class DatabaseManager implements IDatabaseManager {
     public Collection<TransformationOrder> fetchTransformOrders(TransformationOrder.TransformationState state) {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order WHERE state=?;")) {
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order WHERE state=?::transform_order_state;")) {
                 sql.setString(1, state.name());
                 return _extractTransformationOrders(sql.executeQuery());
             }

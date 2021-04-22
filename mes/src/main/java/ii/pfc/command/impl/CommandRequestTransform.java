@@ -2,6 +2,8 @@ package ii.pfc.command.impl;
 
 import ii.pfc.command.CommandRequest;
 import ii.pfc.manager.ICommandManager;
+import ii.pfc.manager.IDatabaseManager;
+import ii.pfc.manager.IOrderManager;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.part.PartType;
 import ii.pfc.part.xml.PartTypeAdapter;
@@ -48,7 +50,8 @@ public class CommandRequestTransform implements CommandRequest {
      */
 
     @Override
-    public void onReceive(ICommandManager commandManager, InetSocketAddress source) {
+    public void onReceive(ICommandManager commandManager, IOrderManager orderManager, IDatabaseManager databaseManager,
+        InetSocketAddress source) {
         TransformationOrder order = new TransformationOrder(
                 orderId,
                 sourceType,
@@ -59,6 +62,8 @@ public class CommandRequestTransform implements CommandRequest {
                 penalty,
                 TransformationOrder.TransformationState.PENDING
         );
+
+        orderManager.enqueueTransformationOrder(order);
     }
 
     /*

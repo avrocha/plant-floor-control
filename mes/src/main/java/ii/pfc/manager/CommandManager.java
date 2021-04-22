@@ -15,16 +15,23 @@ import org.slf4j.LoggerFactory;
 
 public class CommandManager implements ICommandManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommsManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommandManager.class);
 
     //
 
     private final ICommsManager commsManager;
 
+    private final IOrderManager orderManager;
+
+    private final IDatabaseManager databaseManager;
+
     private final Queue<CommandRequestSource> requestQueue = new ArrayBlockingQueue<>(10);
 
-    public CommandManager(ICommsManager commsManager) {
+    public CommandManager(ICommsManager commsManager, IOrderManager orderManager, IDatabaseManager databaseManager) {
         this.commsManager = commsManager;
+        this.orderManager = orderManager;
+        this.databaseManager = databaseManager;
+
         this.commsManager.addUdpListener(this::enqueueRequest);
     }
 
@@ -70,7 +77,7 @@ public class CommandManager implements ICommandManager {
     public void pollRequests() {
         while(!this.requestQueue.isEmpty()) {
             CommandRequestSource requestSource = this.requestQueue.poll();
-            requestSource.request.onReceive(this, requestSource.source);
+            requestSource.request.onReceive(this, this.orderManager, this.databaseManager, requestSource.source);
         }
     }
 

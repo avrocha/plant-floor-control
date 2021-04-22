@@ -4,15 +4,13 @@ import ii.pfc.order.LoadOrder;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
 
-import java.util.Collection;
-
 public interface IOrderManager {
 
-    Collection<LoadOrder> pollLoadOrders();
+    void pollLoadOrders();
 
-    Collection<UnloadOrder> pollUnloadOrders();
+    void pollUnloadOrders();
 
-    Collection<TransformationOrder> pollTransformOrders();
+    void pollTransformOrders();
 
     /*
 
