@@ -1,12 +1,10 @@
 package ii.pfc.order;
 
 import ii.pfc.part.PartType;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-public class TransformationOrder {
+public class TransformationOrder implements Comparable<TransformationOrder> {
 
     private final int orderId;
 
@@ -24,7 +22,8 @@ public class TransformationOrder {
 
     private final TransformationState state;
 
-    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, LocalDateTime date, int quantity, LocalDateTime deadline, int penalty, TransformationState state) {
+    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, LocalDateTime date, int quantity,
+        LocalDateTime deadline, int penalty, TransformationState state) {
         this.orderId = orderId;
         this.sourceType = sourceType;
         this.targetType = targetType;
@@ -73,24 +72,34 @@ public class TransformationOrder {
         }
 
         Duration duration = Duration.between(deadline, currentDate);
-        return (int) (penalty * duration.toDays());
+        return (int) (penalty * Math.ceil((duration.toSeconds() / 50)));
     }
 
     public TransformationState getState() {
         return state;
     }
 
+    /*
+     */
+
+    @Override
+    public int compareTo(TransformationOrder o) {
+        LocalDateTime now = LocalDateTime.now();
+
+        return Integer.compare(computePenalty(now), o.computePenalty(now));
+    }
+
     @Override
     public String toString() {
         return "TransformationOrder{" +
-                "orderId=" + orderId +
-                ", sourceType=" + sourceType +
-                ", targetType=" + targetType +
-                ", date=" + date +
-                ", quantity=" + quantity +
-                ", deadline=" + deadline +
-                ", penalty=" + penalty +
-                '}';
+            "orderId=" + orderId +
+            ", sourceType=" + sourceType +
+            ", targetType=" + targetType +
+            ", date=" + date +
+            ", quantity=" + quantity +
+            ", deadline=" + deadline +
+            ", penalty=" + penalty +
+            '}';
     }
 
     /*

@@ -1,26 +1,20 @@
 package ii.pfc.part;
 
-import java.awt.Color;
 import java.util.UUID;
 
 public class Part {
 
     private final UUID id;
 
+    private final int orderId;
+
     private PartType type;
 
-    private Color color;
-
-    public Part(UUID id, PartType type) {
-        this(id, type, type.getDefaultColor());
-    }
-
-    public Part(UUID id, PartType type, Color color) {
+    public Part(UUID id, int orderId, PartType type) {
         this.id = id;
+        this.orderId = orderId;
         this.type = type;
-        this.color = color;
     }
-
     /*
 
      */
@@ -29,12 +23,12 @@ public class Part {
         return id;
     }
 
-    public PartType getType() {
-        return type;
+    public int getOrderId() {
+        return orderId;
     }
 
-    public Color getColor() {
-        return color;
+    public PartType getType() {
+        return type;
     }
 
     /*
@@ -44,9 +38,9 @@ public class Part {
     @Override
     public String toString() {
         return "Part{" +
-                "id=" + id +
-                ", type=" + type +
-                ", color=" + color +
-                '}';
+            "id=" + id +
+            ", orderId=" + orderId +
+            ", type=" + type +
+            '}';
     }
 }

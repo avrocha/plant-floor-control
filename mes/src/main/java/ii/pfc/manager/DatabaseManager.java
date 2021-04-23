@@ -1,9 +1,5 @@
 package ii.pfc.manager;
 
-import java.sql.*;
-import java.time.Duration;
-import java.util.*;
-
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.order.LoadOrder;
 import ii.pfc.order.TransformationOrder;
@@ -11,6 +7,17 @@ import ii.pfc.order.UnloadOrder;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.postgresql.util.PGInterval;
 import org.slf4j.Logger;
@@ -69,16 +76,28 @@ public class DatabaseManager implements IDatabaseManager {
 
      */
 
+    private Part _extractPart(ResultSet result) throws SQLException {
+        return new Part(
+            UUID.fromString(result.getString("id")),
+            result.getInt("order_id"),
+            PartType.getType(result.getString("type"))
+        );
+    }
+
+    /*
+
+     */
+
     private Collection<LoadOrder> _extractLoadOrders(ResultSet result) throws SQLException {
         List<LoadOrder> orders = new ArrayList<>();
 
         while (result.next()) {
             orders.add(new LoadOrder(
-                    result.getInt("order_id"),
-                    PartType.getType(result.getString("order_type")),
-                    result.getInt("conveyor_id"),
-                    result.getTimestamp("date").toLocalDateTime(),
-                    LoadOrder.LoadState.valueOf(result.getString("state"))
+                result.getInt("order_id"),
+                PartType.getType(result.getString("type")),
+                result.getInt("conveyor_id"),
+                result.getTimestamp("date").toLocalDateTime(),
+                LoadOrder.LoadState.valueOf(result.getString("state"))
             ));
         }
 
@@ -127,12 +146,12 @@ public class DatabaseManager implements IDatabaseManager {
 
         while (result.next()) {
             orders.add(new UnloadOrder(
-                    result.getInt("order_id"),
-                    PartType.getType(result.getString("type")),
-                    result.getInt("conveyor_id"),
-                    result.getTimestamp("date").toLocalDateTime(),
-                    result.getInt("quantity"),
-                    UnloadOrder.UnloadState.valueOf(result.getString("state"))
+                result.getInt("order_id"),
+                PartType.getType(result.getString("type")),
+                result.getInt("conveyor_id"),
+                result.getTimestamp("date").toLocalDateTime(),
+                result.getInt("quantity"),
+                UnloadOrder.UnloadState.valueOf(result.getString("state"))
             ));
         }
 
@@ -180,14 +199,14 @@ public class DatabaseManager implements IDatabaseManager {
 
         while (result.next()) {
             orders.add(new TransformationOrder(
-                    result.getInt("order_id"),
-                    PartType.getType(result.getString("source_type")),
-                    PartType.getType(result.getString("target_type")),
-                    result.getTimestamp("date").toLocalDateTime(),
-                    result.getInt("quantity"),
-                    result.getTimestamp("deadline").toLocalDateTime(),
-                    result.getInt("penalty"),
-                    TransformationOrder.TransformationState.valueOf(result.getString("state")))
+                result.getInt("order_id"),
+                PartType.getType(result.getString("source_type")),
+                PartType.getType(result.getString("target_type")),
+                result.getTimestamp("date").toLocalDateTime(),
+                result.getInt("quantity"),
+                result.getTimestamp("deadline").toLocalDateTime(),
+                result.getInt("penalty"),
+                TransformationOrder.TransformationState.valueOf(result.getString("state")))
             );
         }
 
@@ -198,7 +217,8 @@ public class DatabaseManager implements IDatabaseManager {
     public Collection<TransformationOrder> fetchTransformOrders(TransformationOrder.TransformationState state) {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order WHERE state=?::transform_order_state;")) {
+            try (PreparedStatement sql = connection
+                .prepareStatement("SELECT * FROM transform_order WHERE state=?::transform_order_state;")) {
                 sql.setString(1, state.name());
                 return _extractTransformationOrders(sql.executeQuery());
             }
@@ -239,10 +259,7 @@ public class DatabaseManager implements IDatabaseManager {
 
                 ResultSet result = sql.executeQuery();
                 if (result.next()) {
-                    return new Part(
-                            UUID.fromString(result.getString("id")),
-                            PartType.getType(result.getString("type"))
-                    );
+                    return _extractPart(result);
                 }
             }
 
@@ -263,13 +280,12 @@ public class DatabaseManager implements IDatabaseManager {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unloading_bay_log;")) {
+            try (PreparedStatement sql = connection.prepareStatement(
+                "SELECT * FROM unloading_bay_log ub INNER JOIN part p ON ub.unloading_part=p.id;"
+            )) {
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
-                    parts.add(new Part(
-                            UUID.fromString(result.getString("unloading_part")),
-                            PartType.getType(result.getString("unloading_type"))
-                    ));
+                    parts.add(_extractPart(result));
                 }
             }
 
@@ -290,7 +306,8 @@ public class DatabaseManager implements IDatabaseManager {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT duration FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
+            try (PreparedStatement sql = connection
+                .prepareStatement("SELECT duration FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
                     PGInterval interval = (PGInterval) result.getObject("duration");
@@ -329,7 +346,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                    "INSERT INTO process_log (assembler_id, duration, part_source_type, part_target_type, part_id) " +
+                "INSERT INTO process_log (assembler_id, duration, part_source_type, part_target_type, part_id) " +
                     "VALUES (?, '? seconds', ?, ?, ?) "
             )) {
                 sql.setInt(1, assembler.getId());
@@ -351,7 +368,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                    "INSERT INTO unloading_bay_log (conveyor_id, unloading_part, unloading_type) " +
+                "INSERT INTO unloading_bay_log (conveyor_id, unloading_part, unloading_type) " +
                     "VALUES (?, ?, ?) "
             )) {
                 sql.setInt(1, order.getConveyorId());
@@ -374,7 +391,8 @@ public class DatabaseManager implements IDatabaseManager {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("INSERT INTO transform_order (order_id, date, quantity, penalty, source_type, target_type, deadline) " +
+            try (PreparedStatement sql = connection
+                .prepareStatement("INSERT INTO transform_order (order_id, date, quantity, penalty, source_type, target_type, deadline) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?) ")) {
                 sql.setInt(1, transformationOrder.getOrderId());
                 sql.setTimestamp(2, Timestamp.valueOf(transformationOrder.getDate()));
@@ -415,7 +433,8 @@ public class DatabaseManager implements IDatabaseManager {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("INSERT INTO unload_order (order_id, conveyor_id, date, quantity, type) " +
+            try (PreparedStatement sql = connection
+                .prepareStatement("INSERT INTO unload_order (order_id, conveyor_id, date, quantity, type) " +
                     "VALUES (?, ?, ?, ?, ?) ")) {
                 sql.setInt(1, unloadOrder.getOrderId());
                 sql.setInt(2, unloadOrder.getConveyorId());
@@ -455,7 +474,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement("INSERT INTO load_order (order_id, conveyor_id, date, type) " +
-                    "VALUES (?, ?, ?, ?) ")) {
+                "VALUES (?, ?, ?, ?) ")) {
                 sql.setInt(1, loadOrder.getOrderId());
                 sql.setInt(2, loadOrder.getConveyorId());
                 sql.setTimestamp(3, Timestamp.valueOf(loadOrder.getDate()));

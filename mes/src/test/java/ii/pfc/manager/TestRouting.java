@@ -31,7 +31,7 @@ public class TestRouting extends TestCase {
 
     @Test
     public void testRoutes() {
-        Part part = new Part(UUID.randomUUID(), PartType.PART_1);
+        Part part = new Part(UUID.randomUUID(), 0, PartType.PART_1);
         Route route = this.factory.routingManager.traceRoute(null, this.factory.LIN8, this.factory.LIN7);
 
         try (PlcConnection plcConnection = this.factory.commsManager.getPlcConnection()) {
