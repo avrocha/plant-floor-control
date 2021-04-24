@@ -1,8 +1,8 @@
 package ii.pfc;
 
-import ii.pfc.manager.CommandManager;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
+import ii.pfc.manager.CommandManager;
 import ii.pfc.manager.CommsManager;
 import ii.pfc.manager.DatabaseManager;
 import ii.pfc.manager.ICommandManager;
@@ -12,11 +12,22 @@ import ii.pfc.manager.IOrderManager;
 import ii.pfc.manager.IRoutingManager;
 import ii.pfc.manager.OrderManager;
 import ii.pfc.manager.RoutingManager;
+import ii.pfc.shell.ShellCommand;
+import ii.pfc.shell.impl.ShellCommandInventory;
+import ii.pfc.shell.impl.ShellCommandStop;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Factory {
 
@@ -99,6 +110,9 @@ public class Factory {
 
         this.orderManager = new OrderManager(this.databaseManager, this.routingManager);
         this.commandManager = new CommandManager(commsManager, this.orderManager, this.databaseManager);
+
+        this.registerShellCommand(new ShellCommandStop(this));
+        this.registerShellCommand(new ShellCommandInventory(this.databaseManager));
     }
 
     /*
@@ -124,9 +138,37 @@ public class Factory {
         }
     }
 
+    private void shellTask() {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+
+            do {
+                String cmd = reader.readLine();
+
+                String[] split = cmd.split(" ");
+
+                ShellCommand command = commands.get(split[0].toLowerCase());
+                if (command == null) {
+                    System.out.println("Invalid command.");
+                    continue;
+                }
+
+                command.dispatchCommand(Arrays.copyOfRange(split, 1, split.length));
+            } while(this.running);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+
+     */
+
     public void start() {
         this.executor.submit(this.commsManager::startUdpServer);
         this.executor.submit(this::mainTask);
+
+        this.shellTask();
     }
 
     public void stop() {
@@ -144,6 +186,16 @@ public class Factory {
                 executor.shutdownNow();
             }
         }
+    }
+
+    /*
+
+     */
+
+    private final Map<String, ShellCommand> commands = new HashMap<>();
+
+    private void registerShellCommand(ShellCommand command) {
+        commands.put(command.getName().toLowerCase(),command);
     }
 
     /*

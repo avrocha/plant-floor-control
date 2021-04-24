@@ -78,7 +78,7 @@ public class DatabaseManager implements IDatabaseManager {
 
     private Part _extractPart(ResultSet result) throws SQLException {
         return new Part(
-            UUID.fromString(result.getString("id")),
+            result.getObject("id", UUID.class),
             result.getInt("order_id"),
             PartType.getType(result.getString("type"))
         );
@@ -255,7 +255,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM part WHERE id = ?;")) {
-                sql.setString(1, id.toString());
+                sql.setObject(1, id);
 
                 ResultSet result = sql.executeQuery();
                 if (result.next()) {
@@ -326,22 +326,74 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     @Override
-    public void updatePartType(UUID partId, PartType type) {
+    public boolean clearAllParts() {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("UPDATE part SET type=? where id=?;")) {
-                sql.setString(1, type.getName());
-                sql.setString(2, partId.toString());
+            try (PreparedStatement sql = connection.prepareStatement("DELETE FROM part;")) {
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+
+        return false;
+
+    }
+
+    /*
+
+     */
+
+    @Override
+    public boolean insertPart(Part part) {
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement(
+                "INSERT INTO part (id, order_id, type) " +
+                    "VALUES (?, ?, ?) "
+            )) {
+                sql.setObject(1, part.getId());
+                sql.setInt(2, part.getOrderId());
+                sql.setString(3, part.getType().getName());
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /*
+
+     */
+
+    @Override
+    public boolean updatePartType(UUID partId, PartType type) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE part SET type=? where id=?;")) {
+                sql.setString(1, type.getName());
+                sql.setObject(2, partId);
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
     }
 
     @Override
-    public void insertProcessLog(Process process, Conveyor assembler, Part part) {
+    public boolean insertProcessLog(Process process, Conveyor assembler, Part part) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -353,17 +405,21 @@ public class DatabaseManager implements IDatabaseManager {
                 sql.setInt(2, (int) process.getDuration().toSeconds());
                 sql.setString(3, process.getSource().getName());
                 sql.setString(4, process.getResult().getName());
-                sql.setString(5, part.getId().toString());
+                sql.setObject(5, part.getId());
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
+        return false;
+
     }
 
     @Override
-    public void insertUnloadingBayLog(UnloadOrder order, Part part) {
+    public boolean insertUnloadingBayLog(UnloadOrder order, Part part) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -372,13 +428,17 @@ public class DatabaseManager implements IDatabaseManager {
                     "VALUES (?, ?, ?) "
             )) {
                 sql.setInt(1, order.getConveyorId());
-                sql.setString(2, part.getId().toString());
+                sql.setObject(2, part.getId());
                 sql.setString(3, order.getPartType().getName());
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+
+        return false;
 
     }
 
@@ -387,7 +447,7 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     @Override /*VERIFICAR*/
-    public void insertTransformOrder(TransformationOrder transformationOrder) {
+    public boolean insertTransformOrder(TransformationOrder transformationOrder) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -401,27 +461,35 @@ public class DatabaseManager implements IDatabaseManager {
                 sql.setString(5, transformationOrder.getSourceType().getName());
                 sql.setString(6, transformationOrder.getTargetType().getName());
                 sql.setTimestamp(7, Timestamp.valueOf(transformationOrder.getDeadline()));
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
+        return false;
+
     }
 
     @Override
-    public void updateTransformOrderState(int orderId, TransformationOrder.TransformationState newState) {
+    public boolean updateTransformOrderState(int orderId, TransformationOrder.TransformationState newState) {
 
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement("UPDATE transform_order SET state=? where order_id=?;")) {
                 sql.setInt(1, orderId);
                 sql.setString(2, newState.name());
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+
+        return false;
     }
 
     /*
@@ -429,7 +497,7 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     @Override /*VERIFICAR*/
-    public void insertUnloadOrder(UnloadOrder unloadOrder) {
+    public boolean insertUnloadOrder(UnloadOrder unloadOrder) {
 
         try (Connection connection = dataSource.getConnection()) {
 
@@ -441,27 +509,35 @@ public class DatabaseManager implements IDatabaseManager {
                 sql.setTimestamp(3, Timestamp.valueOf(unloadOrder.getDate()));
                 sql.setInt(4, unloadOrder.getQuantity());
                 sql.setString(1, unloadOrder.getPartType().getName());
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
+        return false;
+
     }
 
     @Override
-    public void updateUnloadOrderState(int orderId, UnloadOrder.UnloadState newState) {
+    public boolean updateUnloadOrderState(int orderId, UnloadOrder.UnloadState newState) {
 
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement("UPDATE unload_order SET state=? where order_id=?;")) {
                 sql.setInt(1, orderId);
                 sql.setString(2, newState.name());
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+
+        return false;
     }
 
     /*
@@ -469,36 +545,45 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     @Override /*VERIFICAR*/
-    public void insertLoadOrder(LoadOrder loadOrder) {
+    public boolean insertLoadOrder(LoadOrder loadOrder) {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("INSERT INTO load_order (order_id, conveyor_id, date, type) " +
-                "VALUES (?, ?, ?, ?) ")) {
+            try (PreparedStatement sql = connection.prepareStatement("INSERT INTO load_order (order_id, conveyor_id, date, type, state) " +
+                "VALUES (?, ?, ?, ?, ?) ")) {
                 sql.setInt(1, loadOrder.getOrderId());
                 sql.setInt(2, loadOrder.getConveyorId());
                 sql.setTimestamp(3, Timestamp.valueOf(loadOrder.getDate()));
                 sql.setString(4, loadOrder.getType().getName());
+                sql.setString(5, loadOrder.getState().name());
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
+        return false;
+
     }
 
     @Override
-    public void updateLoadOrderState(int orderId, LoadOrder.LoadState newState) {
+    public boolean updateLoadOrderState(int orderId, LoadOrder.LoadState newState) {
 
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement("UPDATE load_order SET state=? where order_id=?;")) {
                 sql.setInt(1, orderId);
                 sql.setString(2, newState.name());
+                sql.executeUpdate();
+                return true;
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+
+        return false;
     }
 }

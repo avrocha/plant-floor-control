@@ -3,7 +3,9 @@ package ii.pfc.manager;
 import ii.pfc.order.LoadOrder;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
+import ii.pfc.part.Part;
 import java.util.Collection;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,19 +27,26 @@ public class OrderManager implements IOrderManager {
     @Override
     public void pollLoadOrders() {
         Collection<LoadOrder> orders = databaseManager.fetchLoadOrders(LoadOrder.LoadState.PENDING);
-        logger.info("Load: {}", orders.toString());
+
+        for(LoadOrder order : orders) {
+            if (databaseManager.updateLoadOrderState(order.getOrderId(), LoadOrder.LoadState.IN_PROGRESS)) {
+                Part part = new Part(UUID.randomUUID(), 0, order.getType());
+
+                if (!databaseManager.insertPart(part)) {
+                    logger.error("Could not insert part in the database!");
+                }
+            }
+        }
     }
 
     @Override
     public void pollUnloadOrders() {
         Collection<UnloadOrder> orders = databaseManager.fetchUnloadOrders(UnloadOrder.UnloadState.PENDING);
-        logger.info("Unload: {}", orders.toString());
     }
 
     @Override
     public void pollTransformOrders() {
         Collection<TransformationOrder> orders = databaseManager.fetchTransformOrders(TransformationOrder.TransformationState.PENDING);
-        logger.info("Transformation: {}", orders.toString());
     }
 
     /*

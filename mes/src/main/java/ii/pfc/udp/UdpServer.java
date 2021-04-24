@@ -53,6 +53,7 @@ public class UdpServer {
 
     public void close() {
         this.running = false;
+        this.socket.close();
     }
 
     private void listenForPackets() {
@@ -67,6 +68,7 @@ public class UdpServer {
                 for (UdpListener udpListener : this.udpListeners) {
                     udpListener.onReceive(data, address);
                 }
+            } catch (SocketException ignored) {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

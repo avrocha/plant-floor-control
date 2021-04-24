@@ -56,29 +56,33 @@ public interface IDatabaseManager {
 
      */
 
-    void updatePartType(UUID partId, PartType type);
+    boolean clearAllParts();
+
+    boolean insertPart(Part part);
+
+    boolean updatePartType(UUID partId, PartType type);
 
     //
 
-    void insertProcessLog(Process process, Conveyor assembler, Part part);
+    boolean insertProcessLog(Process process, Conveyor assembler, Part part);
 
-    void insertUnloadingBayLog(UnloadOrder order, Part part);
-
-    //
-
-    void insertUnloadOrder(UnloadOrder unloadOrder);
-
-    void updateUnloadOrderState(int orderId, UnloadOrder.UnloadState newState);
+    boolean insertUnloadingBayLog(UnloadOrder order, Part part);
 
     //
 
-    void insertLoadOrder(LoadOrder loadOrder);
+    boolean insertUnloadOrder(UnloadOrder unloadOrder);
 
-    void updateLoadOrderState(int orderId, LoadOrder.LoadState newState);
+    boolean updateUnloadOrderState(int orderId, UnloadOrder.UnloadState newState);
 
     //
 
-    void insertTransformOrder(TransformationOrder transformationOrder);
+    boolean insertLoadOrder(LoadOrder loadOrder);
 
-    void updateTransformOrderState(int orderId, TransformationOrder.TransformationState newState);
+    boolean updateLoadOrderState(int orderId, LoadOrder.LoadState newState);
+
+    //
+
+    boolean insertTransformOrder(TransformationOrder transformationOrder);
+
+    boolean updateTransformOrderState(int orderId, TransformationOrder.TransformationState newState);
 }
