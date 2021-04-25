@@ -10,13 +10,13 @@ public class LoadOrder {
 
     private final PartType type;
 
-    private final int conveyorId;
+    private final short conveyorId;
 
     private final LocalDateTime date;
 
     private final LoadState state;
 
-    public LoadOrder(int orderId, PartType type, int conveyorId, LocalDateTime date, LoadState state){
+    public LoadOrder(int orderId, PartType type, short conveyorId, LocalDateTime date, LoadState state){
         this.orderId = orderId;
         this.type = type;
         this.conveyorId = conveyorId;
@@ -36,7 +36,7 @@ public class LoadOrder {
         return type;
     }
 
-    public int getConveyorId() {
+    public short getConveyorId() {
         return conveyorId;
     }
 

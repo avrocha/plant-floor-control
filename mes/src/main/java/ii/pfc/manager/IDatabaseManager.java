@@ -46,6 +46,8 @@ public interface IDatabaseManager {
 
     Part fetchPart(UUID id);
 
+    Collection<Part> fetchStoredParts(PartType type, int limit);
+
     Collection<Part> fetchUnloadedParts();
 
     //

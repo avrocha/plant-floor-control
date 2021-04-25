@@ -15,9 +15,9 @@ public class CommandRequestLoad implements CommandRequest {
 
     private final int orderId;
 
-    private final int conveyorId;
+    private final short conveyorId;
 
-    public CommandRequestLoad(int orderId, int conveyorId) {
+    public CommandRequestLoad(int orderId, short conveyorId) {
         this.orderId = orderId;
         this.conveyorId = conveyorId;
     }
@@ -34,7 +34,7 @@ public class CommandRequestLoad implements CommandRequest {
 
         switch(conveyorId) {
             // TODO
-            case 3: {
+            case 1: {
                 type = PartType.PART_2;
                 break;
             }

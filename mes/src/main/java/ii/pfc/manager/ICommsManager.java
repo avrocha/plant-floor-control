@@ -1,5 +1,6 @@
 package ii.pfc.manager;
 
+import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
 import java.net.InetSocketAddress;
@@ -21,6 +22,8 @@ public interface ICommsManager {
      */
 
     PlcConnection getPlcConnection() throws PlcConnectionException;
+
+    boolean getLoadConveyorStatus(short conveyorId);
 
     void sendPlcRoute(Route route);
 

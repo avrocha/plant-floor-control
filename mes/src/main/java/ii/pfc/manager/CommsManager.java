@@ -1,14 +1,21 @@
 package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
+import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
 import ii.pfc.udp.UdpServer;
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
+import org.apache.plc4x.java.api.messages.PlcReadRequest;
+import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteRequest;
+import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,22 +79,40 @@ public class CommsManager implements ICommsManager {
     }
 
     @Override
+    public boolean getLoadConveyorStatus(short conveyorId) {
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
+
+            String fieldName = "Sensor";
+            builder.addItem(fieldName,
+                String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CLD%d.ReadyToReceive"));
+
+            PlcReadRequest readRequest = builder.build();
+            PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
+
+            if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+                return response.getBoolean(fieldName);
+            }
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
     public void sendPlcRoute(Route route) {
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
 
-            StringBuilder serializedRoute = new StringBuilder();
-            serializedRoute = serializedRoute.append(route.getPart().getId().toString());
-
+            int i = 1;
             for (Conveyor conveyor : route.getConveyors()) {
-                serializedRoute = serializedRoute.append(',').append(conveyor.getId());
+                builder.addItem(String.format("Conveyor[%d]", i), String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RoutePart.route[%d]", i), conveyor.getId());
+                i++;
             }
-
-            builder.addItem(
-                "RouteData",
-                "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData",
-                serializedRoute.toString()
-            );
+            builder.addItem("ID", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RoutePart.checkPart", true);
 
             PlcWriteRequest writeRequest = builder.build();
 

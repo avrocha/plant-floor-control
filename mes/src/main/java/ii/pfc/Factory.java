@@ -1,5 +1,7 @@
 package ii.pfc;
 
+import com.google.common.base.Stopwatch;
+import ii.pfc.command.impl.CommandRequestLoad;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.manager.CommandManager;
@@ -26,8 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Factory {
 
@@ -108,7 +108,7 @@ public class Factory {
             .bidirectional(ROT41, ASM28, DEFAULT_WEIGHT)
             .build();
 
-        this.orderManager = new OrderManager(this.databaseManager, this.routingManager);
+        this.orderManager = new OrderManager(commsManager, this.databaseManager, this.routingManager);
         this.commandManager = new CommandManager(commsManager, this.orderManager, this.databaseManager);
 
         this.registerShellCommand(new ShellCommandStop(this));
@@ -119,17 +119,35 @@ public class Factory {
 
      */
 
+    private static short LOAD_ORDER_ID = 1;
+
     private void mainTask() {
         this.databaseManager.openConnection();
 
         this.running = true;
-        long lastDbPolls = 0;
+
+        Stopwatch opcPollTimer = Stopwatch.createStarted();
+        Stopwatch dbPollTimer = Stopwatch.createStarted();
 
         while(running) {
             commandManager.pollRequests();
 
-            if (System.currentTimeMillis() - lastDbPolls > 1000) {
-                lastDbPolls = System.currentTimeMillis();
+            if (opcPollTimer.elapsed(TimeUnit.MILLISECONDS) > 100) {
+                opcPollTimer.reset();
+
+                short[] loadConveyors = { 1, 5 };
+                for(short conveyorId : loadConveyors) {
+                    boolean hasPart = commsManager.getLoadConveyorStatus(conveyorId);
+
+                    if (hasPart) {
+                        CommandRequestLoad request = new CommandRequestLoad(LOAD_ORDER_ID++, conveyorId);
+                        request.onReceive(commandManager, orderManager, databaseManager, null);
+                    }
+                }
+            }
+
+            if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 1000) {
+                dbPollTimer.reset();
 
                 orderManager.pollLoadOrders();
                 orderManager.pollUnloadOrders();
@@ -211,12 +229,12 @@ public class Factory {
     public Conveyor LIN4 = new Conveyor(4, EnumConveyorType.LINEAR);
     public Conveyor LIN5 = new Conveyor(5, EnumConveyorType.LINEAR);
     public Conveyor LIN6 = new Conveyor(6, EnumConveyorType.LINEAR);
-    public Conveyor LIN7 = new Conveyor(7, EnumConveyorType.LINEAR);
-    public Conveyor LIN8 = new Conveyor(8, EnumConveyorType.LINEAR);
+    public Conveyor LIN7 = new Conveyor(7, EnumConveyorType.WAREHOUSE_IN);
+    public Conveyor LIN8 = new Conveyor(8, EnumConveyorType.WAREHOUSE_OUT);
     public Conveyor LIN9 = new Conveyor(9, EnumConveyorType.LINEAR);
-    public Conveyor LIN10 = new Conveyor(10, EnumConveyorType.LINEAR);
+    public Conveyor LIN10 = new Conveyor(10, EnumConveyorType.WAREHOUSE_OUT);
     public Conveyor LIN11 = new Conveyor(11, EnumConveyorType.LINEAR);
-    public Conveyor LIN12 = new Conveyor(12, EnumConveyorType.LINEAR);
+    public Conveyor LIN12 = new Conveyor(12, EnumConveyorType.WAREHOUSE_IN);
 
     /*ROTATIVE*/
     public Conveyor ROT31 = new Conveyor(31, EnumConveyorType.ROTATIVE);

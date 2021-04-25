@@ -1,9 +1,12 @@
 package ii.pfc.manager;
 
+import ii.pfc.conveyor.Conveyor;
+import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.order.LoadOrder;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
 import ii.pfc.part.Part;
+import ii.pfc.route.Route;
 import java.util.Collection;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -15,11 +18,14 @@ public class OrderManager implements IOrderManager {
 
     //
 
+    private final ICommsManager commsManager;
+
     private final IDatabaseManager databaseManager;
 
     private final IRoutingManager routingManager;
 
-    public OrderManager(IDatabaseManager databaseManager, IRoutingManager routingManager) {
+    public OrderManager(ICommsManager commsManager, IDatabaseManager databaseManager, IRoutingManager routingManager) {
+        this.commsManager = commsManager;
         this.databaseManager = databaseManager;
         this.routingManager = routingManager;
     }
@@ -29,12 +35,26 @@ public class OrderManager implements IOrderManager {
         Collection<LoadOrder> orders = databaseManager.fetchLoadOrders(LoadOrder.LoadState.PENDING);
 
         for(LoadOrder order : orders) {
-            if (databaseManager.updateLoadOrderState(order.getOrderId(), LoadOrder.LoadState.IN_PROGRESS)) {
-                Part part = new Part(UUID.randomUUID(), 0, order.getType());
+            Part part = new Part(UUID.randomUUID(), 0, order.getType());
+            Conveyor source = routingManager.getConveyor(order.getConveyorId());
 
-                if (!databaseManager.insertPart(part)) {
-                    logger.error("Could not insert part in the database!");
+            for(Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
+                Route route = routingManager.traceRoute(part, source, target);
+
+                if (route == null) {
+                    continue;
                 }
+
+                commsManager.sendPlcRoute(route);
+
+                if (databaseManager.updateLoadOrderState(order.getOrderId(), LoadOrder.LoadState.IN_PROGRESS)) {
+
+                    if (!databaseManager.insertPart(part)) {
+                        logger.error("Could not insert part in the database!");
+                    }
+                }
+
+                break;
             }
         }
     }
@@ -42,6 +62,27 @@ public class OrderManager implements IOrderManager {
     @Override
     public void pollUnloadOrders() {
         Collection<UnloadOrder> orders = databaseManager.fetchUnloadOrders(UnloadOrder.UnloadState.PENDING);
+
+        for(UnloadOrder order : orders) {
+            Collection<Part> parts = databaseManager.fetchStoredParts(order.getPartType(), order.getQuantity());
+            for(Part part : parts) {
+                outer : for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
+                    for(Conveyor target : routingManager.getConveyors(EnumConveyorType.SLIDER)) {
+                        Route route = routingManager.traceRoute(part, source, target);
+
+                        if (route == null) {
+                            continue;
+                        }
+
+                        if (databaseManager.updateUnloadOrderState(order.getOrderId(), UnloadOrder.UnloadState.IN_PROGRESS)) {
+                            commsManager.sendPlcRoute(route);
+                        }
+
+                        continue outer;
+                    }
+                }
+            }
+        }
     }
 
     @Override

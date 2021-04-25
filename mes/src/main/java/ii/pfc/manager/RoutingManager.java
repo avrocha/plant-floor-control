@@ -1,10 +1,16 @@
 package ii.pfc.manager;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import ii.pfc.conveyor.Conveyor;
+import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.part.Part;
 import ii.pfc.route.Route;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -25,6 +31,10 @@ public class RoutingManager implements IRoutingManager {
 
     private Graph<Conveyor, ConveyorEdge> regionGraph;
 
+    private final Map<Short, Conveyor> conveyorIdMap = new HashMap<>();
+
+    private final Multimap<EnumConveyorType, Conveyor> conveyorTypeMap = HashMultimap.create();
+
     private RoutingManager(Graph<Conveyor, ConveyorEdge> graph) {
         this.regionGraph = new AsWeightedGraph<>(
                 graph,
@@ -36,6 +46,25 @@ public class RoutingManager implements IRoutingManager {
                 return testEdge.getWeight();
             }
         };
+
+        for(Conveyor conveyor : this.regionGraph.vertexSet()) {
+            conveyorIdMap.put(conveyor.getId(), conveyor);
+            conveyorTypeMap.put(conveyor.getType(), conveyor);
+        }
+    }
+
+    /*
+
+     */
+
+    @Override
+    public Conveyor getConveyor(short conveyorId) {
+        return conveyorIdMap.get(conveyorId);
+    }
+
+    @Override
+    public Collection<Conveyor> getConveyors(EnumConveyorType conveyorType) {
+        return conveyorTypeMap.get(conveyorType);
     }
 
     /*

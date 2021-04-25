@@ -95,7 +95,7 @@ public class DatabaseManager implements IDatabaseManager {
             orders.add(new LoadOrder(
                 result.getInt("order_id"),
                 PartType.getType(result.getString("type")),
-                result.getInt("conveyor_id"),
+                result.getShort("conveyor_id"),
                 result.getTimestamp("date").toLocalDateTime(),
                 LoadOrder.LoadState.valueOf(result.getString("state"))
             ));
@@ -268,6 +268,35 @@ public class DatabaseManager implements IDatabaseManager {
         }
 
         return null;
+    }
+
+    /*
+
+     */
+
+    @Override
+    public Collection<Part> fetchStoredParts(PartType type, int limit) {
+        List<Part> parts = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement(
+                "SELECT * FROM part WHERE type=? LIMIT ?;"
+            )) {
+                sql.setString(1, type.getName());
+                sql.setInt(2, limit);
+
+                ResultSet result = sql.executeQuery();
+                while (result.next()) {
+                    parts.add(_extractPart(result));
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return parts;
     }
 
     /*
