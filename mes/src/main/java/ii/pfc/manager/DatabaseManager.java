@@ -507,9 +507,9 @@ public class DatabaseManager implements IDatabaseManager {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("UPDATE transform_order SET state=? where order_id=?;")) {
-                sql.setInt(1, orderId);
-                sql.setString(2, newState.name());
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE transform_order SET state=?::transform_order_state where order_id=?;")) {
+                sql.setString(1, newState.name());
+                sql.setInt(2, orderId);
                 sql.executeUpdate();
                 return true;
             }
@@ -555,9 +555,9 @@ public class DatabaseManager implements IDatabaseManager {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("UPDATE unload_order SET state=? where order_id=?;")) {
-                sql.setInt(1, orderId);
-                sql.setString(2, newState.name());
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE unload_order SET state=?::unload_order_state where order_id=?;")) {
+                sql.setString(1, newState.name());
+                sql.setInt(2, orderId);
                 sql.executeUpdate();
                 return true;
             }
@@ -579,7 +579,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement("INSERT INTO load_order (order_id, conveyor_id, date, type, state) " +
-                "VALUES (?, ?, ?, ?, ?) ")) {
+                "VALUES (?, ?, ?, ?, ?::load_order_state) ")) {
                 sql.setInt(1, loadOrder.getOrderId());
                 sql.setInt(2, loadOrder.getConveyorId());
                 sql.setTimestamp(3, Timestamp.valueOf(loadOrder.getDate()));
@@ -602,9 +602,9 @@ public class DatabaseManager implements IDatabaseManager {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("UPDATE load_order SET state=? where order_id=?;")) {
-                sql.setInt(1, orderId);
-                sql.setString(2, newState.name());
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE load_order SET state=?::load_order_state where order_id=?;")) {
+                sql.setString(1, newState.name());
+                sql.setInt(2, orderId);
                 sql.executeUpdate();
                 return true;
             }
