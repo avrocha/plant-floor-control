@@ -537,7 +537,7 @@ public class DatabaseManager implements IDatabaseManager {
                 sql.setInt(2, unloadOrder.getConveyorId());
                 sql.setTimestamp(3, Timestamp.valueOf(unloadOrder.getDate()));
                 sql.setInt(4, unloadOrder.getQuantity());
-                sql.setString(1, unloadOrder.getPartType().getName());
+                sql.setString(5, unloadOrder.getPartType().getName());
                 sql.executeUpdate();
                 return true;
             }
