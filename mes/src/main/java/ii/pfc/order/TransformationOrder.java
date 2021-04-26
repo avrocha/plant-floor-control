@@ -16,22 +16,25 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
 
     private final int quantity;
 
+    private final int remaining;
+
+    private final int completed;
+
     private final LocalDateTime deadline;
 
     private final int penalty;
 
-    private final TransformationState state;
-
     public TransformationOrder(int orderId, PartType sourceType, PartType targetType, LocalDateTime date, int quantity,
-        LocalDateTime deadline, int penalty, TransformationState state) {
+                               int remaining, int completed, LocalDateTime deadline, int penalty) {
         this.orderId = orderId;
         this.sourceType = sourceType;
         this.targetType = targetType;
         this.date = date;
         this.quantity = quantity;
+        this.remaining = remaining;
+        this.completed = completed;
         this.deadline = deadline;
         this.penalty = penalty;
-        this.state = state;
     }
 
     /*
@@ -58,6 +61,14 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
         return quantity;
     }
 
+    public int getRemaining() {
+        return remaining;
+    }
+
+    public int getCompleted() {
+        return completed;
+    }
+
     public LocalDateTime getDeadline() {
         return deadline;
     }
@@ -73,10 +84,6 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
 
         Duration duration = Duration.between(deadline, currentDate);
         return (int) (penalty * Math.ceil((duration.toSeconds() / 50)));
-    }
-
-    public TransformationState getState() {
-        return state;
     }
 
     /*
@@ -100,14 +107,6 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
             ", deadline=" + deadline +
             ", penalty=" + penalty +
             '}';
-    }
-
-    /*
-
-     */
-
-    public static enum TransformationState {
-        PENDING, IN_PROGRESS, COMPLETED
     }
 }
 

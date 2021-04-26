@@ -57,7 +57,7 @@ public class Part {
 
     public static enum PartState {
 
-        STORED, SPAWNED
+        STORED, PROCESSING, UNLOADING, COMPLETED
 
     }
 }

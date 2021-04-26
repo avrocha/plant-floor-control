@@ -44,6 +44,23 @@ public class CommandRequestTransform implements CommandRequest {
     @XmlAttribute(name = "Penalty")
     private int penalty;
 
+    /*
+
+     */
+
+    public CommandRequestTransform() {
+
+    }
+
+    public CommandRequestTransform(int orderId, PartType sourceType, PartType targetType, int time, int quantity, int deadline, int penalty) {
+        this.orderId = orderId;
+        this.sourceType = sourceType;
+        this.targetType = targetType;
+        this.time = time;
+        this.quantity = quantity;
+        this.deadline = deadline;
+        this.penalty = penalty;
+    }
 
     /*
 
@@ -58,9 +75,10 @@ public class CommandRequestTransform implements CommandRequest {
                 targetType,
                 LocalDateTime.now(),
                 quantity,
+                quantity,
+                0,
                 LocalDateTime.now().plusSeconds(deadline),
-                penalty,
-                TransformationOrder.TransformationState.PENDING
+                penalty
         );
 
         orderManager.enqueueTransformationOrder(order);

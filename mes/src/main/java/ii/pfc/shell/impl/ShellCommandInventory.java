@@ -1,12 +1,17 @@
 package ii.pfc.shell.impl;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import ii.pfc.manager.IDatabaseManager;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.shell.ShellCommand;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class ShellCommandInventory extends ShellCommand {
@@ -28,6 +33,53 @@ public class ShellCommandInventory extends ShellCommand {
                 if (!databaseManager.clearAllParts()) {
                     logger.error("Something went wrong.");
                     return true;
+                }
+
+                logger.info("Completed in {}", stopwatch.stop().toString());
+
+                return true;
+            }
+        });
+
+        registerSubcommand(new ShellCommand("list", "Lists all the inventory") {
+            @Override
+            public boolean onCommand(String[] args) {
+
+                Stopwatch stopwatch = Stopwatch.createStarted();
+                logger.info("Fetching database inventory parts...");
+
+                Collection<Part> parts = databaseManager.fetchParts();
+                Map<Part.PartState, Multimap<PartType, Part>> stateMap = new HashMap<>();
+
+                for(Part part : parts) {
+                    Part.PartState state = part.getState();
+                    Multimap<PartType, Part> typeMap = stateMap.get(state);
+
+                    if (typeMap == null) {
+                        typeMap = HashMultimap.create();
+                        stateMap.put(state, typeMap);
+                    }
+
+                    typeMap.put(part.getType(), part);
+                }
+
+                for(PartType type : PartType.getTypes()) {
+                    if (type.isUnknown()) {
+                        continue;
+                    }
+
+                    StringBuilder builder = new StringBuilder().append(type.getName()).append(" - ");
+                    for(Part.PartState state : Part.PartState.values()) {
+                        int count = 0;
+
+                        if (stateMap.containsKey(state)) {
+                            count = stateMap.get(state).get(type).size();
+                        }
+
+                        builder.append(count).append(' ').append(state.name()).append(" | ");
+                    }
+
+                    logger.info(builder.toString());
                 }
 
                 logger.info("Completed in {}", stopwatch.stop().toString());

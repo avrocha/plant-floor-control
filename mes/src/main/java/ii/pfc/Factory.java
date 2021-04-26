@@ -136,6 +136,7 @@ public class Factory {
             if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 250) {
                 dbPollTimer.reset().start();
 
+                orderManager.checkWarehouseEntries();
                 orderManager.pollLoadOrders();
                 orderManager.pollUnloadOrders();
                 orderManager.pollTransformOrders();
@@ -153,7 +154,7 @@ public class Factory {
 
                 ShellCommand command = commands.get(split[0].toLowerCase());
                 if (command == null) {
-                    System.out.println("Invalid command.");
+                    System.out.println(String.format("Invalid command: %s", cmd));
                     continue;
                 }
 

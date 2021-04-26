@@ -2,6 +2,7 @@ package ii.pfc.shell.impl;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.primitives.Ints;
+import ii.pfc.command.impl.CommandRequestTransform;
 import ii.pfc.command.impl.CommandRequestUnload;
 import ii.pfc.manager.ICommandManager;
 import ii.pfc.part.PartType;
@@ -56,9 +57,59 @@ public class ShellCommandOrder extends ShellCommand {
                         type,
                         conveyorId.shortValue(),
                         quantity
-                        );
+                );
 
                 commandManager.enqueueRequest(commandRequestUnload, new InetSocketAddress(25));
+
+                logger.info("Completed in {}", stopwatch.stop().toString());
+
+                return true;
+            }
+        });
+
+        registerSubcommand(new ShellCommand("transform", "Dispatch a transformation order") {
+            @Override
+            public boolean onCommand(String[] args) {
+
+                if (args.length < 2) {
+                    logger.error("Usage: {} <sourceType> <targetType> [quantity]", this.getLabel());
+                    return true;
+                }
+
+                PartType sourceType = PartType.getType(args[0]);
+                if (sourceType == null) {
+                    logger.error("Invalid part type: {}",  args[0]);
+                    return true;
+                }
+
+                PartType targetType = PartType.getType(args[1]);
+                if (targetType == null) {
+                    logger.error("Invalid part type: {}",  args[1]);
+                    return true;
+                }
+
+                Integer quantity = 1;
+                if (args.length > 2) {
+                    quantity = Ints.tryParse(args[2]);
+
+                    if (quantity == null) {
+                        logger.error("Invalid quantity: {}", args[2]);
+                        return true;
+                    }
+                }
+
+                Stopwatch stopwatch = Stopwatch.createStarted();
+                CommandRequestTransform request = new CommandRequestTransform(
+                        RandomUtils.nextInt(),
+                        sourceType,
+                        targetType,
+                        0,
+                        quantity,
+                        0,
+                        0
+                );
+
+                commandManager.enqueueRequest(request, new InetSocketAddress(25));
 
                 logger.info("Completed in {}", stopwatch.stop().toString());
 

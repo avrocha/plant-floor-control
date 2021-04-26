@@ -12,8 +12,11 @@ public class Route {
 
     private final List<Conveyor> conveyorList;
 
-    public Route(Part part) {
+    private final double weight;
+
+    public Route(Part part, double weight) {
         this.part = part;
+        this.weight = weight;
         this.conveyorList = new ArrayList<>();
     }
 
@@ -23,6 +26,10 @@ public class Route {
 
     public Part getPart() {
         return part;
+    }
+
+    public double getWeight() {
+        return weight;
     }
 
     /*

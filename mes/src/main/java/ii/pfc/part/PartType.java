@@ -1,6 +1,7 @@
 package ii.pfc.part;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +61,10 @@ public class PartType {
         return defaultColor;
     }
 
+    public boolean isUnknown() {
+        return this.equals(UNKNOWN);
+    }
+
     @Override
     public String toString() {
         return this.name;
@@ -71,5 +76,9 @@ public class PartType {
 
     public static final PartType getType(String name) {
         return registry.getOrDefault(name, UNKNOWN);
+    }
+
+    public static final Collection<PartType> getTypes() {
+        return registry.values();
     }
 }

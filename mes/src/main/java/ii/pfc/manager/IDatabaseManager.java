@@ -31,7 +31,7 @@ public interface IDatabaseManager {
 
     //
 
-    Collection<TransformationOrder> fetchTransformOrders(TransformationOrder.TransformationState state);
+    Collection<TransformationOrder> fetchPendingTransformOrders();
 
     Collection<TransformationOrder> fetchAllTransformOrders();
 
@@ -39,7 +39,11 @@ public interface IDatabaseManager {
 
     Part fetchPart(UUID id);
 
-    Collection<Part> fetchParts(PartType type, Part.PartState state, int limit);
+    Collection<Part> fetchParts();
+
+    Collection<Part> fetchParts(int orderId, Part.PartState state, int limit);
+
+    Collection<Part> fetchParts(int orderId, PartType type, Part.PartState state, int limit);
 
     Collection<Part> fetchUnloadedParts();
 
@@ -59,6 +63,8 @@ public interface IDatabaseManager {
 
     boolean updatePartState(UUID partId, Part.PartState state);
 
+    boolean updatePartStateAndOrder(UUID partId, Part.PartState state, int orderId);
+
     //
 
     boolean insertProcessLog(Process process, Conveyor assembler, Part part);
@@ -69,11 +75,7 @@ public interface IDatabaseManager {
 
     boolean insertUnloadOrder(UnloadOrder unloadOrder);
 
-    boolean decreaseUnloadOrderRemaining(int orderId, int amount);
-
     //
 
     boolean insertTransformOrder(TransformationOrder transformationOrder);
-
-    boolean updateTransformOrderState(int orderId, TransformationOrder.TransformationState newState);
 }

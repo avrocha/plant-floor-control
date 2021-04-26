@@ -80,12 +80,20 @@ public class CommsManager implements ICommsManager {
         return connection;
     }
 
+    private boolean isConnected() {
+        return false;
+    }
+
     /*
 
      */
 
     @Override
     public void dispatchWarehouseInConveyorEntry(short conveyorId) {
+        if (!isConnected()) {
+            return;
+        }
+
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
 
@@ -109,6 +117,10 @@ public class CommsManager implements ICommsManager {
 
     @Override
     public Part getWarehouseInConveyorPart(short conveyorId) {
+        if (!isConnected()) {
+            return null;
+        }
+
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
 
@@ -143,6 +155,10 @@ public class CommsManager implements ICommsManager {
 
     @Override
     public void dispatchWarehouseOutConveyorExit(short conveyorId, PartType type) {
+        if (!isConnected()) {
+            return;
+        }
+
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
 
@@ -164,6 +180,10 @@ public class CommsManager implements ICommsManager {
 
     @Override
     public boolean getWarehouseOutConveyorStatus(short conveyorId) {
+        if (!isConnected()) {
+            return false;
+        }
+
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
 
@@ -192,6 +212,10 @@ public class CommsManager implements ICommsManager {
 
     @Override
     public boolean getLoadConveyorStatus(short conveyorId) {
+        if (!isConnected()) {
+            return false;
+        }
+
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
 
@@ -216,6 +240,10 @@ public class CommsManager implements ICommsManager {
 
     @Override
     public void sendPlcRoute(Route route) {
+        if (!isConnected()) {
+            return;
+        }
+
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
 

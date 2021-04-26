@@ -32,6 +32,33 @@ public class OrderManager implements IOrderManager {
     }
 
     @Override
+    public void checkWarehouseEntries() {
+        Collection<Conveyor> winConveyors = routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN);
+        for(Conveyor conveyor : winConveyors) {
+            Part tempPart = commsManager.getWarehouseInConveyorPart(conveyor.getId());
+
+            if (tempPart != null) {
+                Part part = databaseManager.fetchPart(tempPart.getId());
+                if (part != null) {
+                    if (!databaseManager.updatePartState(part.getId(), Part.PartState.STORED)) {
+                        continue;
+                    }
+
+
+                } else {
+                    if (!databaseManager.insertPart(tempPart)) {
+                        continue;
+                    }
+
+
+                }
+
+                commsManager.dispatchWarehouseInConveyorEntry(conveyor.getId());
+            }
+        }
+    }
+
+    @Override
     public void pollLoadOrders() {
         Collection<Conveyor> loadConveyors = routingManager.getConveyors(EnumConveyorType.LOAD);
         for(Conveyor conveyor : loadConveyors) {
@@ -53,8 +80,10 @@ public class OrderManager implements IOrderManager {
                     }
                 }
 
-                Part tempPart = new Part(UUID.randomUUID(), 0, type, Part.PartState.SPAWNED);
+                Part tempPart = new Part(UUID.randomUUID(), 0, type, Part.PartState.PROCESSING);
                 Conveyor source = routingManager.getConveyor(conveyorId);
+
+                Route minimumRoute = null;
 
                 for(Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
                     Route route = routingManager.traceRoute(tempPart, source, target);
@@ -63,19 +92,13 @@ public class OrderManager implements IOrderManager {
                         continue;
                     }
 
-                    commsManager.sendPlcRoute(route);
-                    break;
+                    if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                        minimumRoute = route;
+                    }
                 }
-            }
-        }
 
-        Collection<Conveyor> winConveyors = routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN);
-        for(Conveyor conveyor : winConveyors) {
-            Part part = commsManager.getWarehouseInConveyorPart(conveyor.getId());
-
-            if (part != null) {
-                if (databaseManager.insertPart(part)) {
-                    commsManager.dispatchWarehouseInConveyorEntry(conveyor.getId());
+                if (minimumRoute != null) {
+                    commsManager.sendPlcRoute(minimumRoute);
                 }
             }
         }
@@ -86,9 +109,13 @@ public class OrderManager implements IOrderManager {
         Collection<UnloadOrder> orders = databaseManager.fetchPendingUnloadOrders();
 
         for(UnloadOrder order : orders) {
-            Collection<Part> parts = databaseManager.fetchParts(order.getPartType(), Part.PartState.STORED, order.getRemaining());
+            //logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
+            Collection<Part> parts = databaseManager.fetchParts(0, order.getPartType(), Part.PartState.STORED, order.getRemaining());
 
             for(Part part : parts) {
+                Conveyor minimumSource = null;
+                Route minimumRoute = null;
+
                 for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
                     Conveyor target = routingManager.getConveyor(order.getConveyorId());
                     Route route = routingManager.traceRoute(part, source, target);
@@ -101,12 +128,16 @@ public class OrderManager implements IOrderManager {
                         continue;
                     }
 
-                    if (databaseManager.decreaseUnloadOrderRemaining(order.getOrderId(), 1)) {
-                        databaseManager.updatePartState(part.getId(), Part.PartState.SPAWNED);
+                    if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                        minimumSource = source;
+                        minimumRoute = route;
+                    }
+                }
 
-                        commsManager.dispatchWarehouseOutConveyorExit(source.getId(), part.getType());
-                        commsManager.sendPlcRoute(route);
-                        break;
+                if (minimumRoute != null) {
+                    if (databaseManager.updatePartStateAndOrder(part.getId(), Part.PartState.UNLOADING, order.getOrderId())) {
+                        commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
+                        commsManager.sendPlcRoute(minimumRoute);
                     }
                 }
             }
@@ -115,7 +146,76 @@ public class OrderManager implements IOrderManager {
 
     @Override
     public void pollTransformOrders() {
-        Collection<TransformationOrder> orders = databaseManager.fetchTransformOrders(TransformationOrder.TransformationState.PENDING);
+        Collection<TransformationOrder> orders = databaseManager.fetchPendingTransformOrders();
+
+        for(TransformationOrder order : orders) {
+            //logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
+            Collection<Part> parts = databaseManager.fetchParts(order.getOrderId(), Part.PartState.STORED, 5);
+
+            for(Part part : parts) {
+                Conveyor minimumSource = null;
+                Route minimumRoute = null;
+
+                for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
+                    if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
+                        continue;
+                    }
+
+                    for(Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
+                        Route route = routingManager.traceRoute(part, source, target);
+
+                        if (route == null) {
+                            continue;
+                        }
+
+                        if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                            minimumSource = source;
+                            minimumRoute = route;
+                        }
+                    }
+                }
+
+                if (minimumRoute != null) {
+                    if (databaseManager.updatePartState(part.getId(), Part.PartState.PROCESSING)) {
+                        commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
+                        commsManager.sendPlcRoute(minimumRoute);
+                    }
+                }
+            }
+
+            parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, order.getRemaining());
+
+            for(Part part : parts) {
+                Conveyor minimumSource = null;
+                Route minimumRoute = null;
+
+                for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
+                    if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
+                        continue;
+                    }
+
+                    for(Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
+                        Route route = routingManager.traceRoute(part, source, target);
+
+                        if (route == null) {
+                            continue;
+                        }
+
+                        if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                            minimumSource = source;
+                            minimumRoute = route;
+                        }
+                    }
+                }
+
+                if (minimumRoute != null) {
+                    if (databaseManager.updatePartStateAndOrder(part.getId(), Part.PartState.PROCESSING, order.getOrderId())) {
+                        commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
+                        commsManager.sendPlcRoute(minimumRoute);
+                    }
+                }
+            }
+        }
     }
 
     /*

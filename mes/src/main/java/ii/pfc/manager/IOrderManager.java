@@ -5,6 +5,8 @@ import ii.pfc.order.UnloadOrder;
 
 public interface IOrderManager {
 
+    void checkWarehouseEntries();
+
     void pollLoadOrders();
 
     void pollUnloadOrders();

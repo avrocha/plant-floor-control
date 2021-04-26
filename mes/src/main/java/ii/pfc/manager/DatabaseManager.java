@@ -112,7 +112,7 @@ public class DatabaseManager implements IDatabaseManager {
     public Collection<UnloadOrder> fetchPendingUnloadOrders() {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order WHERE remaining > 0;")) {
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order_status WHERE remaining > 0;")) {
                 return _extractUnloadOrders(sql.executeQuery());
             }
 
@@ -127,7 +127,7 @@ public class DatabaseManager implements IDatabaseManager {
     public Collection<UnloadOrder> fetchAllUnloadOrders() {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order;")) {
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order_status;")) {
                 return _extractUnloadOrders(sql.executeQuery());
             }
 
@@ -152,22 +152,22 @@ public class DatabaseManager implements IDatabaseManager {
                     PartType.getType(result.getString("target_type")),
                     result.getTimestamp("date").toLocalDateTime(),
                     result.getInt("quantity"),
+                    result.getInt("remaining"),
+                    result.getInt("completed"),
                     result.getTimestamp("deadline").toLocalDateTime(),
-                    result.getInt("penalty"),
-                    TransformationOrder.TransformationState.valueOf(result.getString("state")))
-            );
+                    result.getInt("penalty")
+            ));
         }
 
         return orders;
     }
 
     @Override
-    public Collection<TransformationOrder> fetchTransformOrders(TransformationOrder.TransformationState state) {
+    public Collection<TransformationOrder> fetchPendingTransformOrders() {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                    .prepareStatement("SELECT * FROM transform_order WHERE state=?::transform_order_state;")) {
-                sql.setString(1, state.name());
+                    .prepareStatement("SELECT * FROM transform_order_status WHERE remaining > 0;")) {
                 return _extractTransformationOrders(sql.executeQuery());
             }
 
@@ -182,7 +182,7 @@ public class DatabaseManager implements IDatabaseManager {
     public Collection<TransformationOrder> fetchAllTransformOrders() {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order;")) {
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order_status;")) {
                 return _extractTransformationOrders(sql.executeQuery());
             }
 
@@ -223,17 +223,66 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     @Override
-    public Collection<Part> fetchParts(PartType type, Part.PartState state, int limit) {
+    public Collection<Part> fetchParts() {
         List<Part> parts = new ArrayList<>();
 
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                    "SELECT * FROM part WHERE type=? AND state=?::part_state LIMIT ?;"
+                    "SELECT * FROM part;"
             )) {
-                sql.setString(1, type.getName());
+                ResultSet result = sql.executeQuery();
+                while (result.next()) {
+                    parts.add(_extractPart(result));
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return parts;
+    }
+
+    @Override
+    public Collection<Part> fetchParts(int orderId, Part.PartState state, int limit) {
+        List<Part> parts = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement(
+                    "SELECT * FROM part WHERE order_id=? AND state=?::part_state LIMIT ?;"
+            )) {
+                sql.setInt(1, orderId);
                 sql.setString(2, state.name());
                 sql.setInt(3, limit);
+
+                ResultSet result = sql.executeQuery();
+                while (result.next()) {
+                    parts.add(_extractPart(result));
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return parts;
+    }
+
+    @Override
+    public Collection<Part> fetchParts(int orderId, PartType type, Part.PartState state, int limit) {
+        List<Part> parts = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement(
+                    "SELECT * FROM part WHERE order_id=? AND type=? AND state=?::part_state LIMIT ?;"
+            )) {
+                sql.setInt(1, orderId);
+                sql.setString(2, type.getName());
+                sql.setString(3, state.name());
+                sql.setInt(4, limit);
 
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
@@ -391,6 +440,26 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
+    public boolean updatePartStateAndOrder(UUID partId, Part.PartState state, int orderId) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE part SET state=?::part_state, order_id=? where id=?;")) {
+                sql.setString(1, state.name());
+                sql.setInt(2, orderId);
+                sql.setObject(3, partId);
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean insertProcessLog(Process process, Conveyor assembler, Part part) {
 
         try (Connection connection = dataSource.getConnection()) {
@@ -471,25 +540,6 @@ public class DatabaseManager implements IDatabaseManager {
 
     }
 
-    @Override
-    public boolean updateTransformOrderState(int orderId, TransformationOrder.TransformationState newState) {
-
-        try (Connection connection = dataSource.getConnection()) {
-
-            try (PreparedStatement sql = connection.prepareStatement("UPDATE transform_order SET state=?::transform_order_state where order_id=?;")) {
-                sql.setString(1, newState.name());
-                sql.setInt(2, orderId);
-                sql.executeUpdate();
-                return true;
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return false;
-    }
-
     /*
 
      */
@@ -519,24 +569,5 @@ public class DatabaseManager implements IDatabaseManager {
 
         return false;
 
-    }
-
-    @Override
-    public boolean decreaseUnloadOrderRemaining(int orderId, int amount) {
-
-        try (Connection connection = dataSource.getConnection()) {
-
-            try (PreparedStatement sql = connection.prepareStatement("UPDATE unload_order SET remaining=remaining-? WHERE order_id=?;")) {
-                sql.setInt(1, amount);
-                sql.setInt(2, orderId);
-                sql.executeUpdate();
-                return true;
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return false;
     }
 }

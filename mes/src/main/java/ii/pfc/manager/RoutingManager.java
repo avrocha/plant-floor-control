@@ -82,7 +82,7 @@ public class RoutingManager implements IRoutingManager {
                 return null;
             }
 
-            Route route = new Route(part);
+            Route route = new Route(part, path.getWeight());
             route.addConveyor(source);
 
             for (ConveyorEdge edge : path.getEdgeList()) {
@@ -109,7 +109,7 @@ public class RoutingManager implements IRoutingManager {
 
                 GraphPath<Conveyor, ConveyorEdge> path = many.getPath(source, target);
 
-                Route route = new Route(null);
+                Route route = new Route(part, path.getWeight());
                 route.addConveyor(source);
 
                 for (ConveyorEdge edge : path.getEdgeList()) {
