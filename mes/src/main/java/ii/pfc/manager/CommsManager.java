@@ -1,7 +1,6 @@
 package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
-import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.route.Route;
@@ -9,16 +8,14 @@ import ii.pfc.udp.UdpListener;
 import ii.pfc.udp.UdpServer;
 import java.net.InetSocketAddress;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteRequest;
-import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.plc4x.java.utils.connectionpool.PooledPlcDriverManager;
 import org.slf4j.Logger;
@@ -128,7 +125,7 @@ public class CommsManager implements ICommsManager {
 
             if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
                 if (response.getBoolean(fieldName)) {
-                    return new Part(UUID.fromString(response.getString("Id")), 0, PartType.getType(response.getString("Type")));
+                    return new Part(UUID.fromString(response.getString("Id")), 0, PartType.getType(response.getString("Type")), Part.PartState.STORED);
                 }
             }
         } catch (PlcConnectionException e) {

@@ -8,12 +8,15 @@ public class Part {
 
     private final int orderId;
 
-    private PartType type;
+    private final PartType type;
 
-    public Part(UUID id, int orderId, PartType type) {
+    private final PartState state;
+
+    public Part(UUID id, int orderId, PartType type, PartState state) {
         this.id = id;
         this.orderId = orderId;
         this.type = type;
+        this.state = state;
     }
     /*
 
@@ -31,6 +34,10 @@ public class Part {
         return type;
     }
 
+    public PartState getState() {
+        return state;
+    }
+
     /*
 
      */
@@ -42,5 +49,15 @@ public class Part {
             ", orderId=" + orderId +
             ", type=" + type +
             '}';
+    }
+
+    /*
+
+     */
+
+    public static enum PartState {
+
+        STORED, SPAWNED
+
     }
 }

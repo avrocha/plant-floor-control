@@ -1,12 +1,12 @@
 package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
-import ii.pfc.order.LoadOrder;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.postgresql.util.PGInterval;
 import org.slf4j.Logger;
@@ -78,62 +79,10 @@ public class DatabaseManager implements IDatabaseManager {
 
     private Part _extractPart(ResultSet result) throws SQLException {
         return new Part(
-            result.getObject("id", UUID.class),
-            result.getInt("order_id"),
-            PartType.getType(result.getString("type"))
-        );
-    }
-
-    /*
-
-     */
-
-    private Collection<LoadOrder> _extractLoadOrders(ResultSet result) throws SQLException {
-        List<LoadOrder> orders = new ArrayList<>();
-
-        while (result.next()) {
-            orders.add(new LoadOrder(
+                result.getObject("id", UUID.class),
                 result.getInt("order_id"),
                 PartType.getType(result.getString("type")),
-                result.getShort("conveyor_id"),
-                result.getTimestamp("date").toLocalDateTime(),
-                LoadOrder.LoadState.valueOf(result.getString("state"))
-            ));
-        }
-
-        return orders;
-    }
-
-    @Override
-    public Collection<LoadOrder> fetchLoadOrders(LoadOrder.LoadState state) {
-        try (Connection connection = dataSource.getConnection()) {
-
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM load_order WHERE state=?::load_order_state;")) {
-                sql.setString(1, state.name());
-
-                return _extractLoadOrders(sql.executeQuery());
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return Collections.emptySet();
-    }
-
-    @Override
-    public Collection<LoadOrder> fetchAllLoadOrders() {
-        try (Connection connection = dataSource.getConnection()) {
-
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM load_order;")) {
-                return _extractLoadOrders(sql.executeQuery());
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return Collections.emptySet();
+                Part.PartState.valueOf(result.getString("state")));
     }
 
 
@@ -146,12 +95,13 @@ public class DatabaseManager implements IDatabaseManager {
 
         while (result.next()) {
             orders.add(new UnloadOrder(
-                result.getInt("order_id"),
-                PartType.getType(result.getString("type")),
-                result.getShort("conveyor_id"),
-                result.getTimestamp("date").toLocalDateTime(),
-                result.getInt("quantity"),
-                UnloadOrder.UnloadState.valueOf(result.getString("state"))
+                    result.getInt("order_id"),
+                    PartType.getType(result.getString("type")),
+                    result.getShort("conveyor_id"),
+                    result.getTimestamp("date").toLocalDateTime(),
+                    result.getInt("quantity"),
+                    result.getInt("remaining"),
+                    result.getInt("completed")
             ));
         }
 
@@ -159,12 +109,10 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public Collection<UnloadOrder> fetchUnloadOrders(UnloadOrder.UnloadState state) {
+    public Collection<UnloadOrder> fetchPendingUnloadOrders() {
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order WHERE state=?::unload_order_state;")) {
-                sql.setString(1, state.name());
-
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order WHERE remaining > 0;")) {
                 return _extractUnloadOrders(sql.executeQuery());
             }
 
@@ -199,14 +147,14 @@ public class DatabaseManager implements IDatabaseManager {
 
         while (result.next()) {
             orders.add(new TransformationOrder(
-                result.getInt("order_id"),
-                PartType.getType(result.getString("source_type")),
-                PartType.getType(result.getString("target_type")),
-                result.getTimestamp("date").toLocalDateTime(),
-                result.getInt("quantity"),
-                result.getTimestamp("deadline").toLocalDateTime(),
-                result.getInt("penalty"),
-                TransformationOrder.TransformationState.valueOf(result.getString("state")))
+                    result.getInt("order_id"),
+                    PartType.getType(result.getString("source_type")),
+                    PartType.getType(result.getString("target_type")),
+                    result.getTimestamp("date").toLocalDateTime(),
+                    result.getInt("quantity"),
+                    result.getTimestamp("deadline").toLocalDateTime(),
+                    result.getInt("penalty"),
+                    TransformationOrder.TransformationState.valueOf(result.getString("state")))
             );
         }
 
@@ -218,7 +166,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                .prepareStatement("SELECT * FROM transform_order WHERE state=?::transform_order_state;")) {
+                    .prepareStatement("SELECT * FROM transform_order WHERE state=?::transform_order_state;")) {
                 sql.setString(1, state.name());
                 return _extractTransformationOrders(sql.executeQuery());
             }
@@ -275,16 +223,17 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     @Override
-    public Collection<Part> fetchStoredParts(PartType type, int limit) {
+    public Collection<Part> fetchParts(PartType type, Part.PartState state, int limit) {
         List<Part> parts = new ArrayList<>();
 
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                "SELECT * FROM part WHERE type=? LIMIT ?;"
+                    "SELECT * FROM part WHERE type=? AND state=?::part_state LIMIT ?;"
             )) {
                 sql.setString(1, type.getName());
-                sql.setInt(2, limit);
+                sql.setString(2, state.name());
+                sql.setInt(3, limit);
 
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
@@ -310,7 +259,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                "SELECT * FROM unloading_bay_log ub INNER JOIN part p ON ub.unloading_part=p.id;"
+                    "SELECT * FROM unloading_bay_log ub INNER JOIN part p ON ub.unloading_part=p.id;"
             )) {
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
@@ -336,7 +285,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                .prepareStatement("SELECT duration FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
+                    .prepareStatement("SELECT duration FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
                     PGInterval interval = (PGInterval) result.getObject("duration");
@@ -381,12 +330,13 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                "INSERT INTO part (id, order_id, type) " +
-                    "VALUES (?, ?, ?) ON CONFLICT DO NOTHING"
+                    "INSERT INTO part (id, order_id, type, state) " +
+                            "VALUES (?, ?, ?, ?::part_state) ON CONFLICT DO NOTHING"
             )) {
                 sql.setObject(1, part.getId());
                 sql.setInt(2, part.getOrderId());
                 sql.setString(3, part.getType().getName());
+                sql.setString(4, part.getState().name());
                 sql.executeUpdate();
                 return true;
             }
@@ -422,13 +372,32 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
+    public boolean updatePartState(UUID partId, Part.PartState state) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE part SET state=?::part_state where id=?;")) {
+                sql.setString(1, state.name());
+                sql.setObject(2, partId);
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean insertProcessLog(Process process, Conveyor assembler, Part part) {
 
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                "INSERT INTO process_log (assembler_id, duration, part_source_type, part_target_type, part_id) " +
-                    "VALUES (?, '? seconds', ?, ?, ?) "
+                    "INSERT INTO process_log (assembler_id, duration, part_source_type, part_target_type, part_id) " +
+                            "VALUES (?, '? seconds', ?, ?, ?) "
             )) {
                 sql.setInt(1, assembler.getId());
                 sql.setInt(2, (int) process.getDuration().toSeconds());
@@ -453,8 +422,8 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                "INSERT INTO unloading_bay_log (conveyor_id, unloading_part, unloading_type) " +
-                    "VALUES (?, ?, ?) "
+                    "INSERT INTO unloading_bay_log (conveyor_id, unloading_part, unloading_type) " +
+                            "VALUES (?, ?, ?) "
             )) {
                 sql.setInt(1, order.getConveyorId());
                 sql.setObject(2, part.getId());
@@ -481,8 +450,8 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                .prepareStatement("INSERT INTO transform_order (order_id, date, quantity, penalty, source_type, target_type, deadline) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?) ")) {
+                    .prepareStatement("INSERT INTO transform_order (order_id, date, quantity, penalty, source_type, target_type, deadline) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?) ")) {
                 sql.setInt(1, transformationOrder.getOrderId());
                 sql.setTimestamp(2, Timestamp.valueOf(transformationOrder.getDate()));
                 sql.setInt(3, transformationOrder.getQuantity());
@@ -531,13 +500,15 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                .prepareStatement("INSERT INTO unload_order (order_id, conveyor_id, date, quantity, type) " +
-                    "VALUES (?, ?, ?, ?, ?) ")) {
+                    .prepareStatement("INSERT INTO unload_order (order_id, conveyor_id, date, quantity, remaining, completed, type) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?) ")) {
                 sql.setInt(1, unloadOrder.getOrderId());
                 sql.setInt(2, unloadOrder.getConveyorId());
                 sql.setTimestamp(3, Timestamp.valueOf(unloadOrder.getDate()));
                 sql.setInt(4, unloadOrder.getQuantity());
-                sql.setString(1, unloadOrder.getPartType().getName());
+                sql.setInt(5, unloadOrder.getQuantity());
+                sql.setInt(6, 0);
+                sql.setString(7, unloadOrder.getPartType().getName());
                 sql.executeUpdate();
                 return true;
             }
@@ -551,59 +522,12 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public boolean updateUnloadOrderState(int orderId, UnloadOrder.UnloadState newState) {
+    public boolean decreaseUnloadOrderRemaining(int orderId, int amount) {
 
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("UPDATE unload_order SET state=?::unload_order_state where order_id=?;")) {
-                sql.setString(1, newState.name());
-                sql.setInt(2, orderId);
-                sql.executeUpdate();
-                return true;
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return false;
-    }
-
-    /*
-
-     */
-
-    @Override /*VERIFICAR*/
-    public boolean insertLoadOrder(LoadOrder loadOrder) {
-
-        try (Connection connection = dataSource.getConnection()) {
-
-            try (PreparedStatement sql = connection.prepareStatement("INSERT INTO load_order (order_id, conveyor_id, date, type, state) " +
-                "VALUES (?, ?, ?, ?, ?::load_order_state) ")) {
-                sql.setInt(1, loadOrder.getOrderId());
-                sql.setInt(2, loadOrder.getConveyorId());
-                sql.setTimestamp(3, Timestamp.valueOf(loadOrder.getDate()));
-                sql.setString(4, loadOrder.getType().getName());
-                sql.setString(5, loadOrder.getState().name());
-                sql.executeUpdate();
-                return true;
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return false;
-
-    }
-
-    @Override
-    public boolean updateLoadOrderState(int orderId, LoadOrder.LoadState newState) {
-
-        try (Connection connection = dataSource.getConnection()) {
-
-            try (PreparedStatement sql = connection.prepareStatement("UPDATE load_order SET state=?::load_order_state where order_id=?;")) {
-                sql.setString(1, newState.name());
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE unload_order SET remaining=remaining-? WHERE order_id=?;")) {
+                sql.setInt(1, amount);
                 sql.setInt(2, orderId);
                 sql.executeUpdate();
                 return true;

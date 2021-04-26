@@ -17,15 +17,18 @@ public class UnloadOrder {
 
     private final int quantity;
 
-    private final UnloadState state;
+    private final int remaining;
 
-    public UnloadOrder(int orderId, PartType partType, short conveyorId, LocalDateTime date, int quantity, UnloadState state) {
+    private final int completed;
+
+    public UnloadOrder(int orderId, PartType partType, short conveyorId, LocalDateTime date, int quantity, int remaining, int completed) {
         this.orderId = orderId;
         this.partType = partType;
         this.conveyorId = conveyorId;
         this.date = date;
         this.quantity = quantity;
-        this.state = state;
+        this.remaining = remaining;
+        this.completed = completed;
     }
 
     /*
@@ -52,8 +55,12 @@ public class UnloadOrder {
         return quantity;
     }
 
-    public UnloadState getState() {
-        return state;
+    public int getRemaining() {
+        return remaining;
+    }
+
+    public int getCompleted() {
+        return completed;
     }
 
     /*
@@ -68,14 +75,8 @@ public class UnloadOrder {
                 ", conveyorId=" + conveyorId +
                 ", date=" + date +
                 ", quantity=" + quantity +
+                ", remaining=" + remaining +
+                ", completed=" + completed +
                 '}';
-    }
-
-    /*
-
-     */
-
-    public static enum UnloadState {
-        PENDING, IN_PROGRESS, COMPLETED
     }
 }

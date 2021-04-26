@@ -29,7 +29,7 @@ public class RoutingManager implements IRoutingManager {
 
      */
 
-    private Graph<Conveyor, ConveyorEdge> regionGraph;
+    private final Graph<Conveyor, ConveyorEdge> regionGraph;
 
     private final Map<Short, Conveyor> conveyorIdMap = new HashMap<>();
 

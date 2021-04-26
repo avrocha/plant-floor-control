@@ -10,6 +10,7 @@ public enum EnumConveyorType {
     ROTATIVE,
     PUSHER,
     SLIDER,
-    ASSEMBLY
+    ASSEMBLY,
+    LOAD
 
 }

@@ -128,68 +128,15 @@ public class Factory {
 
         this.running = true;
 
-        Stopwatch opcPollTimer = Stopwatch.createStarted();
         Stopwatch dbPollTimer = Stopwatch.createStarted();
 
         while(running) {
             commandManager.pollRequests();
 
-            if (opcPollTimer.elapsed(TimeUnit.MILLISECONDS) > 100) {
-                opcPollTimer.reset().start();
-
-                short[] loadConveyors = { 1, 5 };
-                for(short conveyorId : loadConveyors) {
-                    boolean hasPart = commsManager.getLoadConveyorStatus(conveyorId);
-
-                    if (hasPart) {
-                        PartType type;
-
-                        switch(conveyorId) {
-                            // TODO
-                            case 1: {
-                                type = PartType.PART_2;
-                                break;
-                            }
-
-                            default: {
-                                type = PartType.PART_1;
-                                break;
-                            }
-                        }
-
-                        System.out.println("Test0");
-
-                        Part tempPart = new Part(UUID.randomUUID(), 0, type);
-                        Conveyor source = routingManager.getConveyor(conveyorId);
-
-                        for(Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
-                            Route route = routingManager.traceRoute(tempPart, source, target);
-
-                            if (route == null) {
-                                continue;
-                            }
-
-                            commsManager.sendPlcRoute(route);
-                            break;
-                        }
-                    }
-                }
-
-                Collection<Conveyor> winConveyors = routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN);
-                for(Conveyor conveyor : winConveyors) {
-                    Part part = commsManager.getWarehouseInConveyorPart(conveyor.getId());
-
-                    if (part != null) {
-                        if (databaseManager.insertPart(part)) {
-                            commsManager.dispatchWarehouseInConveyorEntry(conveyor.getId());
-                        }
-                    }
-                }
-            }
-
-            if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 1000) {
+            if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 250) {
                 dbPollTimer.reset().start();
 
+                orderManager.pollLoadOrders();
                 orderManager.pollUnloadOrders();
                 orderManager.pollTransformOrders();
             }
@@ -263,11 +210,11 @@ public class Factory {
     public Function<RoutingManager.RouteData, Double> DEFAULT_WEIGHT = (routeData) -> 1.0;
 
     /* LINEAR*/
-    public Conveyor LIN1 = new Conveyor(1, EnumConveyorType.LINEAR);
+    public Conveyor LIN1 = new Conveyor(1, EnumConveyorType.LOAD);
     public Conveyor LIN2 = new Conveyor(2, EnumConveyorType.LINEAR);
     public Conveyor LIN3 = new Conveyor(3, EnumConveyorType.LINEAR);
     public Conveyor LIN4 = new Conveyor(4, EnumConveyorType.LINEAR);
-    public Conveyor LIN5 = new Conveyor(5, EnumConveyorType.LINEAR);
+    public Conveyor LIN5 = new Conveyor(5, EnumConveyorType.LOAD);
     public Conveyor LIN6 = new Conveyor(6, EnumConveyorType.LINEAR);
     public Conveyor LIN7 = new Conveyor(7, EnumConveyorType.WAREHOUSE_IN);
     public Conveyor LIN8 = new Conveyor(8, EnumConveyorType.WAREHOUSE_OUT);

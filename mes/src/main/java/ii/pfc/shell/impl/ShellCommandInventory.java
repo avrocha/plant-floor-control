@@ -6,6 +6,7 @@ import ii.pfc.manager.IDatabaseManager;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.shell.ShellCommand;
+
 import java.util.UUID;
 
 public class ShellCommandInventory extends ShellCommand {
@@ -24,7 +25,7 @@ public class ShellCommandInventory extends ShellCommand {
                 Stopwatch stopwatch = Stopwatch.createStarted();
                 logger.info("Clearing database inventory parts...");
 
-                if(!databaseManager.clearAllParts()) {
+                if (!databaseManager.clearAllParts()) {
                     logger.error("Something went wrong.");
                     return true;
                 }
@@ -46,7 +47,7 @@ public class ShellCommandInventory extends ShellCommand {
 
                 PartType type = PartType.getType(args[0]);
                 if (type == null) {
-                    logger.error("Invalid part type: {}",  args[0]);
+                    logger.error("Invalid part type: {}", args[0]);
                     return true;
                 }
 
@@ -63,12 +64,12 @@ public class ShellCommandInventory extends ShellCommand {
                 Stopwatch stopwatch = Stopwatch.createStarted();
                 logger.info("Inserting {} {} part(s) in the inventory...", quantity, type.getName());
 
-                for(int i = 0; i < quantity; i++) {
+                for (int i = 0; i < quantity; i++) {
                     Part part = new Part(
-                        UUID.randomUUID(),
-                        0,
-                        type
-                    );
+                            UUID.randomUUID(),
+                            0,
+                            type,
+                            Part.PartState.STORED);
 
                     if (!databaseManager.insertPart(part)) {
                         logger.error("Something went wrong.");

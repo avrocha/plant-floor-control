@@ -1,7 +1,6 @@
 package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
-import ii.pfc.order.LoadOrder;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
 import ii.pfc.part.Part;
@@ -26,13 +25,7 @@ public interface IDatabaseManager {
 
      */
 
-    Collection<LoadOrder> fetchLoadOrders(LoadOrder.LoadState state);
-
-    Collection<LoadOrder> fetchAllLoadOrders();
-
-    //
-
-    Collection<UnloadOrder> fetchUnloadOrders(UnloadOrder.UnloadState state);
+    Collection<UnloadOrder> fetchPendingUnloadOrders();
 
     Collection<UnloadOrder> fetchAllUnloadOrders();
 
@@ -46,7 +39,7 @@ public interface IDatabaseManager {
 
     Part fetchPart(UUID id);
 
-    Collection<Part> fetchStoredParts(PartType type, int limit);
+    Collection<Part> fetchParts(PartType type, Part.PartState state, int limit);
 
     Collection<Part> fetchUnloadedParts();
 
@@ -64,6 +57,8 @@ public interface IDatabaseManager {
 
     boolean updatePartType(UUID partId, PartType type);
 
+    boolean updatePartState(UUID partId, Part.PartState state);
+
     //
 
     boolean insertProcessLog(Process process, Conveyor assembler, Part part);
@@ -74,13 +69,7 @@ public interface IDatabaseManager {
 
     boolean insertUnloadOrder(UnloadOrder unloadOrder);
 
-    boolean updateUnloadOrderState(int orderId, UnloadOrder.UnloadState newState);
-
-    //
-
-    boolean insertLoadOrder(LoadOrder loadOrder);
-
-    boolean updateLoadOrderState(int orderId, LoadOrder.LoadState newState);
+    boolean decreaseUnloadOrderRemaining(int orderId, int amount);
 
     //
 

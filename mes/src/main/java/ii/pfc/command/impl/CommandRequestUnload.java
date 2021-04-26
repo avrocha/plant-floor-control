@@ -62,7 +62,8 @@ public class CommandRequestUnload implements CommandRequest {
                 conveyorId,
                 LocalDateTime.now(),
                 quantity,
-                UnloadOrder.UnloadState.PENDING
+                quantity,
+                0
         );
 
         orderManager.enqueueUnloadOrder(order);
