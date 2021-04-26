@@ -11,7 +11,7 @@ public class UnloadOrder {
 
     private final PartType partType;
 
-    private final int conveyorId;
+    private final short conveyorId;
 
     private final LocalDateTime date;
 
@@ -19,7 +19,7 @@ public class UnloadOrder {
 
     private final UnloadState state;
 
-    public UnloadOrder(int orderId, PartType partType, int conveyorId, LocalDateTime date, int quantity, UnloadState state) {
+    public UnloadOrder(int orderId, PartType partType, short conveyorId, LocalDateTime date, int quantity, UnloadState state) {
         this.orderId = orderId;
         this.partType = partType;
         this.conveyorId = conveyorId;
@@ -40,7 +40,7 @@ public class UnloadOrder {
         return partType;
     }
 
-    public int getConveyorId() {
+    public short getConveyorId() {
         return conveyorId;
     }
 

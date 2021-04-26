@@ -54,7 +54,7 @@ public class ShellCommandOrder extends ShellCommand {
                 CommandRequestUnload commandRequestUnload = new CommandRequestUnload(
                         RandomUtils.nextInt(),
                         type,
-                        conveyorId,
+                        conveyorId.shortValue(),
                         quantity
                         );
 

@@ -37,24 +37,22 @@ public class OrderManager implements IOrderManager {
         for(UnloadOrder order : orders) {
             Collection<Part> parts = databaseManager.fetchStoredParts(order.getPartType(), order.getQuantity());
             for(Part part : parts) {
-                outer : for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
-                    for(Conveyor target : routingManager.getConveyors(EnumConveyorType.SLIDER)) {
-                        Route route = routingManager.traceRoute(part, source, target);
+                for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
+                    Conveyor target = routingManager.getConveyor(order.getConveyorId());
+                    Route route = routingManager.traceRoute(part, source, target);
 
-                        if (route == null) {
-                            continue;
-                        }
+                    if (route == null) {
+                        continue;
+                    }
 
-                        if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
-                            continue;
-                        }
+                    if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
+                        continue;
+                    }
 
-                        if (databaseManager.updateUnloadOrderState(order.getOrderId(), UnloadOrder.UnloadState.IN_PROGRESS)) {
-                            commsManager.dispatchWarehouseOutConveyorExit(source.getId(), part.getType());
-                            commsManager.sendPlcRoute(route);
-                        }
-
-                        continue outer;
+                    if (databaseManager.updateUnloadOrderState(order.getOrderId(), UnloadOrder.UnloadState.IN_PROGRESS)) {
+                        commsManager.dispatchWarehouseOutConveyorExit(source.getId(), part.getType());
+                        commsManager.sendPlcRoute(route);
+                        break;
                     }
                 }
             }

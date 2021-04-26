@@ -148,7 +148,7 @@ public class DatabaseManager implements IDatabaseManager {
             orders.add(new UnloadOrder(
                 result.getInt("order_id"),
                 PartType.getType(result.getString("type")),
-                result.getInt("conveyor_id"),
+                result.getShort("conveyor_id"),
                 result.getTimestamp("date").toLocalDateTime(),
                 result.getInt("quantity"),
                 UnloadOrder.UnloadState.valueOf(result.getString("state"))

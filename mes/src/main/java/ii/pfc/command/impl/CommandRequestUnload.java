@@ -29,7 +29,7 @@ public class CommandRequestUnload implements CommandRequest {
     private PartType partType;
 
     @XmlAttribute(name = "Destination")
-    private int conveyorId;
+    private short conveyorId;
 
     @XmlAttribute(name = "Quantity")
     private int quantity;
@@ -42,7 +42,7 @@ public class CommandRequestUnload implements CommandRequest {
 
     }
 
-    public CommandRequestUnload(int orderId, PartType partType, int conveyorId, int quantity) {
+    public CommandRequestUnload(int orderId, PartType partType, short conveyorId, int quantity) {
         this.orderId = orderId;
         this.partType = partType;
         this.conveyorId = conveyorId;
