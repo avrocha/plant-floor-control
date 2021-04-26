@@ -2,6 +2,7 @@ package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
+import ii.pfc.part.PartType;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
 import ii.pfc.udp.UdpServer;
@@ -79,6 +80,65 @@ public class CommsManager implements ICommsManager {
         return connection;
     }
 
+    /*
+
+     */
+
+    @Override
+    public void dispatchWarehouseInConveyorEntry(short conveyorId) {
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
+
+            builder.addItem("EWI",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CWI%d.EntryWarehouseI", conveyorId));
+
+            PlcWriteRequest writeRequest = builder.build();
+
+            // Async execution
+            writeRequest.execute();
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+
+     */
+
+    @Override
+    public PartType getWarehouseInConveyorPart(short conveyorId) {
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
+
+            String fieldName = "Sensor";
+            builder.addItem(fieldName,
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CWI%d.ReadyToEntry", conveyorId));
+            builder.addItem("Type",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CWI%d.CurrentPartType", conveyorId));
+
+            PlcReadRequest readRequest = builder.build();
+            PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
+
+            if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+                if (response.getBoolean(fieldName)) {
+                    return PartType.getType(response.getString("Type"));
+                }
+            }
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return PartType.UNKNOWN;
+    }
+
+    /*
+
+     */
+
     @Override
     public boolean getLoadConveyorStatus(short conveyorId) {
         try (PlcConnection plcConnection = getPlcConnection()) {
@@ -119,7 +179,7 @@ public class CommsManager implements ICommsManager {
             PlcWriteRequest writeRequest = builder.build();
 
             // Async execution
-            PlcWriteResponse writeResponse = writeRequest.execute().get(1000, TimeUnit.SECONDS);
+            writeRequest.execute();
         } catch (PlcConnectionException e) {
             e.printStackTrace();
         } catch (Exception e) {

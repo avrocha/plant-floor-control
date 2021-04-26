@@ -23,10 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -172,6 +169,19 @@ public class Factory {
 
                             commsManager.sendPlcRoute(route);
                             break;
+                        }
+                    }
+                }
+
+                Collection<Conveyor> winConveyors = routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN);
+                for(Conveyor conveyor : winConveyors) {
+                    PartType type = commsManager.getWarehouseInConveyorPart(conveyor.getId());
+
+                    if (type != PartType.UNKNOWN) {
+                        Part part = new Part(UUID.randomUUID(), 0, type);
+                        
+                        if (databaseManager.insertPart(part)) {
+                            commsManager.dispatchWarehouseInConveyorEntry(conveyor.getId());
                         }
                     }
                 }
