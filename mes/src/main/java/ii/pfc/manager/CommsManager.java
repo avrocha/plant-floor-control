@@ -15,6 +15,7 @@ import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteRequest;
+import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,7 @@ public class CommsManager implements ICommsManager {
 
             String fieldName = "Sensor";
             builder.addItem(fieldName,
-                String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CLD%d.ReadyToReceive"));
+                String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CLD%d.ReadyToReceive", conveyorId));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
@@ -109,15 +110,15 @@ public class CommsManager implements ICommsManager {
 
             int i = 1;
             for (Conveyor conveyor : route.getConveyors()) {
-                builder.addItem(String.format("Conveyor[%d]", i), String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RoutePart.route[%d]", i), conveyor.getId());
+                builder.addItem(String.format("Conveyor[%d]", i), String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Route[%d]", i), conveyor.getId());
                 i++;
             }
-            builder.addItem("ID", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RoutePart.checkPart", true);
+            builder.addItem("ID", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.CheckPart", true);
 
             PlcWriteRequest writeRequest = builder.build();
 
             // Async execution
-            writeRequest.execute();
+            PlcWriteResponse writeResponse = writeRequest.execute().get(1000, TimeUnit.SECONDS);
         } catch (PlcConnectionException e) {
             e.printStackTrace();
         } catch (Exception e) {

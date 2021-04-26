@@ -136,7 +136,7 @@ public class Factory {
             commandManager.pollRequests();
 
             if (opcPollTimer.elapsed(TimeUnit.MILLISECONDS) > 100) {
-                opcPollTimer.reset();
+                opcPollTimer.reset().start();
 
                 short[] loadConveyors = { 1, 5 };
                 for(short conveyorId : loadConveyors) {
@@ -157,6 +157,8 @@ public class Factory {
                                 break;
                             }
                         }
+
+                        System.out.println("Test0");
 
                         Part part = new Part(UUID.randomUUID(), 0, type);
                         Conveyor source = routingManager.getConveyor(conveyorId);
@@ -181,7 +183,7 @@ public class Factory {
             }
 
             if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 1000) {
-                dbPollTimer.reset();
+                dbPollTimer.reset().start();
 
                 orderManager.pollUnloadOrders();
                 orderManager.pollTransformOrders();
