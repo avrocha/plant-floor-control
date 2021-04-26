@@ -175,11 +175,9 @@ public class Factory {
 
                 Collection<Conveyor> winConveyors = routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN);
                 for(Conveyor conveyor : winConveyors) {
-                    PartType type = commsManager.getWarehouseInConveyorPart(conveyor.getId());
+                    Part part = commsManager.getWarehouseInConveyorPart(conveyor.getId());
 
-                    if (type != PartType.UNKNOWN) {
-                        Part part = new Part(UUID.randomUUID(), 0, type);
-                        
+                    if (part != null) {
                         if (databaseManager.insertPart(part)) {
                             commsManager.dispatchWarehouseInConveyorEntry(conveyor.getId());
                         }

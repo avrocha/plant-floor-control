@@ -1,6 +1,7 @@
 package ii.pfc.manager;
 
 import ii.pfc.conveyor.EnumConveyorType;
+import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
@@ -26,7 +27,7 @@ public interface ICommsManager {
 
     void dispatchWarehouseInConveyorEntry(short conveyorId);
 
-    PartType getWarehouseInConveyorPart(short conveyorId);
+    Part getWarehouseInConveyorPart(short conveyorId);
 
     boolean getLoadConveyorStatus(short conveyorId);
 

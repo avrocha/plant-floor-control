@@ -382,7 +382,7 @@ public class DatabaseManager implements IDatabaseManager {
 
             try (PreparedStatement sql = connection.prepareStatement(
                 "INSERT INTO part (id, order_id, type) " +
-                    "VALUES (?, ?, ?) "
+                    "VALUES (?, ?, ?) ON CONFLICT DO NOTHING"
             )) {
                 sql.setObject(1, part.getId());
                 sql.setInt(2, part.getOrderId());

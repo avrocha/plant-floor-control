@@ -2,11 +2,13 @@ package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
+import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
 import ii.pfc.udp.UdpServer;
 import java.net.InetSocketAddress;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -106,7 +108,7 @@ public class CommsManager implements ICommsManager {
      */
 
     @Override
-    public PartType getWarehouseInConveyorPart(short conveyorId) {
+    public Part getWarehouseInConveyorPart(short conveyorId) {
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
 
@@ -115,17 +117,15 @@ public class CommsManager implements ICommsManager {
                     String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CWI%d.ReadyToEntry", conveyorId));
             builder.addItem("Type",
                     String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CWI%d.CurrentPartType", conveyorId));
+            builder.addItem("Id",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CWI%d.CurrentPartId", conveyorId));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
-            System.out.println(response.getResponseCode(fieldName).name());
-
             if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
-                System.out.println(response.getBoolean(fieldName));
                 if (response.getBoolean(fieldName)) {
-                    System.out.println(PartType.getType(response.getString("Type")));
-                    return PartType.getType(response.getString("Type"));
+                    return new Part(UUID.fromString(response.getString("Id")), 0, PartType.getType(response.getString("Type")));
                 }
             }
         } catch (PlcConnectionException e) {
@@ -134,7 +134,7 @@ public class CommsManager implements ICommsManager {
             e.printStackTrace();
         }
 
-        return PartType.UNKNOWN;
+        return null;
     }
 
     /*
@@ -176,6 +176,7 @@ public class CommsManager implements ICommsManager {
                 i++;
             }
             builder.addItem("Type", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.PartType", route.getPart().getType().getName());
+            builder.addItem("Type", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.PartId", route.getPart().getId());
             builder.addItem("ID", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.CheckPart", true);
 
             PlcWriteRequest writeRequest = builder.build();
