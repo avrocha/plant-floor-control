@@ -31,35 +31,6 @@ public class OrderManager implements IOrderManager {
     }
 
     @Override
-    public void pollLoadOrders() {
-        Collection<LoadOrder> orders = databaseManager.fetchLoadOrders(LoadOrder.LoadState.PENDING);
-
-        for(LoadOrder order : orders) {
-            Part part = new Part(UUID.randomUUID(), 0, order.getType());
-            Conveyor source = routingManager.getConveyor(order.getConveyorId());
-
-            for(Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
-                Route route = routingManager.traceRoute(part, source, target);
-
-                if (route == null) {
-                    continue;
-                }
-
-                commsManager.sendPlcRoute(route);
-
-                if (databaseManager.updateLoadOrderState(order.getOrderId(), LoadOrder.LoadState.IN_PROGRESS)) {
-
-                    if (!databaseManager.insertPart(part)) {
-                        logger.error("Could not insert part in the database!");
-                    }
-                }
-
-                break;
-            }
-        }
-    }
-
-    @Override
     public void pollUnloadOrders() {
         Collection<UnloadOrder> orders = databaseManager.fetchUnloadOrders(UnloadOrder.UnloadState.PENDING);
 
@@ -93,11 +64,6 @@ public class OrderManager implements IOrderManager {
     /*
 
      */
-
-    @Override
-    public void enqueueLoadOrder(LoadOrder loadOrder) {
-        databaseManager.insertLoadOrder(loadOrder);
-    }
 
     @Override
     public void enqueueUnloadOrder(UnloadOrder unloadOrder) {

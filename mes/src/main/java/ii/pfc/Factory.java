@@ -1,7 +1,6 @@
 package ii.pfc;
 
 import com.google.common.base.Stopwatch;
-import ii.pfc.command.impl.CommandRequestLoad;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.manager.CommandManager;
@@ -14,6 +13,9 @@ import ii.pfc.manager.IOrderManager;
 import ii.pfc.manager.IRoutingManager;
 import ii.pfc.manager.OrderManager;
 import ii.pfc.manager.RoutingManager;
+import ii.pfc.part.Part;
+import ii.pfc.part.PartType;
+import ii.pfc.route.Route;
 import ii.pfc.shell.ShellCommand;
 import ii.pfc.shell.impl.ShellCommandInventory;
 import ii.pfc.shell.impl.ShellCommandStop;
@@ -24,6 +26,7 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -140,8 +143,39 @@ public class Factory {
                     boolean hasPart = commsManager.getLoadConveyorStatus(conveyorId);
 
                     if (hasPart) {
-                        CommandRequestLoad request = new CommandRequestLoad(LOAD_ORDER_ID++, conveyorId);
-                        request.onReceive(commandManager, orderManager, databaseManager, null);
+                        PartType type;
+
+                        switch(conveyorId) {
+                            // TODO
+                            case 1: {
+                                type = PartType.PART_2;
+                                break;
+                            }
+
+                            default: {
+                                type = PartType.PART_1;
+                                break;
+                            }
+                        }
+
+                        Part part = new Part(UUID.randomUUID(), 0, type);
+                        Conveyor source = routingManager.getConveyor(conveyorId);
+
+                        for(Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
+                            Route route = routingManager.traceRoute(part, source, target);
+
+                            if (route == null) {
+                                continue;
+                            }
+
+                            commsManager.sendPlcRoute(route);
+
+                            if (!databaseManager.insertPart(part)) {
+                                System.out.println("Could not insert part in the database!");
+                            }
+
+                            break;
+                        }
                     }
                 }
             }
@@ -149,7 +183,6 @@ public class Factory {
             if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 1000) {
                 dbPollTimer.reset();
 
-                orderManager.pollLoadOrders();
                 orderManager.pollUnloadOrders();
                 orderManager.pollTransformOrders();
             }

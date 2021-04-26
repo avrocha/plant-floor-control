@@ -6,8 +6,6 @@ import ii.pfc.order.UnloadOrder;
 
 public interface IOrderManager {
 
-    void pollLoadOrders();
-
     void pollUnloadOrders();
 
     void pollTransformOrders();
@@ -15,8 +13,6 @@ public interface IOrderManager {
     /*
 
      */
-
-    void enqueueLoadOrder(LoadOrder loadOrder);
 
     void enqueueUnloadOrder(UnloadOrder unloadOrder);
 
