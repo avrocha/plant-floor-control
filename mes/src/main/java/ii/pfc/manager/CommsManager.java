@@ -88,7 +88,7 @@ public class CommsManager implements ICommsManager {
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
 
             builder.addItem("EWI",
-                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CWI%d.EntryWarehouseI", conveyorId));
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CWI%d.EntryWarehouseI", conveyorId), true);
 
             PlcWriteRequest writeRequest = builder.build();
 
