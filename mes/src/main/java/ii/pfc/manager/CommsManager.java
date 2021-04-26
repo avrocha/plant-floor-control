@@ -74,8 +74,6 @@ public class CommsManager implements ICommsManager {
     @Override
     public PlcConnection getPlcConnection() throws PlcConnectionException {
         String opcConnection = String.format("opcua:tcp://%s:%d?discovery=false", plcAddress.getHostName(), plcAddress.getPort());
-        System.out.println(String.format("OPCUA ADDRESS: %s", opcConnection));
-
         PlcConnection connection = this.plcDriverManager.getConnection(opcConnection);
         return connection;
     }
