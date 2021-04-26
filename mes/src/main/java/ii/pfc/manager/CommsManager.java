@@ -119,8 +119,12 @@ public class CommsManager implements ICommsManager {
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
+            System.out.println(response.getResponseCode(fieldName).name());
+
             if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+                System.out.println(response.getBoolean(fieldName));
                 if (response.getBoolean(fieldName)) {
+                    System.out.println(PartType.getType(response.getString("Type")));
                     return PartType.getType(response.getString("Type"));
                 }
             }
