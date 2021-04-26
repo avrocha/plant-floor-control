@@ -160,22 +160,17 @@ public class Factory {
 
                         System.out.println("Test0");
 
-                        Part part = new Part(UUID.randomUUID(), 0, type);
+                        Part tempPart = new Part(UUID.randomUUID(), 0, type);
                         Conveyor source = routingManager.getConveyor(conveyorId);
 
                         for(Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
-                            Route route = routingManager.traceRoute(part, source, target);
+                            Route route = routingManager.traceRoute(tempPart, source, target);
 
                             if (route == null) {
                                 continue;
                             }
 
                             commsManager.sendPlcRoute(route);
-
-                            if (!databaseManager.insertPart(part)) {
-                                System.out.println("Could not insert part in the database!");
-                            }
-
                             break;
                         }
                     }

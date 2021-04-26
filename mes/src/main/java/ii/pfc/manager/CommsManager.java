@@ -113,6 +113,7 @@ public class CommsManager implements ICommsManager {
                 builder.addItem(String.format("Conveyor[%d]", i), String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Route[%d]", i), conveyor.getId());
                 i++;
             }
+            builder.addItem("Type", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.PartType", route.getPart().getType().getName());
             builder.addItem("ID", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.CheckPart", true);
 
             PlcWriteRequest writeRequest = builder.build();
