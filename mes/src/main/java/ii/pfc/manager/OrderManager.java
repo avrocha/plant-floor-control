@@ -45,7 +45,12 @@ public class OrderManager implements IOrderManager {
                             continue;
                         }
 
+                        if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
+                            continue;
+                        }
+
                         if (databaseManager.updateUnloadOrderState(order.getOrderId(), UnloadOrder.UnloadState.IN_PROGRESS)) {
+                            commsManager.dispatchWarehouseOutConveyorExit(source.getId(), part.getType());
                             commsManager.sendPlcRoute(route);
                         }
 

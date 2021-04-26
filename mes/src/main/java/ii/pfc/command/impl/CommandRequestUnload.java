@@ -38,6 +38,21 @@ public class CommandRequestUnload implements CommandRequest {
 
      */
 
+    public CommandRequestUnload() {
+
+    }
+
+    public CommandRequestUnload(int orderId, PartType partType, int conveyorId, int quantity) {
+        this.orderId = orderId;
+        this.partType = partType;
+        this.conveyorId = conveyorId;
+        this.quantity = quantity;
+    }
+
+    /*
+
+     */
+
     @Override
     public void onReceive(ICommandManager commandManager, IOrderManager orderManager, IDatabaseManager databaseManager,
         InetSocketAddress source) {

@@ -18,6 +18,7 @@ import ii.pfc.part.PartType;
 import ii.pfc.route.Route;
 import ii.pfc.shell.ShellCommand;
 import ii.pfc.shell.impl.ShellCommandInventory;
+import ii.pfc.shell.impl.ShellCommandOrder;
 import ii.pfc.shell.impl.ShellCommandStop;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -113,6 +114,7 @@ public class Factory {
 
         this.registerShellCommand(new ShellCommandStop(this));
         this.registerShellCommand(new ShellCommandInventory(this.databaseManager));
+        this.registerShellCommand(new ShellCommandOrder(this.commandManager));
     }
 
     /*

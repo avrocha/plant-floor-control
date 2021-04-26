@@ -39,11 +39,13 @@ public class CommandManager implements ICommandManager {
 
      */
 
-    private void enqueueRequest(CommandRequest request, InetSocketAddress address) {
+    @Override
+    public void enqueueRequest(CommandRequest request, InetSocketAddress address) {
         requestQueue.offer(new CommandRequestSource(request, address));
     }
 
-    private void enqueueRequests(CommandRequest[] requests, InetSocketAddress address) {
+    @Override
+    public void enqueueRequests(CommandRequest[] requests, InetSocketAddress address) {
         for (CommandRequest request : requests) {
             enqueueRequest(request, address);
         }

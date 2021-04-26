@@ -25,9 +25,25 @@ public interface ICommsManager {
 
     PlcConnection getPlcConnection() throws PlcConnectionException;
 
+    /*
+
+     */
+
     void dispatchWarehouseInConveyorEntry(short conveyorId);
 
     Part getWarehouseInConveyorPart(short conveyorId);
+
+    /*
+
+     */
+
+    void dispatchWarehouseOutConveyorExit(short conveyorId, PartType type);
+
+    boolean getWarehouseOutConveyorStatus(short conveyorId);
+
+    /*
+
+     */
 
     boolean getLoadConveyorStatus(short conveyorId);
 
