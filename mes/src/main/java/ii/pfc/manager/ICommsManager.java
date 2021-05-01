@@ -47,6 +47,23 @@ public interface ICommsManager {
 
     boolean getLoadConveyorStatus(short conveyorId);
 
+    /*
+
+     */
+
+    int getSliderConveyorOccupation(short conveyorId);
+
+    /*
+
+     */
+
+    short getAssemblyConveyorTool(short conveyorId);
+
+    boolean getAssemblyConveyorOccupation(short conveyorId);
+
+    /*
+
+    */
     void sendPlcRoute(Route route);
 
 }

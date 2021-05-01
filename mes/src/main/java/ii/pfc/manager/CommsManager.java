@@ -81,7 +81,7 @@ public class CommsManager implements ICommsManager {
     }
 
     private boolean isConnected() {
-        return false;
+        return true;
     }
 
     /*
@@ -206,10 +206,6 @@ public class CommsManager implements ICommsManager {
         return false;
     }
 
-    /*
-
-     */
-
     @Override
     public boolean getLoadConveyorStatus(short conveyorId) {
         if (!isConnected()) {
@@ -237,6 +233,91 @@ public class CommsManager implements ICommsManager {
 
         return false;
     }
+
+    @Override
+    public int getSliderConveyorOccupation(short conveyorId) {
+        if (!isConnected()) {
+            return -1;
+        }
+
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
+
+            String fieldName = "SliderStatus";
+            builder.addItem(fieldName,
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.SlidersStatus[%d]", (short)(conveyorId - 60)));
+
+            PlcReadRequest readRequest = builder.build();
+            PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
+
+            if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+                return response.getInteger(fieldName);
+            }
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    @Override
+    public short getAssemblyConveyorTool(short conveyorId) {
+        if (!isConnected()) {
+            return -1;
+        }
+
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
+
+            builder.addItem("ConveyorActualTool",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.ConveyorParts[%d].ActualTool", (short)(conveyorId)));
+
+            PlcReadRequest readRequest = builder.build();
+            PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
+
+            if(response.getResponseCode("ConveyorActualTool") == PlcResponseCode.OK) {
+                return response.getShort("ConveyorActualTool");
+            }
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    @Override
+    public boolean getAssemblyConveyorOccupation(short conveyorId) {
+        if (!isConnected()) {
+            return false;
+        }
+
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
+
+            builder.addItem("ConveyorHasPart",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Si", (short)(conveyorId)));
+
+            PlcReadRequest readRequest = builder.build();
+            PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
+            if(response.getResponseCode("ConveyorHasPart") == PlcResponseCode.OK) {
+                return response.getBoolean("ConveyorHasPart");
+            }
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /*
+
+     */
 
     @Override
     public void sendPlcRoute(Route route) {

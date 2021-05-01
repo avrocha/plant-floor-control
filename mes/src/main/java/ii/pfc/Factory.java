@@ -59,28 +59,26 @@ public class Factory {
         this.routingManager = RoutingManager.builder()
 
              /*unidirectional right side edges*/
-            .unidirectional(LIN1, ROT31, DEFAULT_WEIGHT)
-            .unidirectional(ROT31, LIN3, DEFAULT_WEIGHT)
-            .unidirectional(LIN3, PSH51, DEFAULT_WEIGHT)
-            .unidirectional(PSH51, SLD63, DEFAULT_WEIGHT)
-            .unidirectional(PSH51, PSH52, DEFAULT_WEIGHT)
-            .unidirectional(PSH52, SLD62, DEFAULT_WEIGHT)
-            .unidirectional(PSH52, PSH53, DEFAULT_WEIGHT)
-            .unidirectional(PSH53, SLD61, DEFAULT_WEIGHT)
-            .unidirectional(PSH53, LIN4, DEFAULT_WEIGHT)
-            .unidirectional(LIN4, ROT38, DEFAULT_WEIGHT)
-            .unidirectional(LIN5, ROT38, DEFAULT_WEIGHT)
-            .unidirectional(ROT38, LIN6, DEFAULT_WEIGHT)
-            .unidirectional(LIN6, ROT39, DEFAULT_WEIGHT)
             .unidirectional(ROT39, LIN7, DEFAULT_WEIGHT)
             .unidirectional(LIN8, LIN9, DEFAULT_WEIGHT)
-            .unidirectional(LIN9, ROT33, DEFAULT_WEIGHT)
-            .unidirectional(ROT33, ROT32, DEFAULT_WEIGHT)
+            .unidirectional(LIN1, ROT31, DEFAULT_WEIGHT)
+            .unidirectional(LIN5, ROT38, DEFAULT_WEIGHT)
+            .unidirectional(ROT31, LIN3, DEFAULT_WEIGHT)
+            .unidirectional(LIN3, PSH51, DEFAULT_WEIGHT)
+            .unidirectional(PSH51, SLD63, getSliderWeight((short) 63))
+            .unidirectional(PSH51, PSH52, DEFAULT_WEIGHT)
+            .unidirectional(PSH52, SLD62, getSliderWeight((short) 62))
+            .unidirectional(PSH52, PSH53, DEFAULT_WEIGHT)
+            .unidirectional(PSH53, SLD61, getSliderWeight((short) 61))
+            .unidirectional(PSH53, LIN4, DEFAULT_WEIGHT)
+            .unidirectional(LIN4, ROT38, DEFAULT_WEIGHT)
             .unidirectional(ROT32, ROT34, DEFAULT_WEIGHT)
             .unidirectional(ROT34, ROT35, DEFAULT_WEIGHT)
             .unidirectional(ROT35, ROT36, DEFAULT_WEIGHT)
             .unidirectional(ROT36, ROT37, DEFAULT_WEIGHT)
             .unidirectional(ROT37, ROT39, DEFAULT_WEIGHT)
+            .unidirectional(LIN9, ROT33, DEFAULT_WEIGHT)
+            .unidirectional(ROT33, ROT32, DEFAULT_WEIGHT)
 
 
             /*unidirectional left side edges*/
@@ -95,18 +93,20 @@ public class Factory {
             .unidirectional(ROT40, LIN12, DEFAULT_WEIGHT)
 
             /*bidirectional right side edges*/
-            .bidirectional(ROT37, ASM24, DEFAULT_WEIGHT)
-            .bidirectional(ROT36, ASM23, DEFAULT_WEIGHT)
-            .bidirectional(ROT35, ASM22, DEFAULT_WEIGHT)
-            .bidirectional(ROT34, ASM21, DEFAULT_WEIGHT)
+            .bidirectional(ROT37, ASM24, getAssemblyWeight((short) 24))
+            .bidirectional(ROT36, ASM23, getAssemblyWeight((short) 23))
+            .bidirectional(ROT35, ASM22, getAssemblyWeight((short) 22))
+            .bidirectional(ROT34, ASM21, getAssemblyWeight((short) 21))
             .bidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
             .bidirectional(ROT31, LIN2, DEFAULT_WEIGHT)
+            .bidirectional(ROT38, LIN6, DEFAULT_WEIGHT)
+            .bidirectional(LIN6, ROT39, DEFAULT_WEIGHT)
 
             /*bidirectional left side edges*/
-            .bidirectional(ROT44, ASM25, DEFAULT_WEIGHT)
-            .bidirectional(ROT43, ASM26, DEFAULT_WEIGHT)
-            .bidirectional(ROT42, ASM27, DEFAULT_WEIGHT)
-            .bidirectional(ROT41, ASM28, DEFAULT_WEIGHT)
+            .bidirectional(ROT44, ASM25, getAssemblyWeight((short) 25))
+            .bidirectional(ROT43, ASM26, getAssemblyWeight((short) 26))
+            .bidirectional(ROT42, ASM27, getAssemblyWeight((short) 27))
+            .bidirectional(ROT41, ASM28, getAssemblyWeight((short) 28))
             .build();
 
         this.orderManager = new OrderManager(commsManager, this.databaseManager, this.routingManager);
@@ -198,6 +198,33 @@ public class Factory {
 
      */
 
+    private Function<RoutingManager.RouteData, Double> getSliderWeight(short conveyorId) {
+        return (routeData) -> {
+            if (commsManager.getSliderConveyorOccupation(conveyorId) == 3) {
+                return Double.MAX_VALUE;
+            }
+
+            return DEFAULT_WEIGHT.apply(routeData);
+        };
+    }
+
+    /*
+
+     */
+
+    private Function<RoutingManager.RouteData, Double> getAssemblyWeight(short conveyorId) {
+        return (routeData) -> {
+            if (commsManager.getAssemblyConveyorOccupation(conveyorId)) {
+                return Double.MAX_VALUE;
+            }
+
+            return DEFAULT_WEIGHT.apply(routeData);
+        };
+    }
+
+    /*
+
+     */
     private final Map<String, ShellCommand> commands = new HashMap<>();
 
     private void registerShellCommand(ShellCommand command) {

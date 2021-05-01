@@ -149,7 +149,7 @@ public class OrderManager implements IOrderManager {
         Collection<TransformationOrder> orders = databaseManager.fetchPendingTransformOrders();
 
         for(TransformationOrder order : orders) {
-            //logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
+            logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
             Collection<Part> parts = databaseManager.fetchParts(order.getOrderId(), Part.PartState.STORED, 5);
 
             for(Part part : parts) {
@@ -184,6 +184,7 @@ public class OrderManager implements IOrderManager {
             }
 
             parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, order.getRemaining());
+            //logger.info("Received {} parts", parts.size());
 
             for(Part part : parts) {
                 Conveyor minimumSource = null;
