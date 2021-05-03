@@ -2,9 +2,9 @@ package ii.pfc.part;
 
 public enum EnumTool {
 
-    TOOL_1(1),
-    TOOL_2(2),
-    TOOL_3(3);
+    T1(1),
+    T2(2),
+    T3(3);
 
     private final int id;
 

@@ -18,6 +18,7 @@ public class ProcessRegistry {
     private static final Graph<PartType, ProcessEdge> graph = new DefaultUndirectedGraph<>(ProcessEdge.class);
 
     public static void registerProcess(Process process) {
+        System.out.println(process.toString());
         graph.addVertex(process.getSource());
         graph.addVertex(process.getResult());
         graph.addEdge(process.getSource(), process.getResult(), new ProcessEdge(process));
@@ -32,6 +33,10 @@ public class ProcessRegistry {
         }
 
         return output;
+    }
+
+    public static Graph<PartType, ProcessEdge> getProcessGraph() {
+        return graph;
     }
 
     /*

@@ -127,7 +127,7 @@ public class Factory {
     private void mainTask() {
         this.databaseManager.openConnection();
         this.databaseManager.fetchProcesses().forEach(ProcessRegistry::registerProcess);
-
+        
         this.running = true;
 
         Stopwatch dbPollTimer = Stopwatch.createStarted();
