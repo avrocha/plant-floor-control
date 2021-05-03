@@ -2,11 +2,14 @@ package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.part.Part;
+import ii.pfc.part.Process;
 import ii.pfc.part.PartType;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
 import ii.pfc.udp.UdpServer;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +18,7 @@ import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
+import org.apache.plc4x.java.api.messages.PlcSubscriptionRequest;
 import org.apache.plc4x.java.api.messages.PlcWriteRequest;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.plc4x.java.utils.connectionpool.PooledPlcDriverManager;
@@ -79,6 +83,10 @@ public class CommsManager implements ICommsManager {
         PlcConnection connection = this.plcDriverManager.getConnection(opcConnectionUrl);
         return connection;
     }
+
+    /*
+
+     */
 
     private boolean isConnected() {
         return true;
@@ -170,7 +178,7 @@ public class CommsManager implements ICommsManager {
             PlcWriteRequest writeRequest = builder.build();
 
             // Async execution
-            writeRequest.execute();
+            writeRequest.execute().get(1000, TimeUnit.SECONDS);
         } catch (PlcConnectionException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -300,11 +308,13 @@ public class CommsManager implements ICommsManager {
 
             builder.addItem("ConveyorHasPart",
                     String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Si", (short)(conveyorId)));
+            builder.addItem("ConveyorIsReserved",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.IsReserved", (short)(conveyorId)));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
-            if(response.getResponseCode("ConveyorHasPart") == PlcResponseCode.OK) {
-                return response.getBoolean("ConveyorHasPart");
+            if(response.getResponseCode("ConveyorHasPart") == PlcResponseCode.OK && response.getResponseCode("ConveyorIsReserved") == PlcResponseCode.OK) {
+                return response.getBoolean("ConveyorHasPart") && !response.getBoolean("ConveyorIsReserved");
             }
         } catch (PlcConnectionException e) {
             e.printStackTrace();
@@ -321,6 +331,11 @@ public class CommsManager implements ICommsManager {
 
     @Override
     public void sendPlcRoute(Route route) {
+        sendPlcRoute(route, null);
+    }
+
+    @Override
+    public void sendPlcRoute(Route route, Process process) {
         if (!isConnected()) {
             return;
         }
@@ -333,14 +348,24 @@ public class CommsManager implements ICommsManager {
                 builder.addItem(String.format("Conveyor[%d]", i), String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Route[%d]", i), conveyor.getId());
                 i++;
             }
+
             builder.addItem("Type", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.PartType", route.getPart().getType().getName());
             builder.addItem("ID", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.PartId", route.getPart().getId().toString());
             builder.addItem("CHECK", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.CheckPart", true);
 
+            if (process != null) {
+                builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", process.getTool().getId());
+                builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", process.getDuration().toSeconds());
+                builder.addItem("RESERVE", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Reserve", (short)(route.getTarget().getId())), true);
+            } else {
+                builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", 1);
+                builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", 0);
+            }
+
             PlcWriteRequest writeRequest = builder.build();
 
             // Async execution
-            writeRequest.execute();
+            writeRequest.execute().get(1000, TimeUnit.SECONDS);
         } catch (PlcConnectionException e) {
             e.printStackTrace();
         } catch (Exception e) {

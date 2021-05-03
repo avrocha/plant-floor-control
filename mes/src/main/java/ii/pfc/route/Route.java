@@ -36,6 +36,14 @@ public class Route {
 
      */
 
+    public Conveyor getSource() {
+        return conveyorList.isEmpty() ? null : conveyorList.get(0);
+    }
+
+    public Conveyor getTarget() {
+        return conveyorList.isEmpty() ? null : conveyorList.get(conveyorList.size() - 1);
+    }
+
     public void addConveyor(Conveyor conveyor) {
         this.conveyorList.add(conveyor);
     }

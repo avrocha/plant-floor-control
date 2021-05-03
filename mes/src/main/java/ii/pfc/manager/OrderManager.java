@@ -6,8 +6,11 @@ import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
+import ii.pfc.part.Process;
+import ii.pfc.part.ProcessRegistry;
 import ii.pfc.route.Route;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -25,11 +28,19 @@ public class OrderManager implements IOrderManager {
 
     private final IRoutingManager routingManager;
 
+    //
+
+    //
+
     public OrderManager(ICommsManager commsManager, IDatabaseManager databaseManager, IRoutingManager routingManager) {
         this.commsManager = commsManager;
         this.databaseManager = databaseManager;
         this.routingManager = routingManager;
     }
+
+    /*
+
+     */
 
     @Override
     public void checkWarehouseEntries() {
@@ -110,7 +121,7 @@ public class OrderManager implements IOrderManager {
 
         for(UnloadOrder order : orders) {
             //logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
-            Collection<Part> parts = databaseManager.fetchParts(0, order.getPartType(), Part.PartState.STORED, order.getRemaining());
+            Collection<Part> parts = databaseManager.fetchParts(0, order.getPartType(), Part.PartState.STORED, 1);
 
             for(Part part : parts) {
                 Conveyor minimumSource = null;
@@ -150,9 +161,15 @@ public class OrderManager implements IOrderManager {
 
         for(TransformationOrder order : orders) {
             logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
-            Collection<Part> parts = databaseManager.fetchParts(order.getOrderId(), Part.PartState.STORED, 5);
+            Collection<Part> parts = databaseManager.fetchParts(order.getOrderId(), Part.PartState.STORED, 1);
 
             for(Part part : parts) {
+                List<Process> processes = ProcessRegistry.getProcesses(part.getType(), order.getTargetType());
+
+                if(processes.isEmpty()) {
+                    continue;
+                }
+
                 Conveyor minimumSource = null;
                 Route minimumRoute = null;
 
@@ -178,15 +195,21 @@ public class OrderManager implements IOrderManager {
                 if (minimumRoute != null) {
                     if (databaseManager.updatePartState(part.getId(), Part.PartState.PROCESSING)) {
                         commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
-                        commsManager.sendPlcRoute(minimumRoute);
+                        commsManager.sendPlcRoute(minimumRoute, processes.get(0));
                     }
                 }
             }
 
-            parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, order.getRemaining());
+            parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, 1);
             //logger.info("Received {} parts", parts.size());
 
             for(Part part : parts) {
+                List<Process> processes = ProcessRegistry.getProcesses(part.getType(), order.getTargetType());
+
+                if(processes.isEmpty()) {
+                    continue;
+                }
+
                 Conveyor minimumSource = null;
                 Route minimumRoute = null;
 
@@ -212,7 +235,7 @@ public class OrderManager implements IOrderManager {
                 if (minimumRoute != null) {
                     if (databaseManager.updatePartStateAndOrder(part.getId(), Part.PartState.PROCESSING, order.getOrderId())) {
                         commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
-                        commsManager.sendPlcRoute(minimumRoute);
+                        commsManager.sendPlcRoute(minimumRoute, processes.get(0));
                     }
                 }
             }

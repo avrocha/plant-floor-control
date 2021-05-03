@@ -49,6 +49,8 @@ public interface IDatabaseManager {
 
     //
 
+    Collection<Process> fetchProcesses();
+
     Duration fetchProcessDuration(int assemblerId, PartType type);
 
     /*

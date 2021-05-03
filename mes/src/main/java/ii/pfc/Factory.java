@@ -15,6 +15,7 @@ import ii.pfc.manager.OrderManager;
 import ii.pfc.manager.RoutingManager;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
+import ii.pfc.part.ProcessRegistry;
 import ii.pfc.route.Route;
 import ii.pfc.shell.ShellCommand;
 import ii.pfc.shell.impl.ShellCommandInventory;
@@ -125,6 +126,7 @@ public class Factory {
 
     private void mainTask() {
         this.databaseManager.openConnection();
+        this.databaseManager.fetchProcesses().forEach(ProcessRegistry::registerProcess);
 
         this.running = true;
 

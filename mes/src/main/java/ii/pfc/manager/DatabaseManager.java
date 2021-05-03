@@ -3,6 +3,7 @@ package ii.pfc.manager;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
+import ii.pfc.part.EnumTool;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
@@ -23,6 +24,8 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.postgresql.util.PGInterval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
 
 public class DatabaseManager implements IDatabaseManager {
 
@@ -321,6 +324,36 @@ public class DatabaseManager implements IDatabaseManager {
         }
 
         return parts;
+    }
+
+    @Override
+    public Collection<Process> fetchProcesses() {
+        List<Process> processes = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement(
+                    "SELECT * FROM process;"
+            )) {
+                ResultSet result = sql.executeQuery();
+                while (result.next()) {
+                    PGInterval interval = (PGInterval) result.getObject("duration");
+
+                    processes.add(new Process(
+                            PartType.getType(result.getString("source_type")),
+                            PartType.getType(result.getString("target_type")),
+                            EnumTool.valueOf(result.getString("tool")),
+                            Duration.ofSeconds((long) interval.getSeconds())
+
+                    ));
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return processes;
     }
 
     /*
