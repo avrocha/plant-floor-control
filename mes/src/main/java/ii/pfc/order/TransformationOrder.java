@@ -18,6 +18,8 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
 
     private final int remaining;
 
+    private final int holding;
+
     private final int completed;
 
     private final LocalDateTime deadline;
@@ -25,13 +27,14 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
     private final int penalty;
 
     public TransformationOrder(int orderId, PartType sourceType, PartType targetType, LocalDateTime date, int quantity,
-                               int remaining, int completed, LocalDateTime deadline, int penalty) {
+                               int remaining, int holding, int completed, LocalDateTime deadline, int penalty) {
         this.orderId = orderId;
         this.sourceType = sourceType;
         this.targetType = targetType;
         this.date = date;
         this.quantity = quantity;
         this.remaining = remaining;
+        this.holding = holding;
         this.completed = completed;
         this.deadline = deadline;
         this.penalty = penalty;
@@ -63,6 +66,10 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
 
     public int getRemaining() {
         return remaining;
+    }
+
+    public int getHolding() {
+        return holding;
     }
 
     public int getCompleted() {

@@ -77,6 +77,7 @@ public class CommandRequestTransform implements CommandRequest {
                 quantity,
                 quantity,
                 0,
+                0,
                 LocalDateTime.now().plusSeconds(deadline),
                 penalty
         );

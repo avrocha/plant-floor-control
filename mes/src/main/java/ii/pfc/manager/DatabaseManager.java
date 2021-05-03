@@ -21,8 +21,6 @@ import org.postgresql.util.PGInterval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-
 public class DatabaseManager implements IDatabaseManager {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
@@ -152,6 +150,7 @@ public class DatabaseManager implements IDatabaseManager {
                     result.getTimestamp("date").toLocalDateTime(),
                     result.getInt("quantity"),
                     result.getInt("remaining"),
+                    result.getInt("holding"),
                     result.getInt("completed"),
                     result.getTimestamp("deadline").toLocalDateTime(),
                     result.getInt("penalty")
