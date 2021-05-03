@@ -207,6 +207,7 @@ public class OrderManager implements IOrderManager {
                 List<Process> processes = ProcessRegistry.getProcesses(part.getType(), order.getTargetType());
 
                 if(processes.isEmpty()) {
+                    System.out.println("NO PROCESS!");
                     continue;
                 }
 

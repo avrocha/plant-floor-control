@@ -16,10 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
-import org.apache.plc4x.java.api.messages.PlcReadRequest;
-import org.apache.plc4x.java.api.messages.PlcReadResponse;
-import org.apache.plc4x.java.api.messages.PlcSubscriptionRequest;
-import org.apache.plc4x.java.api.messages.PlcWriteRequest;
+import org.apache.plc4x.java.api.messages.*;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.plc4x.java.utils.connectionpool.PooledPlcDriverManager;
 import org.slf4j.Logger;
@@ -314,7 +311,7 @@ public class CommsManager implements ICommsManager {
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
             if(response.getResponseCode("ConveyorHasPart") == PlcResponseCode.OK && response.getResponseCode("ConveyorIsReserved") == PlcResponseCode.OK) {
-                return response.getBoolean("ConveyorHasPart") && !response.getBoolean("ConveyorIsReserved");
+                return response.getBoolean("ConveyorHasPart") || response.getBoolean("ConveyorIsReserved");
             }
         } catch (PlcConnectionException e) {
             e.printStackTrace();
@@ -340,6 +337,8 @@ public class CommsManager implements ICommsManager {
             return;
         }
 
+        System.out.println(process == null ? " no " : "sr - " + process.toString());
+
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
 
@@ -354,18 +353,24 @@ public class CommsManager implements ICommsManager {
             builder.addItem("CHECK", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.CheckPart", true);
 
             if (process != null) {
-                builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", process.getTool().getId());
-                builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", process.getDuration().toSeconds());
-                builder.addItem("RESERVE", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Reserve", (short)(route.getTarget().getId())), true);
+                System.out.println("ABC");
+                builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", (short) process.getTool().getId());
+                builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) process.getDuration().toSeconds());
+                builder.addItem("RESERVE", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Reserve", route.getTarget().getId()), true);
             } else {
-                builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", 1);
-                builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", 0);
+                System.out.println("DEF");
+                builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", (short) 1);
+                builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) 0);
             }
 
             PlcWriteRequest writeRequest = builder.build();
 
             // Async execution
-            writeRequest.execute().get(1000, TimeUnit.SECONDS);
+            PlcWriteResponse response = writeRequest.execute().get(1000, TimeUnit.SECONDS);
+
+            for (String fieldName : writeRequest.getFieldNames()) {
+                System.out.println(fieldName + " - " + response.getResponseCode(fieldName));
+            }
         } catch (PlcConnectionException e) {
             e.printStackTrace();
         } catch (Exception e) {
