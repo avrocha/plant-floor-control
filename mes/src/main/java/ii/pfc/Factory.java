@@ -37,6 +37,10 @@ public class Factory {
 
     //
 
+    private final ProcessRegistry processRegistry;
+
+    //
+
     public final ICommsManager commsManager;
 
     private final IDatabaseManager databaseManager;
@@ -54,6 +58,8 @@ public class Factory {
     //
 
     public Factory() {
+        this.processRegistry = new ProcessRegistry();
+
         this.commsManager = new CommsManager(54321, new InetSocketAddress("127.0.0.1", 4840));
         this.databaseManager = new DatabaseManager();
 
@@ -110,8 +116,8 @@ public class Factory {
             .bidirectional(ROT41, ASM28, getAssemblyWeight((short) 28))
             .build();
 
-        this.orderManager = new OrderManager(commsManager, this.databaseManager, this.routingManager);
-        this.commandManager = new CommandManager(commsManager, this.orderManager, this.databaseManager);
+        this.orderManager = new OrderManager(this.processRegistry, this.commsManager, this.databaseManager, this.routingManager);
+        this.commandManager = new CommandManager(this.commsManager, this.orderManager, this.databaseManager);
 
         this.registerShellCommand(new ShellCommandStop(this));
         this.registerShellCommand(new ShellCommandInventory(this.databaseManager));
@@ -126,7 +132,7 @@ public class Factory {
 
     private void mainTask() {
         this.databaseManager.openConnection();
-        this.databaseManager.fetchProcesses().forEach(ProcessRegistry::registerProcess);
+        this.databaseManager.fetchProcesses().forEach(processRegistry::registerProcess);
         
         this.running = true;
 

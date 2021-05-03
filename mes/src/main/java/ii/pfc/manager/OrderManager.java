@@ -22,6 +22,10 @@ public class OrderManager implements IOrderManager {
 
     //
 
+    private final ProcessRegistry processRegistry;
+
+    //
+
     private final ICommsManager commsManager;
 
     private final IDatabaseManager databaseManager;
@@ -32,7 +36,8 @@ public class OrderManager implements IOrderManager {
 
     //
 
-    public OrderManager(ICommsManager commsManager, IDatabaseManager databaseManager, IRoutingManager routingManager) {
+    public OrderManager(ProcessRegistry processRegistry, ICommsManager commsManager, IDatabaseManager databaseManager, IRoutingManager routingManager) {
+        this.processRegistry = processRegistry;
         this.commsManager = commsManager;
         this.databaseManager = databaseManager;
         this.routingManager = routingManager;
@@ -164,7 +169,7 @@ public class OrderManager implements IOrderManager {
             Collection<Part> parts = databaseManager.fetchParts(order.getOrderId(), Part.PartState.STORED, 1);
 
             for(Part part : parts) {
-                List<Process> processes = ProcessRegistry.getProcesses(part.getType(), order.getTargetType());
+                List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
                 if(processes.isEmpty()) {
                     continue;
@@ -204,7 +209,7 @@ public class OrderManager implements IOrderManager {
             //logger.info("Received {} parts", parts.size());
 
             for(Part part : parts) {
-                List<Process> processes = ProcessRegistry.getProcesses(part.getType(), order.getTargetType());
+                List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
                 if(processes.isEmpty()) {
                     System.out.println("NO PROCESS!");
