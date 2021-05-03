@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 public interface IDatabaseManager {
@@ -46,6 +47,8 @@ public interface IDatabaseManager {
     Collection<Part> fetchParts(int orderId, PartType type, Part.PartState state, int limit);
 
     Collection<Part> fetchUnloadedParts();
+
+    Map<PartType, Integer> countPartsTypes(Part.PartState state);
 
     //
 

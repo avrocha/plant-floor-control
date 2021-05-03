@@ -14,11 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.postgresql.util.PGInterval;
@@ -324,6 +320,38 @@ public class DatabaseManager implements IDatabaseManager {
         }
 
         return parts;
+    }
+
+    @Override
+    public Map<PartType, Integer> countPartsTypes(Part.PartState state) {
+        Map<PartType, Integer> partsCount = new HashMap<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement(
+                    "SELECT type, COUNT(*) as total FROM part WHERE state=?::part_state GROUP BY type;"
+            )) {
+                sql.setString(1, state.name());
+
+                ResultSet result = sql.executeQuery();
+                while (result.next()) {
+                    PartType type = PartType.getType(result.getString("type"));
+                    if(type.isUnknown()) {
+                        continue;
+                    }
+
+                    partsCount.put(
+                            type,
+                            result.getInt("total")
+                    );
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return partsCount;
     }
 
     @Override
