@@ -14,6 +14,7 @@ import ii.pfc.manager.IRoutingManager;
 import ii.pfc.manager.OrderManager;
 import ii.pfc.manager.RoutingManager;
 import ii.pfc.part.Part;
+import ii.pfc.gui.GUI;
 import ii.pfc.part.PartType;
 import ii.pfc.part.ProcessRegistry;
 import ii.pfc.route.Route;
@@ -50,6 +51,10 @@ public class Factory {
     private final IOrderManager orderManager;
 
     private final ICommandManager commandManager;
+
+    //
+
+    private final GUI gui;
 
     //
 
@@ -119,6 +124,8 @@ public class Factory {
         this.orderManager = new OrderManager(this.processRegistry, this.commsManager, this.databaseManager, this.routingManager);
         this.commandManager = new CommandManager(this.commsManager, this.orderManager, this.databaseManager);
 
+        this.gui = new GUI(this.databaseManager);
+
         this.registerShellCommand(new ShellCommandStop(this));
         this.registerShellCommand(new ShellCommandInventory(this.databaseManager));
         this.registerShellCommand(new ShellCommandOrder(this.commandManager));
@@ -131,7 +138,6 @@ public class Factory {
     private static short LOAD_ORDER_ID = 1;
 
     private void mainTask() {
-        this.databaseManager.openConnection();
         this.databaseManager.fetchProcesses().forEach(processRegistry::registerProcess);
         
         this.running = true;
@@ -174,13 +180,20 @@ public class Factory {
         }
     }
 
+    private void uiTask() {
+        this.gui.show();
+    }
+
     /*
 
      */
 
     public void start() {
+        this.databaseManager.openConnection();
+
         this.executor.submit(this.commsManager::startUdpServer);
         this.executor.submit(this::mainTask);
+        this.executor.submit(this::uiTask);
 
         this.shellTask();
     }
