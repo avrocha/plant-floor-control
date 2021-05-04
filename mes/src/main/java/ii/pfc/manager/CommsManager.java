@@ -86,7 +86,7 @@ public class CommsManager implements ICommsManager {
      */
 
     private boolean isConnected() {
-        return true;
+        return false;
     }
 
     /*

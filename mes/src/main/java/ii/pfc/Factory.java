@@ -124,7 +124,7 @@ public class Factory {
         this.orderManager = new OrderManager(this.processRegistry, this.commsManager, this.databaseManager, this.routingManager);
         this.commandManager = new CommandManager(this.commsManager, this.orderManager, this.databaseManager);
 
-        this.gui = new GUI(this.databaseManager);
+        this.gui = new GUI(this.databaseManager, this.routingManager);
 
         this.registerShellCommand(new ShellCommandStop(this));
         this.registerShellCommand(new ShellCommandInventory(this.databaseManager));
@@ -190,6 +190,7 @@ public class Factory {
 
     public void start() {
         this.databaseManager.openConnection();
+        this.gui.init();
 
         this.executor.submit(this.commsManager::startUdpServer);
         this.executor.submit(this::mainTask);

@@ -1,5 +1,7 @@
 package ii.pfc.manager;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
@@ -300,17 +302,27 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     @Override
-    public Collection<Part> fetchUnloadedParts() {
-        List<Part> parts = new ArrayList<>();
+    public Map<PartType, Integer> countUnloadedParts(short conveyorId) {
+        Map<PartType, Integer> partsCount = new HashMap<>();
 
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                    "SELECT * FROM unloading_bay_log ub INNER JOIN part p ON ub.unloading_part=p.id;"
+                    "SELECT unloading_type, COUNT(*) as total FROM unloading_bay_log WHERE conveyor_id=? GROUP BY unloading_type;"
             )) {
+                sql.setShort(1, conveyorId);
+
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
-                    parts.add(_extractPart(result));
+                    PartType type = PartType.getType(result.getString("type"));
+                    if(type.isUnknown()) {
+                        continue;
+                    }
+
+                    partsCount.put(
+                            type,
+                            result.getInt("total")
+                    );
                 }
             }
 
@@ -318,7 +330,7 @@ public class DatabaseManager implements IDatabaseManager {
             ex.printStackTrace();
         }
 
-        return parts;
+        return partsCount;
     }
 
     @Override
@@ -389,15 +401,14 @@ public class DatabaseManager implements IDatabaseManager {
 
     @Override
     public Duration fetchProcessDuration(int assemblerId, PartType type) {
-        Duration duration = Duration.ofSeconds(0);
-
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                    .prepareStatement("SELECT duration FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
+                    .prepareStatement("SELECT SUM(duration) as total FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
                 ResultSet result = sql.executeQuery();
-                while (result.next()) {
-                    PGInterval interval = (PGInterval) result.getObject("duration");
+                if (result.next()) {
+                    PGInterval interval = (PGInterval) result.getObject("total");
+                    return Duration.ofSeconds((long) interval.getSeconds());
                 }
             }
 
@@ -405,7 +416,32 @@ public class DatabaseManager implements IDatabaseManager {
             ex.printStackTrace();
         }
 
-        return duration;
+        return Duration.ZERO;
+    }
+
+    @Override
+    public Map<PartType, Duration> fetchProcessDurations(int assemblerId) {
+        Map<PartType, Duration> durationMap = new HashMap<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection
+                    .prepareStatement("SELECT part_target_type, SUM(duration) as total FROM process_log where assembler_id = ? GROUP BY part_target_type;")) {
+                ResultSet result = sql.executeQuery();
+                while (result.next()) {
+                    PGInterval interval = (PGInterval) result.getObject("total");
+                    durationMap.put(
+                            PartType.getType(result.getString("part_target_type")),
+                            Duration.ofSeconds((long) interval.getSeconds())
+                    );
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return durationMap;
     }
 
     /*

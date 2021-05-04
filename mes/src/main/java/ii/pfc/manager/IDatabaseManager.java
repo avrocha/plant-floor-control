@@ -1,5 +1,6 @@
 package ii.pfc.manager;
 
+import com.google.common.collect.Multimap;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
@@ -46,7 +47,7 @@ public interface IDatabaseManager {
 
     Collection<Part> fetchParts(int orderId, PartType type, Part.PartState state, int limit);
 
-    Collection<Part> fetchUnloadedParts();
+    Map<PartType, Integer> countUnloadedParts(short conveyorId);
 
     Map<PartType, Integer> countPartsTypes(Part.PartState state);
 
@@ -55,6 +56,8 @@ public interface IDatabaseManager {
     Collection<Process> fetchProcesses();
 
     Duration fetchProcessDuration(int assemblerId, PartType type);
+
+    Map<PartType, Duration> fetchProcessDurations(int assemblerId);
 
     /*
 

@@ -11,13 +11,9 @@ public class Conveyor {
 
     private final EnumConveyorType type;
 
-    private final List<Part> partList;
-
     public Conveyor(int id, EnumConveyorType type) {
         this.id = (short) id;
         this.type = type;
-
-        this.partList = new ArrayList<>();
     }
 
     /*
@@ -30,18 +26,6 @@ public class Conveyor {
 
     public EnumConveyorType getType() {
         return type;
-    }
-
-    public List<Part> getParts() {
-        return Collections.unmodifiableList(partList);
-    }
-
-    /*
-
-     */
-
-    public boolean hasPart(Part part) {
-        return partList.contains(part);
     }
 
     /*

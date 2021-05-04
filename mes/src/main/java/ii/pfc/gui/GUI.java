@@ -2,7 +2,10 @@ package ii.pfc.gui;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import ii.pfc.conveyor.Conveyor;
+import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.manager.IDatabaseManager;
+import ii.pfc.manager.IRoutingManager;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 
@@ -18,29 +21,24 @@ import java.util.Map;
 
 public class GUI extends JFrame {
 
-    JLabel tab1Title;
+    private final IDatabaseManager databaseManager;
 
-    JLabel tab2Title;
+    private final IRoutingManager routingManager;
 
-    JLabel tab3Title;
-
-
-    JTable assemblersTable;
-
-    JTable unloadedPartsTable;
-
-    JTable inventoryTable;
-
-
-    public GUI(IDatabaseManager databaseManager) {
+    public GUI(IDatabaseManager databaseManager, IRoutingManager routingManager) {
         super("Interface");
 
+        this.databaseManager = databaseManager;
+        this.routingManager = routingManager;
+    }
+
+    public void init() {
         int width = 600;
         int height = 600;
 
-        tab1Title = new JLabel("Assemblers Stats");
-        tab2Title = new JLabel("Unloaded Parts");
-        tab3Title = new JLabel("Inventory");
+        JLabel tab1Title = new JLabel("Assemblers Stats");
+        JLabel tab2Title = new JLabel("Unloaded Parts");
+        JLabel tab3Title = new JLabel("Inventory");
 
         JPanel p1=new JPanel();
         JPanel p2=new JPanel();
@@ -49,6 +47,9 @@ public class GUI extends JFrame {
         p1.setLayout(new BoxLayout(p1, BoxLayout.PAGE_AXIS));
         p2.setLayout(new BoxLayout(p2, BoxLayout.PAGE_AXIS));
         p3.setLayout(new BoxLayout(p3, BoxLayout.PAGE_AXIS));
+
+        Part.PartState[] partStates = Part.PartState.values();
+        Collection<PartType> partTypes = PartType.getTypes();
 
         /*
             Info table about Assemblers
@@ -66,7 +67,7 @@ public class GUI extends JFrame {
                 {"Assembler 7", 0, 0},
                 {"Assembler 8", 0, 0}};
 
-        assemblersTable= new JTable(dataAssemblers, assemblers){
+        JTable assemblersTable= new JTable(dataAssemblers, assemblers){
             @Override
             public boolean editCellAt(int row, int column, EventObject event) {
                 return false;
@@ -78,21 +79,46 @@ public class GUI extends JFrame {
            Info table about Unloading Parts
          */
 
-        String unloadInfo[] = {"Part types", "Slider 1", "Slider 2", "Slider 3"};
 
-        Object[][] dataUnloadedParts = {
-                {"P1", 0, 0, 0},
-                {"P2", 0, 0, 0},
-                {"P3", 0, 0, 0},
-                {"P4", 0, 0, 0},
-                {"P5", 0, 0, 0},
-                {"P6", 0, 0, 0},
-                {"P7", 0, 0, 0},
-                {"P8", 0, 0, 0},
-                {"P9", 0, 0, 0},
-                {"Total", 0, 0, 0}};
+        // Type | Slider 1 | Slider 2 | ... | Total
+        // P1   |        0 |        1 | ... | 1
 
-        unloadedPartsTable = new JTable(dataUnloadedParts, unloadInfo){
+        Collection<Conveyor> sliderConveyors = routingManager.getConveyors(EnumConveyorType.SLIDER);
+        String[] unloadInfo = new String[1 + sliderConveyors.size() + 1];
+        unloadInfo[0] = "Type";
+
+        for(int i = 0; i < sliderConveyors.size(); i++) {
+            unloadInfo[1 + i] = String.format("Slider %d", i + 1);
+        }
+
+        unloadInfo[unloadInfo.length - 1] = "Total";
+
+        Object[][] dataUnloadedParts = new Object[partTypes.size()][1 + sliderConveyors.size() + 1];
+
+        int typeIndex = 0;
+        for(PartType type : partTypes) {
+            dataUnloadedParts[typeIndex][0] = type.getName();
+            dataUnloadedParts[typeIndex][unloadInfo.length - 1] = 0;
+
+            typeIndex++;
+        }
+
+        int sliderConveyorIndex = 0;
+        for(Conveyor sliderConveyor : sliderConveyors) {
+            Map<PartType, Integer> unloadedParts = databaseManager.countUnloadedParts(sliderConveyor.getId());
+
+            typeIndex = 0;
+            for (PartType type : partTypes) {
+                int amount = unloadedParts.getOrDefault(type, 0);
+                dataUnloadedParts[typeIndex][1 + sliderConveyorIndex] = amount;
+                dataUnloadedParts[typeIndex][unloadInfo.length - 1] = ((int) dataUnloadedParts[typeIndex][unloadInfo.length - 1]) + amount;
+                typeIndex++;
+            }
+
+            sliderConveyorIndex++;
+        }
+
+        JTable unloadedPartsTable = new JTable(dataUnloadedParts, unloadInfo){
             @Override
             public boolean editCellAt(int row, int column, EventObject event) {
                 return false;
@@ -104,14 +130,11 @@ public class GUI extends JFrame {
             Info table about Inventory
          */
 
-        Part.PartState[] partStates = Part.PartState.values();
-        Collection<PartType> partTypes = PartType.getTypes();
-
         String[] partHeaders = new String[1 + partStates.length];
         partHeaders[0] = "Type";
 
         for(int i = 0; i < partStates.length; i++) {
-            partHeaders[i + 1] = partStates[i].name();
+            partHeaders[i + 1] = partStates[i].getDisplayName();
         }
 
         Collection<Part> parts = databaseManager.fetchParts();
@@ -146,7 +169,7 @@ public class GUI extends JFrame {
             i++;
         }
 
-        inventoryTable= new JTable(dataParts, partHeaders){
+        JTable inventoryTable= new JTable(dataParts, partHeaders){
             @Override
             public boolean editCellAt(int row, int column, EventObject event) {
                 return false;
@@ -158,6 +181,7 @@ public class GUI extends JFrame {
 
         tp.add("Assemblers",p1);
         tp.add("Unloaded parts",p2);
+        tp.add("Inventory", p3);
 
         p1.add(tab1Title);
         p1.add(Box.createRigidArea(new Dimension(2,10)));

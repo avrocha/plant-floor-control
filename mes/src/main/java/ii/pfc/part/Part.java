@@ -57,7 +57,23 @@ public class Part {
 
     public static enum PartState {
 
-        STORED, PROCESSING, UNLOADING, COMPLETED
+        STORED("Stored"),
+        PROCESSING("Processing"),
+        UNLOADING("Unloading"),
+        COMPLETED("Completed");
 
+        private final String displayName;
+
+        PartState(String displayName) {
+            this.displayName = displayName;
+        }
+
+        /*
+
+         */
+
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 }
