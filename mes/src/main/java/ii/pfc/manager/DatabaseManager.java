@@ -155,7 +155,10 @@ public class DatabaseManager implements IDatabaseManager {
 
             try (PreparedStatement sql = connection
                     .prepareStatement("SELECT * FROM transform_order_status WHERE remaining > 0;")) {
-                return _extractTransformationOrders(sql.executeQuery());
+                ResultSet result = sql.executeQuery();
+                if(result.next()) {
+                    return _extractTransformationOrders(result);
+                }
             }
 
         } catch (SQLException ex) {
@@ -175,7 +178,7 @@ public class DatabaseManager implements IDatabaseManager {
                     .prepareStatement("SELECT * FROM transform_order_status WHERE remaining > 0;")) {
                 ResultSet result = sql.executeQuery();
                 while(result.next()) {
-                    orders.add(_extractTransformationOrders(sql.executeQuery()));
+                    orders.add(_extractTransformationOrders(result));
                 }
             }
 
@@ -195,7 +198,7 @@ public class DatabaseManager implements IDatabaseManager {
             try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order_status;")) {
                 ResultSet result = sql.executeQuery();
                 while(result.next()) {
-                    orders.add(_extractTransformationOrders(sql.executeQuery()));
+                    orders.add(_extractTransformationOrders(result));
                 }
             }
 

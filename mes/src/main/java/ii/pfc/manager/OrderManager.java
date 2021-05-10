@@ -80,6 +80,7 @@ public class OrderManager implements IOrderManager {
         Collection<Conveyor> assConveyors = routingManager.getConveyors(EnumConveyorType.ASSEMBLY);
         for (Conveyor conveyor : assConveyors) {
             Pair<UUID, PartType> result = commsManager.getAssemblyConveyorCompletedStatus(conveyor.getId());
+            logger.info("Result: {}", result);
             if (result == null) {
                 continue;
             }

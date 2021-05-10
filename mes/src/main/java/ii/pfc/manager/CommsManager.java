@@ -89,7 +89,7 @@ public class CommsManager implements ICommsManager {
      */
 
     private boolean isConnected() {
-        return false;
+        return true;
     }
 
     /*
@@ -339,15 +339,16 @@ public class CommsManager implements ICommsManager {
             builder.addItem("ID",
                     String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.CurrentPartId", (short) (conveyorId)));
             builder.addItem("TYPE",
-                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.CurrentPartId", (short) (conveyorId)));
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.CurrentTargetType", (short) (conveyorId)));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
             if (response.getResponseCode("AssembleDone") == PlcResponseCode.OK && response.getResponseCode("ID") == PlcResponseCode.OK && response.getResponseCode("TYPE") == PlcResponseCode.OK) {
-                if (response.getBoolean("ConveyorHasPart")) {
+                if (response.getBoolean("AssembleDone")) {
                     return Pair.of(UUID.fromString(response.getString("ID")), PartType.getType(response.getString("TYPE")));
                 }
             }
+
         } catch (PlcConnectionException e) {
             e.printStackTrace();
         } catch (Exception e) {
