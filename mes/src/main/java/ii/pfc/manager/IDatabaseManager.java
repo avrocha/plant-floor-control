@@ -32,6 +32,8 @@ public interface IDatabaseManager {
 
     //
 
+    TransformationOrder fetchTransformOrder(int orderId);
+
     Collection<TransformationOrder> fetchPendingTransformOrders();
 
     Collection<TransformationOrder> fetchAllTransformOrders();
@@ -69,6 +71,8 @@ public interface IDatabaseManager {
     boolean insertPart(Part part);
 
     boolean updatePartType(UUID partId, PartType type);
+
+    boolean updatePartTypeAndOrder(UUID partId, PartType type, int orderId);
 
     boolean updatePartState(UUID partId, Part.PartState state);
 

@@ -1,12 +1,14 @@
 package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
+import ii.pfc.part.EnumTool;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
 import ii.pfc.udp.UdpServer;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
@@ -269,22 +271,22 @@ public class CommsManager implements ICommsManager {
     }
 
     @Override
-    public short getAssemblyConveyorTool(short conveyorId) {
+    public EnumTool getAssemblyConveyorTool(short conveyorId) {
         if (!isConnected()) {
-            return -1;
+            return null;
         }
 
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
 
             builder.addItem("ConveyorActualTool",
-                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.ConveyorParts[%d].ActualTool", (short) (conveyorId)));
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.ActualTool", (short) (conveyorId)));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
             if (response.getResponseCode("ConveyorActualTool") == PlcResponseCode.OK) {
-                return response.getShort("ConveyorActualTool");
+                return EnumTool.getTool(response.getShort("ConveyorActualTool"));
             }
         } catch (PlcConnectionException e) {
             e.printStackTrace();
@@ -292,7 +294,7 @@ public class CommsManager implements ICommsManager {
             e.printStackTrace();
         }
 
-        return -1;
+        return null;
     }
 
     @Override
@@ -323,6 +325,38 @@ public class CommsManager implements ICommsManager {
         return false;
     }
 
+    @Override
+    public Pair<UUID, PartType> getAssemblyConveyorCompletedStatus(short conveyorId) {
+        if (!isConnected()) {
+            return null;
+        }
+
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
+
+            builder.addItem("AssembleDone",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.AssembleDone", (short) (conveyorId)));
+            builder.addItem("ID",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.CurrentPartId", (short) (conveyorId)));
+            builder.addItem("TYPE",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.CurrentPartId", (short) (conveyorId)));
+
+            PlcReadRequest readRequest = builder.build();
+            PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
+            if (response.getResponseCode("AssembleDone") == PlcResponseCode.OK && response.getResponseCode("ID") == PlcResponseCode.OK && response.getResponseCode("TYPE") == PlcResponseCode.OK) {
+                if (response.getBoolean("ConveyorHasPart")) {
+                    return Pair.of(UUID.fromString(response.getString("ID")), PartType.getType(response.getString("TYPE")));
+                }
+            }
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     /*
 
      */
@@ -338,8 +372,6 @@ public class CommsManager implements ICommsManager {
             return;
         }
 
-        System.out.println(process == null ? " no " : "sr - " + process.toString());
-
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
 
@@ -354,12 +386,11 @@ public class CommsManager implements ICommsManager {
             builder.addItem("CHECK", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.CheckPart", true);
 
             if (process != null) {
-                System.out.println("ABC");
                 builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", (short) process.getTool().getId());
+                builder.addItem("TARGET", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.TargetType", process.getResult().getName());
                 builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) process.getDuration().toSeconds());
                 builder.addItem("RESERVE", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Reserve", route.getTarget().getId()), true);
             } else {
-                System.out.println("DEF");
                 builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", (short) 1);
                 builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) 0);
             }
@@ -370,7 +401,7 @@ public class CommsManager implements ICommsManager {
             PlcWriteResponse response = writeRequest.execute().get(1000, TimeUnit.SECONDS);
 
             for (String fieldName : writeRequest.getFieldNames()) {
-                System.out.println(fieldName + " - " + response.getResponseCode(fieldName));
+                //System.out.println(fieldName + " - " + response.getResponseCode(fieldName));
             }
         } catch (PlcConnectionException e) {
             e.printStackTrace();

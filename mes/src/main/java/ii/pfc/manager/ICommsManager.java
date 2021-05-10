@@ -1,14 +1,17 @@
 package ii.pfc.manager;
 
+import ii.pfc.part.EnumTool;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 
 import java.net.InetSocketAddress;
+import java.util.UUID;
 
 public interface ICommsManager {
 
@@ -58,9 +61,11 @@ public interface ICommsManager {
 
      */
 
-    short getAssemblyConveyorTool(short conveyorId);
+    EnumTool getAssemblyConveyorTool(short conveyorId);
 
     boolean getAssemblyConveyorOccupation(short conveyorId);
+
+    Pair<UUID, PartType> getAssemblyConveyorCompletedStatus(short conveyorId);
 
     /*
 

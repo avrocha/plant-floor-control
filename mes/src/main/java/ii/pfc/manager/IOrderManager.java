@@ -11,6 +11,10 @@ public interface IOrderManager {
 
     void checkWarehouseEntries();
 
+    void checkAssemblyCompletions();
+
+    //
+
     void pollLoadOrders();
 
     void pollUnloadOrders();

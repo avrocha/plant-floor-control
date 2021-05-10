@@ -142,6 +142,8 @@ public class Factory {
                 dbPollTimer.reset().start();
 
                 orderManager.checkWarehouseEntries();
+                orderManager.checkAssemblyCompletions();
+
                 orderManager.pollLoadOrders();
                 orderManager.pollUnloadOrders();
                 orderManager.pollTransformOrders();
@@ -229,6 +231,12 @@ public class Factory {
         return (routeData) -> {
             if (commsManager.getAssemblyConveyorOccupation(conveyorId)) {
                 return Double.MAX_VALUE;
+            }
+
+            if (routeData.getProcess() != null) {
+                if (routeData.getProcess().getTool() != commsManager.getAssemblyConveyorTool(conveyorId)) {
+                    return DEFAULT_WEIGHT.apply(routeData) + 10;
+                }
             }
 
             return DEFAULT_WEIGHT.apply(routeData);

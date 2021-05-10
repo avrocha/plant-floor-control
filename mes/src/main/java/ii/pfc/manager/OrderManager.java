@@ -9,6 +9,7 @@ import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
 import ii.pfc.part.ProcessRegistry;
 import ii.pfc.route.Route;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +74,85 @@ public class OrderManager implements IOrderManager {
             }
         }
     }
+
+    @Override
+    public void checkAssemblyCompletions() {
+        Collection<Conveyor> assConveyors = routingManager.getConveyors(EnumConveyorType.ASSEMBLY);
+        for (Conveyor conveyor : assConveyors) {
+            Pair<UUID, PartType> result = commsManager.getAssemblyConveyorCompletedStatus(conveyor.getId());
+            if (result == null) {
+                continue;
+            }
+
+            UUID partId = result.getKey();
+            PartType targetType = result.getValue();
+            Part part = databaseManager.fetchPart(partId);
+
+            if (part.getOrderId() != 0 && part.getType() != targetType) {
+                TransformationOrder order = databaseManager.fetchTransformOrder(part.getOrderId());
+
+                databaseManager.updatePartTypeAndOrder(part.getId(), targetType, order.getTargetType().equals(targetType) ? 0 : order.getOrderId());
+                part = databaseManager.fetchPart(partId);
+
+                if (part.getOrderId() != 0) {
+                    List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
+
+                    if (processes.isEmpty()) {
+                        continue;
+                    }
+
+                    Conveyor minimumSource = null;
+                    Route minimumRoute = null;
+
+                    for (Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
+                        if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
+                            continue;
+                        }
+
+                        for (Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
+                            Route route = routingManager.traceRoute(part, processes.get(0), source, target);
+
+                            if (route == null) {
+                                continue;
+                            }
+
+                            if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                                minimumSource = source;
+                                minimumRoute = route;
+                            }
+                        }
+                    }
+
+                    if (minimumRoute != null) {
+                        commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
+                        commsManager.sendPlcRoute(minimumRoute, processes.get(0));
+                        continue;
+                    }
+                }
+            }
+
+            Route minimumRoute = null;
+
+            for (Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
+                Route route = routingManager.traceRoute(part, null, conveyor, target);
+
+                if (route == null) {
+                    continue;
+                }
+
+                if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                    minimumRoute = route;
+                }
+            }
+
+            if (minimumRoute != null) {
+                commsManager.sendPlcRoute(minimumRoute);
+            }
+
+        }
+    }
+
+    //
 
     @Override
     public void pollLoadOrders() {

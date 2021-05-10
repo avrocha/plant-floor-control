@@ -134,29 +134,23 @@ public class DatabaseManager implements IDatabaseManager {
 
      */
 
-    private Collection<TransformationOrder> _extractTransformationOrders(ResultSet result) throws SQLException {
-        List<TransformationOrder> orders = new ArrayList<>();
-
-        while (result.next()) {
-            orders.add(new TransformationOrder(
-                    result.getInt("order_id"),
-                    PartType.getType(result.getString("source_type")),
-                    PartType.getType(result.getString("target_type")),
-                    result.getTimestamp("date").toLocalDateTime(),
-                    result.getInt("quantity"),
-                    result.getInt("remaining"),
-                    result.getInt("holding"),
-                    result.getInt("completed"),
-                    result.getTimestamp("deadline").toLocalDateTime(),
-                    result.getInt("penalty")
-            ));
-        }
-
-        return orders;
+    private TransformationOrder _extractTransformationOrders(ResultSet result) throws SQLException {
+        return new TransformationOrder(
+                result.getInt("order_id"),
+                PartType.getType(result.getString("source_type")),
+                PartType.getType(result.getString("target_type")),
+                result.getTimestamp("date").toLocalDateTime(),
+                result.getInt("quantity"),
+                result.getInt("remaining"),
+                result.getInt("holding"),
+                result.getInt("completed"),
+                result.getTimestamp("deadline").toLocalDateTime(),
+                result.getInt("penalty")
+        );
     }
 
     @Override
-    public Collection<TransformationOrder> fetchPendingTransformOrders() {
+    public TransformationOrder fetchTransformOrder(int orderId) {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
@@ -168,22 +162,48 @@ public class DatabaseManager implements IDatabaseManager {
             ex.printStackTrace();
         }
 
-        return Collections.emptySet();
+        return null;
     }
 
     @Override
-    public Collection<TransformationOrder> fetchAllTransformOrders() {
+    public Collection<TransformationOrder> fetchPendingTransformOrders() {
+        List<TransformationOrder> orders = new ArrayList<>();
+
         try (Connection connection = dataSource.getConnection()) {
 
-            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order_status;")) {
-                return _extractTransformationOrders(sql.executeQuery());
+            try (PreparedStatement sql = connection
+                    .prepareStatement("SELECT * FROM transform_order_status WHERE remaining > 0;")) {
+                ResultSet result = sql.executeQuery();
+                while(result.next()) {
+                    orders.add(_extractTransformationOrders(sql.executeQuery()));
+                }
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
-        return Collections.emptySet();
+        return orders;
+    }
+
+    @Override
+    public Collection<TransformationOrder> fetchAllTransformOrders() {
+        List<TransformationOrder> orders = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM transform_order_status;")) {
+                ResultSet result = sql.executeQuery();
+                while(result.next()) {
+                    orders.add(_extractTransformationOrders(sql.executeQuery()));
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return orders;
     }
 
     /*
@@ -517,6 +537,26 @@ public class DatabaseManager implements IDatabaseManager {
             try (PreparedStatement sql = connection.prepareStatement("UPDATE part SET type=? where id=?;")) {
                 sql.setString(1, type.getName());
                 sql.setObject(2, partId);
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean updatePartTypeAndOrder(UUID partId, PartType type, int orderId) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE part SET type=?, order_id=? where id=?;")) {
+                sql.setString(1, type.getName());
+                sql.setInt(2, orderId);
+                sql.setObject(3, partId);
                 sql.executeUpdate();
                 return true;
             }
