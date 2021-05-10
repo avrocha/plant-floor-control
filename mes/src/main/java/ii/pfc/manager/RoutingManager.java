@@ -260,6 +260,10 @@ public class RoutingManager implements IRoutingManager {
 
             return super.getWeight();
         }
+
+        public boolean conflictsWith(ConveyorEdge other) {
+            return getSource().equals(other.getTarget()) && other.getTarget().equals(getSource());
+        }
     }
 
 }
