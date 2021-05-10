@@ -9,12 +9,12 @@ import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
 import ii.pfc.part.ProcessRegistry;
 import ii.pfc.route.Route;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OrderManager implements IOrderManager {
 
@@ -50,7 +50,7 @@ public class OrderManager implements IOrderManager {
     @Override
     public void checkWarehouseEntries() {
         Collection<Conveyor> winConveyors = routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN);
-        for(Conveyor conveyor : winConveyors) {
+        for (Conveyor conveyor : winConveyors) {
             Part tempPart = commsManager.getWarehouseInConveyorPart(conveyor.getId());
 
             if (tempPart != null) {
@@ -77,14 +77,14 @@ public class OrderManager implements IOrderManager {
     @Override
     public void pollLoadOrders() {
         Collection<Conveyor> loadConveyors = routingManager.getConveyors(EnumConveyorType.LOAD);
-        for(Conveyor conveyor : loadConveyors) {
+        for (Conveyor conveyor : loadConveyors) {
             short conveyorId = conveyor.getId();
             boolean hasPart = commsManager.getLoadConveyorStatus(conveyorId);
 
             if (hasPart) {
                 PartType type;
 
-                switch(conveyorId) {
+                switch (conveyorId) {
                     case 1: {
                         type = PartType.PART_2;
                         break;
@@ -101,8 +101,8 @@ public class OrderManager implements IOrderManager {
 
                 Route minimumRoute = null;
 
-                for(Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
-                    Route route = routingManager.traceRoute(tempPart, source, target);
+                for (Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
+                    Route route = routingManager.traceRoute(tempPart, null, source, target);
 
                     if (route == null) {
                         continue;
@@ -124,17 +124,17 @@ public class OrderManager implements IOrderManager {
     public void pollUnloadOrders() {
         Collection<UnloadOrder> orders = databaseManager.fetchPendingUnloadOrders();
 
-        for(UnloadOrder order : orders) {
+        for (UnloadOrder order : orders) {
             //logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
             Collection<Part> parts = databaseManager.fetchParts(0, order.getPartType(), Part.PartState.STORED, 1);
 
-            for(Part part : parts) {
+            for (Part part : parts) {
                 Conveyor minimumSource = null;
                 Route minimumRoute = null;
 
-                for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
+                for (Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
                     Conveyor target = routingManager.getConveyor(order.getConveyorId());
-                    Route route = routingManager.traceRoute(part, source, target);
+                    Route route = routingManager.traceRoute(part, null, source, target);
 
                     if (route == null) {
                         continue;
@@ -164,27 +164,27 @@ public class OrderManager implements IOrderManager {
     public void pollTransformOrders() {
         Collection<TransformationOrder> orders = databaseManager.fetchPendingTransformOrders();
 
-        for(TransformationOrder order : orders) {
+        for (TransformationOrder order : orders) {
             logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
             Collection<Part> parts = databaseManager.fetchParts(order.getOrderId(), Part.PartState.STORED, 1);
 
-            for(Part part : parts) {
+            for (Part part : parts) {
                 List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
-                if(processes.isEmpty()) {
+                if (processes.isEmpty()) {
                     continue;
                 }
 
                 Conveyor minimumSource = null;
                 Route minimumRoute = null;
 
-                for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
+                for (Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
                     if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
                         continue;
                     }
 
-                    for(Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
-                        Route route = routingManager.traceRoute(part, source, target);
+                    for (Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
+                        Route route = routingManager.traceRoute(part, processes.get(0), source, target);
 
                         if (route == null) {
                             continue;
@@ -208,10 +208,10 @@ public class OrderManager implements IOrderManager {
             parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, 1);
             //logger.info("Received {} parts", parts.size());
 
-            for(Part part : parts) {
+            for (Part part : parts) {
                 List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
-                if(processes.isEmpty()) {
+                if (processes.isEmpty()) {
                     System.out.println("NO PROCESS!");
                     continue;
                 }
@@ -219,13 +219,13 @@ public class OrderManager implements IOrderManager {
                 Conveyor minimumSource = null;
                 Route minimumRoute = null;
 
-                for(Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
+                for (Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
                     if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
                         continue;
                     }
 
-                    for(Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
-                        Route route = routingManager.traceRoute(part, source, target);
+                    for (Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
+                        Route route = routingManager.traceRoute(part, processes.get(0), source, target);
 
                         if (route == null) {
                             continue;

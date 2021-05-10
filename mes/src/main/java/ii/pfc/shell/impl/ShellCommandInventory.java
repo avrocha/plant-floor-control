@@ -51,7 +51,7 @@ public class ShellCommandInventory extends ShellCommand {
                 Collection<Part> parts = databaseManager.fetchParts();
                 Map<Part.PartState, Multimap<PartType, Part>> stateMap = new HashMap<>();
 
-                for(Part part : parts) {
+                for (Part part : parts) {
                     Part.PartState state = part.getState();
                     Multimap<PartType, Part> typeMap = stateMap.get(state);
 
@@ -63,13 +63,13 @@ public class ShellCommandInventory extends ShellCommand {
                     typeMap.put(part.getType(), part);
                 }
 
-                for(PartType type : PartType.getTypes()) {
+                for (PartType type : PartType.getTypes()) {
                     if (type.isUnknown()) {
                         continue;
                     }
 
                     StringBuilder builder = new StringBuilder().append(type.getName()).append(" - ");
-                    for(Part.PartState state : Part.PartState.values()) {
+                    for (Part.PartState state : Part.PartState.values()) {
                         int count = 0;
 
                         if (stateMap.containsKey(state)) {

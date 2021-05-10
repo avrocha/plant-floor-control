@@ -1,7 +1,5 @@
 package ii.pfc.manager;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.order.UnloadOrder;
@@ -9,19 +7,14 @@ import ii.pfc.part.EnumTool;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Duration;
-import java.util.*;
-
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.postgresql.util.PGInterval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.*;
+import java.time.Duration;
+import java.util.*;
 
 public class DatabaseManager implements IDatabaseManager {
 
@@ -315,7 +308,7 @@ public class DatabaseManager implements IDatabaseManager {
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
                     PartType type = PartType.getType(result.getString("type"));
-                    if(type.isUnknown()) {
+                    if (type.isUnknown()) {
                         continue;
                     }
 
@@ -347,7 +340,7 @@ public class DatabaseManager implements IDatabaseManager {
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
                     PartType type = PartType.getType(result.getString("type"));
-                    if(type.isUnknown()) {
+                    if (type.isUnknown()) {
                         continue;
                     }
 
@@ -442,6 +435,25 @@ public class DatabaseManager implements IDatabaseManager {
         }
 
         return durationMap;
+    }
+
+    @Override
+    public int countProcessedParts(int assemblerId) {
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection
+                    .prepareStatement("SELECT COUNT(*) as total FROM process_log where assembler_id = ?;")) {
+                ResultSet result = sql.executeQuery();
+                if (result.next()) {
+                    return result.getInt("total");
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return 0;
     }
 
     /*

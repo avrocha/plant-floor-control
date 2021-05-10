@@ -1,6 +1,7 @@
 package ii.pfc.order;
 
 import ii.pfc.part.PartType;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -106,14 +107,14 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
     @Override
     public String toString() {
         return "TransformationOrder{" +
-            "orderId=" + orderId +
-            ", sourceType=" + sourceType +
-            ", targetType=" + targetType +
-            ", date=" + date +
-            ", quantity=" + quantity +
-            ", deadline=" + deadline +
-            ", penalty=" + penalty +
-            '}';
+                "orderId=" + orderId +
+                ", sourceType=" + sourceType +
+                ", targetType=" + targetType +
+                ", date=" + date +
+                ", quantity=" + quantity +
+                ", deadline=" + deadline +
+                ", penalty=" + penalty +
+                '}';
     }
 }
 

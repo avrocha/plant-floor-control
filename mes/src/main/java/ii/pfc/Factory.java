@@ -3,30 +3,21 @@ package ii.pfc;
 import com.google.common.base.Stopwatch;
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
-import ii.pfc.manager.CommandManager;
-import ii.pfc.manager.CommsManager;
-import ii.pfc.manager.DatabaseManager;
-import ii.pfc.manager.ICommandManager;
-import ii.pfc.manager.ICommsManager;
-import ii.pfc.manager.IDatabaseManager;
-import ii.pfc.manager.IOrderManager;
-import ii.pfc.manager.IRoutingManager;
-import ii.pfc.manager.OrderManager;
-import ii.pfc.manager.RoutingManager;
-import ii.pfc.part.Part;
 import ii.pfc.gui.GUI;
-import ii.pfc.part.PartType;
+import ii.pfc.manager.*;
 import ii.pfc.part.ProcessRegistry;
-import ii.pfc.route.Route;
 import ii.pfc.shell.ShellCommand;
 import ii.pfc.shell.impl.ShellCommandInventory;
 import ii.pfc.shell.impl.ShellCommandOrder;
 import ii.pfc.shell.impl.ShellCommandStop;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +36,7 @@ public class Factory {
     public final ICommsManager commsManager;
 
     private final IDatabaseManager databaseManager;
-    
+
     public final IRoutingManager routingManager;
 
     private final IOrderManager orderManager;
@@ -70,56 +61,56 @@ public class Factory {
 
         this.routingManager = RoutingManager.builder()
 
-             /*unidirectional right side edges*/
-            .unidirectional(ROT39, LIN7, DEFAULT_WEIGHT)
-            .unidirectional(LIN8, LIN9, DEFAULT_WEIGHT)
-            .unidirectional(LIN1, ROT31, DEFAULT_WEIGHT)
-            .unidirectional(LIN5, ROT38, DEFAULT_WEIGHT)
-            .unidirectional(ROT31, LIN3, DEFAULT_WEIGHT)
-            .unidirectional(LIN3, PSH51, DEFAULT_WEIGHT)
-            .unidirectional(PSH51, SLD63, getSliderWeight((short) 63))
-            .unidirectional(PSH51, PSH52, DEFAULT_WEIGHT)
-            .unidirectional(PSH52, SLD62, getSliderWeight((short) 62))
-            .unidirectional(PSH52, PSH53, DEFAULT_WEIGHT)
-            .unidirectional(PSH53, SLD61, getSliderWeight((short) 61))
-            .unidirectional(PSH53, LIN4, DEFAULT_WEIGHT)
-            .unidirectional(LIN4, ROT38, DEFAULT_WEIGHT)
-            .unidirectional(ROT32, ROT34, DEFAULT_WEIGHT)
-            .unidirectional(ROT34, ROT35, DEFAULT_WEIGHT)
-            .unidirectional(ROT35, ROT36, DEFAULT_WEIGHT)
-            .unidirectional(ROT36, ROT37, DEFAULT_WEIGHT)
-            .unidirectional(ROT37, ROT39, DEFAULT_WEIGHT)
-            .unidirectional(LIN9, ROT33, DEFAULT_WEIGHT)
-            .unidirectional(ROT33, ROT32, DEFAULT_WEIGHT)
+                /*unidirectional right side edges*/
+                .unidirectional(ROT39, LIN7, DEFAULT_WEIGHT)
+                .unidirectional(LIN8, LIN9, DEFAULT_WEIGHT)
+                .unidirectional(LIN1, ROT31, DEFAULT_WEIGHT)
+                .unidirectional(LIN5, ROT38, DEFAULT_WEIGHT)
+                .unidirectional(ROT31, LIN3, DEFAULT_WEIGHT)
+                .unidirectional(LIN3, PSH51, DEFAULT_WEIGHT)
+                .unidirectional(PSH51, SLD63, getSliderWeight((short) 63))
+                .unidirectional(PSH51, PSH52, DEFAULT_WEIGHT)
+                .unidirectional(PSH52, SLD62, getSliderWeight((short) 62))
+                .unidirectional(PSH52, PSH53, DEFAULT_WEIGHT)
+                .unidirectional(PSH53, SLD61, getSliderWeight((short) 61))
+                .unidirectional(PSH53, LIN4, DEFAULT_WEIGHT)
+                .unidirectional(LIN4, ROT38, DEFAULT_WEIGHT)
+                .unidirectional(ROT32, ROT34, DEFAULT_WEIGHT)
+                .unidirectional(ROT34, ROT35, DEFAULT_WEIGHT)
+                .unidirectional(ROT35, ROT36, DEFAULT_WEIGHT)
+                .unidirectional(ROT36, ROT37, DEFAULT_WEIGHT)
+                .unidirectional(ROT37, ROT39, DEFAULT_WEIGHT)
+                .unidirectional(LIN9, ROT33, DEFAULT_WEIGHT)
+                .unidirectional(ROT33, ROT32, DEFAULT_WEIGHT)
 
 
-            /*unidirectional left side edges*/
-            .unidirectional(LIN10, LIN11, DEFAULT_WEIGHT)
-            .unidirectional(LIN11, ROT46, DEFAULT_WEIGHT)
-            .unidirectional(ROT46, ROT45, DEFAULT_WEIGHT)
-            .unidirectional(ROT45, ROT44, DEFAULT_WEIGHT)
-            .unidirectional(ROT44, ROT43, DEFAULT_WEIGHT)
-            .unidirectional(ROT43, ROT42, DEFAULT_WEIGHT)
-            .unidirectional(ROT42, ROT41, DEFAULT_WEIGHT)
-            .unidirectional(ROT41, ROT40, DEFAULT_WEIGHT)
-            .unidirectional(ROT40, LIN12, DEFAULT_WEIGHT)
+                /*unidirectional left side edges*/
+                .unidirectional(LIN10, LIN11, DEFAULT_WEIGHT)
+                .unidirectional(LIN11, ROT46, DEFAULT_WEIGHT)
+                .unidirectional(ROT46, ROT45, DEFAULT_WEIGHT)
+                .unidirectional(ROT45, ROT44, DEFAULT_WEIGHT)
+                .unidirectional(ROT44, ROT43, DEFAULT_WEIGHT)
+                .unidirectional(ROT43, ROT42, DEFAULT_WEIGHT)
+                .unidirectional(ROT42, ROT41, DEFAULT_WEIGHT)
+                .unidirectional(ROT41, ROT40, DEFAULT_WEIGHT)
+                .unidirectional(ROT40, LIN12, DEFAULT_WEIGHT)
 
-            /*bidirectional right side edges*/
-            .bidirectional(ROT37, ASM24, getAssemblyWeight((short) 24))
-            .bidirectional(ROT36, ASM23, getAssemblyWeight((short) 23))
-            .bidirectional(ROT35, ASM22, getAssemblyWeight((short) 22))
-            .bidirectional(ROT34, ASM21, getAssemblyWeight((short) 21))
-            .bidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
-            .bidirectional(ROT31, LIN2, DEFAULT_WEIGHT)
-            .bidirectional(ROT38, LIN6, DEFAULT_WEIGHT)
-            .bidirectional(LIN6, ROT39, DEFAULT_WEIGHT)
+                /*bidirectional right side edges*/
+                .bidirectional(ROT37, ASM24, getAssemblyWeight((short) 24))
+                .bidirectional(ROT36, ASM23, getAssemblyWeight((short) 23))
+                .bidirectional(ROT35, ASM22, getAssemblyWeight((short) 22))
+                .bidirectional(ROT34, ASM21, getAssemblyWeight((short) 21))
+                .bidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
+                .bidirectional(ROT31, LIN2, DEFAULT_WEIGHT)
+                .bidirectional(ROT38, LIN6, DEFAULT_WEIGHT)
+                .bidirectional(LIN6, ROT39, DEFAULT_WEIGHT)
 
-            /*bidirectional left side edges*/
-            .bidirectional(ROT44, ASM25, getAssemblyWeight((short) 25))
-            .bidirectional(ROT43, ASM26, getAssemblyWeight((short) 26))
-            .bidirectional(ROT42, ASM27, getAssemblyWeight((short) 27))
-            .bidirectional(ROT41, ASM28, getAssemblyWeight((short) 28))
-            .build();
+                /*bidirectional left side edges*/
+                .bidirectional(ROT44, ASM25, getAssemblyWeight((short) 25))
+                .bidirectional(ROT43, ASM26, getAssemblyWeight((short) 26))
+                .bidirectional(ROT42, ASM27, getAssemblyWeight((short) 27))
+                .bidirectional(ROT41, ASM28, getAssemblyWeight((short) 28))
+                .build();
 
         this.orderManager = new OrderManager(this.processRegistry, this.commsManager, this.databaseManager, this.routingManager);
         this.commandManager = new CommandManager(this.commsManager, this.orderManager, this.databaseManager);
@@ -139,12 +130,12 @@ public class Factory {
 
     private void mainTask() {
         this.databaseManager.fetchProcesses().forEach(processRegistry::registerProcess);
-        
+
         this.running = true;
 
         Stopwatch dbPollTimer = Stopwatch.createStarted();
 
-        while(running) {
+        while (running) {
             commandManager.pollRequests();
 
             if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 250) {
@@ -173,7 +164,7 @@ public class Factory {
                 }
 
                 command.dispatchCommand(Arrays.copyOfRange(split, 1, split.length));
-            } while(this.running);
+            } while (this.running);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -250,7 +241,7 @@ public class Factory {
     private final Map<String, ShellCommand> commands = new HashMap<>();
 
     private void registerShellCommand(ShellCommand command) {
-        commands.put(command.getName().toLowerCase(),command);
+        commands.put(command.getName().toLowerCase(), command);
     }
 
     /*

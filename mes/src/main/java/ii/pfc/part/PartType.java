@@ -1,6 +1,6 @@
 package ii.pfc.part;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

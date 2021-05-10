@@ -1,10 +1,5 @@
 package ii.pfc.conveyor;
 
-import ii.pfc.part.Part;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class Conveyor {
 
     private final short id;

@@ -45,10 +45,10 @@ public class Part {
     @Override
     public String toString() {
         return "Part{" +
-            "id=" + id +
-            ", orderId=" + orderId +
-            ", type=" + type +
-            '}';
+                "id=" + id +
+                ", orderId=" + orderId +
+                ", type=" + type +
+                '}';
     }
 
     /*

@@ -1,9 +1,5 @@
 package ii.pfc.manager;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
 import org.apache.plc4x.java.api.messages.PlcReadRequest;
@@ -12,6 +8,11 @@ import org.apache.plc4x.java.api.messages.PlcWriteRequest;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.junit.Test;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class TestOPC {
 
@@ -74,7 +75,7 @@ public class TestOPC {
 
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
             builder.addItem("ALT5_MOTOR_NEG", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.IoConfig_Globals_Mapping.ALT5_MOTOR_NEG",
-                true);
+                    true);
             PlcWriteRequest writeRequest = builder.build();
 
             try {

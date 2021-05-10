@@ -7,12 +7,13 @@ import ii.pfc.manager.IOrderManager;
 import ii.pfc.order.TransformationOrder;
 import ii.pfc.part.PartType;
 import ii.pfc.part.xml.PartTypeAdapter;
-import java.net.InetSocketAddress;
-import java.time.LocalDateTime;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
 
 public class CommandRequestTransform implements CommandRequest {
 
@@ -68,7 +69,7 @@ public class CommandRequestTransform implements CommandRequest {
 
     @Override
     public void onReceive(ICommandManager commandManager, IOrderManager orderManager, IDatabaseManager databaseManager,
-        InetSocketAddress source) {
+                          InetSocketAddress source) {
         TransformationOrder order = new TransformationOrder(
                 orderId,
                 sourceType,
@@ -92,13 +93,13 @@ public class CommandRequestTransform implements CommandRequest {
     @Override
     public String toString() {
         return "CommandRequestTransform{" +
-            "orderId=" + orderId +
-            ", sourceType=" + sourceType +
-            ", targetType=" + targetType +
-            ", time=" + time +
-            ", quantity=" + quantity +
-            ", deadline=" + deadline +
-            ", penalty=" + penalty +
-            '}';
+                "orderId=" + orderId +
+                ", sourceType=" + sourceType +
+                ", targetType=" + targetType +
+                ", time=" + time +
+                ", quantity=" + quantity +
+                ", deadline=" + deadline +
+                ", penalty=" + penalty +
+                '}';
     }
 }

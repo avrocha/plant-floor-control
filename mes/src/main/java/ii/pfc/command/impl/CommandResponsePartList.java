@@ -3,13 +3,14 @@ package ii.pfc.command.impl;
 import ii.pfc.command.CommandResponse;
 import ii.pfc.part.PartType;
 import ii.pfc.part.xml.PartTypeAdapter;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @XmlRootElement(name = "Current_Stores")
 public class CommandResponsePartList implements CommandResponse {

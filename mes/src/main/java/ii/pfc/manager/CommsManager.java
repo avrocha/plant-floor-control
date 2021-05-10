@@ -2,25 +2,26 @@ package ii.pfc.manager;
 
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.part.Part;
-import ii.pfc.part.Process;
 import ii.pfc.part.PartType;
+import ii.pfc.part.Process;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
 import ii.pfc.udp.UdpServer;
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.plc4x.java.PlcDriverManager;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
-import org.apache.plc4x.java.api.messages.*;
+import org.apache.plc4x.java.api.messages.PlcReadRequest;
+import org.apache.plc4x.java.api.messages.PlcReadResponse;
+import org.apache.plc4x.java.api.messages.PlcWriteRequest;
+import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.apache.plc4x.java.utils.connectionpool.PooledPlcDriverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class CommsManager implements ICommsManager {
 
@@ -140,7 +141,7 @@ public class CommsManager implements ICommsManager {
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
-            if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+            if (response.getResponseCode(fieldName) == PlcResponseCode.OK) {
                 if (response.getBoolean(fieldName)) {
                     return new Part(UUID.fromString(response.getString("Id")), 0, PartType.getType(response.getString("Type")), Part.PartState.STORED);
                 }
@@ -199,7 +200,7 @@ public class CommsManager implements ICommsManager {
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
-            if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+            if (response.getResponseCode(fieldName) == PlcResponseCode.OK) {
                 return response.getBoolean(fieldName);
             }
         } catch (PlcConnectionException e) {
@@ -222,12 +223,12 @@ public class CommsManager implements ICommsManager {
 
             String fieldName = "Sensor";
             builder.addItem(fieldName,
-                String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CLD%d.ReadyToReceive", conveyorId));
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CLD%d.ReadyToReceive", conveyorId));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
-            if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+            if (response.getResponseCode(fieldName) == PlcResponseCode.OK) {
                 return response.getBoolean(fieldName);
             }
         } catch (PlcConnectionException e) {
@@ -250,12 +251,12 @@ public class CommsManager implements ICommsManager {
 
             String fieldName = "SliderStatus";
             builder.addItem(fieldName,
-                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.SlidersStatus[%d]", (short)(conveyorId - 60)));
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.SlidersStatus[%d]", (short) (conveyorId - 60)));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
-            if(response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+            if (response.getResponseCode(fieldName) == PlcResponseCode.OK) {
                 return response.getInteger(fieldName);
             }
         } catch (PlcConnectionException e) {
@@ -277,12 +278,12 @@ public class CommsManager implements ICommsManager {
             PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
 
             builder.addItem("ConveyorActualTool",
-                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.ConveyorParts[%d].ActualTool", (short)(conveyorId)));
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.ConveyorParts[%d].ActualTool", (short) (conveyorId)));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
-            if(response.getResponseCode("ConveyorActualTool") == PlcResponseCode.OK) {
+            if (response.getResponseCode("ConveyorActualTool") == PlcResponseCode.OK) {
                 return response.getShort("ConveyorActualTool");
             }
         } catch (PlcConnectionException e) {
@@ -304,13 +305,13 @@ public class CommsManager implements ICommsManager {
             PlcReadRequest.Builder builder = plcConnection.readRequestBuilder();
 
             builder.addItem("ConveyorHasPart",
-                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Si", (short)(conveyorId)));
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Si", (short) (conveyorId)));
             builder.addItem("ConveyorIsReserved",
-                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.IsReserved", (short)(conveyorId)));
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.IsReserved", (short) (conveyorId)));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
-            if(response.getResponseCode("ConveyorHasPart") == PlcResponseCode.OK && response.getResponseCode("ConveyorIsReserved") == PlcResponseCode.OK) {
+            if (response.getResponseCode("ConveyorHasPart") == PlcResponseCode.OK && response.getResponseCode("ConveyorIsReserved") == PlcResponseCode.OK) {
                 return response.getBoolean("ConveyorHasPart") || response.getBoolean("ConveyorIsReserved");
             }
         } catch (PlcConnectionException e) {

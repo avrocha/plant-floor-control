@@ -18,11 +18,11 @@ public class CommandRequestPartList implements CommandRequest {
 
     @Override
     public void onReceive(ICommandManager commandManager, IOrderManager orderManager, IDatabaseManager databaseManager,
-        InetSocketAddress source) {
+                          InetSocketAddress source) {
         CommandResponsePartList response = new CommandResponsePartList();
 
         Map<PartType, Integer> count = databaseManager.countPartsTypes(Part.PartState.STORED);
-        for(PartType type : PartType.getTypes()) {
+        for (PartType type : PartType.getTypes()) {
             response.addPartList(type, count.getOrDefault(type, 0));
         }
 

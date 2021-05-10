@@ -1,17 +1,13 @@
 package ii.pfc.shell;
 
 import com.google.common.base.Joiner;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public abstract class ShellCommand {
 
@@ -53,7 +49,7 @@ public abstract class ShellCommand {
         label.addFirst(this.name);
 
         ShellCommand _parent = parent;
-        while(_parent != null) {
+        while (_parent != null) {
             label.addFirst(_parent.name);
             _parent = _parent.parent;
         }

@@ -31,7 +31,7 @@ public class ShellCommandOrder extends ShellCommand {
 
                 PartType type = PartType.getType(args[0]);
                 if (type == null) {
-                    logger.error("Invalid part type: {}",  args[0]);
+                    logger.error("Invalid part type: {}", args[0]);
                     return true;
                 }
 
@@ -78,13 +78,13 @@ public class ShellCommandOrder extends ShellCommand {
 
                 PartType sourceType = PartType.getType(args[0]);
                 if (sourceType == null) {
-                    logger.error("Invalid part type: {}",  args[0]);
+                    logger.error("Invalid part type: {}", args[0]);
                     return true;
                 }
 
                 PartType targetType = PartType.getType(args[1]);
                 if (targetType == null) {
-                    logger.error("Invalid part type: {}",  args[1]);
+                    logger.error("Invalid part type: {}", args[1]);
                     return true;
                 }
 

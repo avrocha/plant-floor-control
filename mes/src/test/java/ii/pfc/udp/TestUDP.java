@@ -4,9 +4,10 @@ import ii.pfc.manager.CommandManager;
 import ii.pfc.manager.CommsManager;
 import ii.pfc.manager.ICommandManager;
 import ii.pfc.manager.ICommsManager;
-import java.net.InetSocketAddress;
 import junit.framework.TestCase;
 import org.junit.Test;
+
+import java.net.InetSocketAddress;
 
 public class TestUDP extends TestCase {
 
@@ -24,7 +25,8 @@ public class TestUDP extends TestCase {
     public void testUDP() {
         this.commsManager.startUdpServer();
 
-        while(true) { }
+        while (true) {
+        }
     }
 
 }

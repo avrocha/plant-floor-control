@@ -1,14 +1,14 @@
 package ii.pfc.manager;
 
-import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
 import ii.pfc.route.Route;
 import ii.pfc.udp.UdpListener;
-import java.net.InetSocketAddress;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
+
+import java.net.InetSocketAddress;
 
 public interface ICommsManager {
 
@@ -64,7 +64,7 @@ public interface ICommsManager {
 
     /*
 
-    */
+     */
     void sendPlcRoute(Route route);
 
     void sendPlcRoute(Route route, Process process);

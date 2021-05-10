@@ -1,9 +1,8 @@
 package ii.pfc.command.impl;
 
-import java.util.Arrays;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Arrays;
 
 @XmlRootElement(name = "ORDERS")
 public class BatchRequestOrderWrapper {
@@ -40,9 +39,9 @@ public class BatchRequestOrderWrapper {
     @Override
     public String toString() {
         return "BatchRequestOrderWrapper{" +
-            "orders=" + Arrays.toString(orders) +
-            ", orderList=" + Arrays.toString(orderList) +
-            ", partList=" + Arrays.toString(partList) +
-            '}';
+                "orders=" + Arrays.toString(orders) +
+                ", orderList=" + Arrays.toString(orderList) +
+                ", partList=" + Arrays.toString(partList) +
+                '}';
     }
 }
