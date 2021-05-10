@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.net.InetSocketAddress;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class CommandRequestTransform implements CommandRequest {
 
@@ -70,16 +72,21 @@ public class CommandRequestTransform implements CommandRequest {
     @Override
     public void onReceive(ICommandManager commandManager, IOrderManager orderManager, IDatabaseManager databaseManager,
                           InetSocketAddress source) {
+        LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(this.time), ZoneId.systemDefault());
+
         TransformationOrder order = new TransformationOrder(
                 orderId,
                 sourceType,
                 targetType,
+                time,
                 LocalDateTime.now(),
+                null,
+                null,
                 quantity,
                 quantity,
                 0,
                 0,
-                LocalDateTime.now().plusSeconds(deadline),
+                time.plusSeconds(deadline),
                 penalty
         );
 

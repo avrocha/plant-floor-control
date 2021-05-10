@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Date;
 
 public class DatabaseManager implements IDatabaseManager {
 
@@ -135,11 +137,24 @@ public class DatabaseManager implements IDatabaseManager {
      */
 
     private TransformationOrder _extractTransformationOrders(ResultSet result) throws SQLException {
+        Timestamp startDate = result.getTimestamp("start_date");
+        if (result.wasNull()) {
+            startDate = null;
+        }
+
+        Timestamp finishDate = result.getTimestamp("finish_date");
+        if (result.wasNull()) {
+            finishDate = null;
+        }
+
         return new TransformationOrder(
                 result.getInt("order_id"),
                 PartType.getType(result.getString("source_type")),
                 PartType.getType(result.getString("target_type")),
                 result.getTimestamp("date").toLocalDateTime(),
+                result.getTimestamp("received_date").toLocalDateTime(),
+                startDate == null ? null : startDate.toLocalDateTime(),
+                finishDate == null ? null : finishDate.toLocalDateTime(),
                 result.getInt("quantity"),
                 result.getInt("remaining"),
                 result.getInt("holding"),
@@ -417,14 +432,20 @@ public class DatabaseManager implements IDatabaseManager {
 
     @Override
     public Duration fetchProcessDuration(int assemblerId, PartType type) {
+
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
                     .prepareStatement("SELECT SUM(duration) as total FROM process_log where assembler_id = ? AND part_target_type = ?;")) {
                 ResultSet result = sql.executeQuery();
                 if (result.next()) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(0);
+
                     PGInterval interval = (PGInterval) result.getObject("total");
-                    return Duration.ofSeconds((long) interval.getSeconds());
+                    interval.add(calendar);
+
+                    return Duration.ofMillis(calendar.getTimeInMillis());
                 }
             }
 
@@ -670,15 +691,16 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                    .prepareStatement("INSERT INTO transform_order (order_id, date, quantity, penalty, source_type, target_type, deadline) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?) ")) {
+                    .prepareStatement("INSERT INTO transform_order (order_id, date, received_date, quantity, penalty, source_type, target_type, deadline) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ")) {
                 sql.setInt(1, transformationOrder.getOrderId());
                 sql.setTimestamp(2, Timestamp.valueOf(transformationOrder.getDate()));
-                sql.setInt(3, transformationOrder.getQuantity());
-                sql.setInt(4, transformationOrder.getDayPenalty());
-                sql.setString(5, transformationOrder.getSourceType().getName());
-                sql.setString(6, transformationOrder.getTargetType().getName());
-                sql.setTimestamp(7, Timestamp.valueOf(transformationOrder.getDeadline()));
+                sql.setTimestamp(3, Timestamp.valueOf(transformationOrder.getReceivedDate()));
+                sql.setInt(4, transformationOrder.getQuantity());
+                sql.setInt(5, transformationOrder.getDayPenalty());
+                sql.setString(6, transformationOrder.getSourceType().getName());
+                sql.setString(7, transformationOrder.getTargetType().getName());
+                sql.setTimestamp(8, Timestamp.valueOf(transformationOrder.getDeadline()));
                 sql.executeUpdate();
                 return true;
             }
@@ -689,6 +711,63 @@ public class DatabaseManager implements IDatabaseManager {
 
         return false;
 
+    }
+
+    @Override
+    public boolean incrementTransformOrderCompletions(int orderId, int quantity) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE transform_order SET completed=completed+? where order_id=?;")) {
+                sql.setInt(1, quantity);
+                sql.setInt(2, orderId);
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean updateTransformOrderStart(int orderId, LocalDateTime startDate) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE transform_order SET start_date=? where order_id=?;")) {
+                sql.setTimestamp(1,  Timestamp.valueOf(startDate));
+                sql.setInt(2, orderId);
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean updateTransformOrderFinish(int orderId, LocalDateTime finishDate) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("UPDATE transform_order SET finish_date=? where order_id=?;")) {
+                sql.setTimestamp(1,  Timestamp.valueOf(finishDate));
+                sql.setInt(2, orderId);
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
     }
 
     /*

@@ -10,6 +10,7 @@ import ii.pfc.part.Process;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -91,4 +92,10 @@ public interface IDatabaseManager {
     //
 
     boolean insertTransformOrder(TransformationOrder transformationOrder);
+
+    boolean incrementTransformOrderCompletions(int orderId, int quantity);
+
+    boolean updateTransformOrderStart(int orderId, LocalDateTime startDate);
+
+    boolean updateTransformOrderFinish(int orderId, LocalDateTime finishDate);
 }

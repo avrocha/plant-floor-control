@@ -13,6 +13,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -92,7 +93,17 @@ public class OrderManager implements IOrderManager {
             if (part.getOrderId() != 0 && part.getType() != targetType) {
                 TransformationOrder order = databaseManager.fetchTransformOrder(part.getOrderId());
 
-                databaseManager.updatePartTypeAndOrder(part.getId(), targetType, order.getTargetType().equals(targetType) ? 0 : order.getOrderId());
+                if (order.getTargetType() == targetType) {
+                    databaseManager.updatePartTypeAndOrder(part.getId(), targetType, 0);
+                    databaseManager.incrementTransformOrderCompletions(order.getOrderId(), 1);
+
+                    if (order.getCompleted() + 1 == order.getQuantity()) {
+                        databaseManager.updateTransformOrderFinish(order.getOrderId(), LocalDateTime.now());
+                    }
+                } else {
+                    databaseManager.updatePartType(part.getId(), targetType);
+                }
+
                 part = databaseManager.fetchPart(partId);
 
                 if (part.getOrderId() != 0) {
@@ -289,6 +300,8 @@ public class OrderManager implements IOrderManager {
             parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, 1);
             //logger.info("Received {} parts", parts.size());
 
+            boolean updatedStart = false;
+
             for (Part part : parts) {
                 List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
@@ -321,6 +334,11 @@ public class OrderManager implements IOrderManager {
 
                 if (minimumRoute != null) {
                     if (databaseManager.updatePartStateAndOrder(part.getId(), Part.PartState.PROCESSING, order.getOrderId())) {
+                        if (!updatedStart && order.getRemaining() == order.getQuantity()) {
+                            databaseManager.updateTransformOrderStart(order.getOrderId(), LocalDateTime.now());
+                            updatedStart = true;
+                        }
+
                         commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
                         commsManager.sendPlcRoute(minimumRoute, processes.get(0));
                     }

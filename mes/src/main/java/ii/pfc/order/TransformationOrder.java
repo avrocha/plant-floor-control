@@ -15,6 +15,12 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
 
     private final LocalDateTime date;
 
+    private final LocalDateTime receivedDate;
+
+    private final LocalDateTime startDate;
+
+    private final LocalDateTime finishDate;
+
     private final int quantity;
 
     private final int remaining;
@@ -27,12 +33,15 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
 
     private final int penalty;
 
-    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, LocalDateTime date, int quantity,
+    public TransformationOrder(int orderId, PartType sourceType, PartType targetType, LocalDateTime date, LocalDateTime receivedDate, LocalDateTime startDate, LocalDateTime finishDate, int quantity,
                                int remaining, int holding, int completed, LocalDateTime deadline, int penalty) {
         this.orderId = orderId;
         this.sourceType = sourceType;
         this.targetType = targetType;
         this.date = date;
+        this.receivedDate = receivedDate;
+        this.startDate = startDate;
+        this.finishDate = finishDate;
         this.quantity = quantity;
         this.remaining = remaining;
         this.holding = holding;
@@ -59,6 +68,18 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
 
     public LocalDateTime getDate() {
         return date;
+    }
+
+    public LocalDateTime getReceivedDate() {
+        return receivedDate;
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public LocalDateTime getFinishDate() {
+        return finishDate;
     }
 
     public int getQuantity() {
@@ -111,7 +132,11 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
                 ", sourceType=" + sourceType +
                 ", targetType=" + targetType +
                 ", date=" + date +
+                ", receivedDate=" + receivedDate +
                 ", quantity=" + quantity +
+                ", remaining=" + remaining +
+                ", holding=" + holding +
+                ", completed=" + completed +
                 ", deadline=" + deadline +
                 ", penalty=" + penalty +
                 '}';
