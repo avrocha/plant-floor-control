@@ -40,14 +40,17 @@ public class GUI extends JFrame {
         JLabel tab1Title = new JLabel("Assemblers Stats");
         JLabel tab2Title = new JLabel("Unloaded Parts");
         JLabel tab3Title = new JLabel("Inventory");
+        JLabel tab4Title = new JLabel("Admin");
 
         JPanel p1=new JPanel();
         JPanel p2=new JPanel();
         JPanel p3=new JPanel();
+        JPanel p4=new JPanel();
 
         p1.setLayout(new BoxLayout(p1, BoxLayout.PAGE_AXIS));
         p2.setLayout(new BoxLayout(p2, BoxLayout.PAGE_AXIS));
         p3.setLayout(new BoxLayout(p3, BoxLayout.PAGE_AXIS));
+        p4.setLayout(new BoxLayout(p4, BoxLayout.PAGE_AXIS));
 
         Part.PartState[] partStates = Part.PartState.values();
         Collection<PartType> partTypes = PartType.getTypes();
@@ -68,19 +71,30 @@ public class GUI extends JFrame {
 
         Object[][] dataAssemblers = new Object[assemblerConveyors.size()][assemblers.length];
 
-        int assembleIndex = 0;
-        for(assembleIndex = 0; assembleIndex < assemblers.length;assembleIndex ++) {
-            dataAssemblers[assembleIndex][0] = String.format("Assembler %d", assembleIndex + 1);
-        }
-
         int assemblerConveyorIndex = 0;
         for(Conveyor assemblerConveyor : assemblerConveyors) {
-            Map<PartType, Duration> processDurations = databaseManager.fetchProcessDurations(assemblerConveyor.getId());
-            //int value = (Duration);
-            //dataAssemblers[assemblerConveyorIndex][1 + assemblerConveyorIndex] = value;
+            dataAssemblers[assemblerConveyorIndex][0] = String.format("Assembler %d", assemblerConveyorIndex + 1);
 
+            Map<PartType, Duration> processDurations = databaseManager.fetchProcessDurations(assemblerConveyor.getId());
+
+            Duration totalValue = Duration.ZERO;
+            for (PartType type : partTypes) {
+                Duration value = processDurations.getOrDefault(type, Duration.ZERO);
+                totalValue = totalValue.plus(value);
+
+            }
+
+            dataAssemblers[assemblerConveyorIndex][1] = totalValue.toString();
+
+            int parts = databaseManager.countProcessedParts(assemblerConveyor.getId());
+
+            dataAssemblers[assemblerConveyorIndex][2] = parts;
+
+            assemblerConveyorIndex++;
 
         }
+
+
 
         JTable assemblersTable= new JTable(dataAssemblers, assemblers){
             @Override
@@ -196,11 +210,16 @@ public class GUI extends JFrame {
         };
         inventoryTable.setRowSelectionAllowed(false);
 
+        JButton inventoryClean=new JButton("Clean Inventory");
+        inventoryClean.setBounds(100,100,100, 40);
+
+
         JTabbedPane tp=new JTabbedPane();
 
         tp.add("Assemblers",p1);
         tp.add("Unloaded parts",p2);
         tp.add("Inventory", p3);
+        tp.add("Admin", p4);
 
         p1.add(tab1Title);
         p1.add(Box.createRigidArea(new Dimension(2,10)));
@@ -222,6 +241,10 @@ public class GUI extends JFrame {
 
         p3.add(inventoryTable.getTableHeader());
         p3.add(inventoryTable);
+
+        p4.add(tab4Title);
+        p4.add(Box.createRigidArea(new Dimension(2,10)));
+        p4.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
 
         this.add(tp);
         this.setSize(width,height);

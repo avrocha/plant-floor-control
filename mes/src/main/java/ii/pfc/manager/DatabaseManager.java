@@ -464,6 +464,8 @@ public class DatabaseManager implements IDatabaseManager {
 
             try (PreparedStatement sql = connection
                     .prepareStatement("SELECT part_target_type, SUM(duration) as total FROM process_log where assembler_id = ? GROUP BY part_target_type;")) {
+                sql.setInt(1, assemblerId);
+
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
                     PGInterval interval = (PGInterval) result.getObject("total");
@@ -487,6 +489,8 @@ public class DatabaseManager implements IDatabaseManager {
 
             try (PreparedStatement sql = connection
                     .prepareStatement("SELECT COUNT(*) as total FROM process_log where assembler_id = ?;")) {
+                sql.setInt(1, assemblerId);
+
                 ResultSet result = sql.executeQuery();
                 if (result.next()) {
                     return result.getInt("total");
