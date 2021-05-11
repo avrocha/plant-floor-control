@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -322,7 +323,7 @@ public class CommsManager implements ICommsManager {
             e.printStackTrace();
         }
 
-        return false;
+        return true;
     }
 
     @Override
@@ -373,6 +374,8 @@ public class CommsManager implements ICommsManager {
             return;
         }
 
+        System.out.println("Send route " + route.toString());
+
         try (PlcConnection plcConnection = getPlcConnection()) {
             PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
 
@@ -389,6 +392,7 @@ public class CommsManager implements ICommsManager {
             if (process != null) {
                 builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", (short) process.getTool().getId());
                 builder.addItem("TARGET", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.TargetType", process.getResult().getName());
+                System.out.println("Adding target " + process.getResult().getName());
                 builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) process.getDuration().toSeconds());
                 builder.addItem("RESERVE", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Reserve", route.getTarget().getId()), true);
             } else {

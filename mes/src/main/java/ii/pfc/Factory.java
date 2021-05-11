@@ -56,7 +56,7 @@ public class Factory {
     public Factory() {
         this.processRegistry = new ProcessRegistry();
 
-        this.commsManager = new CommsManager(54321, new InetSocketAddress("127.0.0.1", 4840));
+        this.commsManager = new CommsManager(54321, new InetSocketAddress("192.168.243.69", 4840));
         this.databaseManager = new DatabaseManager();
 
         this.routingManager = RoutingManager.builder()
@@ -96,20 +96,20 @@ public class Factory {
                 .unidirectional(ROT40, LIN12, DEFAULT_WEIGHT)
 
                 /*bidirectional right side edges*/
-                .bidirectional(ROT37, ASM24, getAssemblyWeight((short) 24))
-                .bidirectional(ROT36, ASM23, getAssemblyWeight((short) 23))
-                .bidirectional(ROT35, ASM22, getAssemblyWeight((short) 22))
-                .bidirectional(ROT34, ASM21, getAssemblyWeight((short) 21))
+                .bidirectional(ROT37, ASM24, getAssemblyWeight((short) 24), DEFAULT_WEIGHT)
+                .bidirectional(ROT36, ASM23, getAssemblyWeight((short) 23), DEFAULT_WEIGHT)
+                .bidirectional(ROT35, ASM22, getAssemblyWeight((short) 22), DEFAULT_WEIGHT)
+                .bidirectional(ROT34, ASM21, getAssemblyWeight((short) 21), DEFAULT_WEIGHT)
                 .bidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
                 .bidirectional(ROT31, LIN2, DEFAULT_WEIGHT)
                 .bidirectional(ROT38, LIN6, DEFAULT_WEIGHT)
                 .bidirectional(LIN6, ROT39, DEFAULT_WEIGHT)
 
                 /*bidirectional left side edges*/
-                .bidirectional(ROT44, ASM25, getAssemblyWeight((short) 25))
-                .bidirectional(ROT43, ASM26, getAssemblyWeight((short) 26))
-                .bidirectional(ROT42, ASM27, getAssemblyWeight((short) 27))
-                .bidirectional(ROT41, ASM28, getAssemblyWeight((short) 28))
+                .bidirectional(ROT44, ASM25, getAssemblyWeight((short) 25), DEFAULT_WEIGHT)
+                .bidirectional(ROT43, ASM26, getAssemblyWeight((short) 26), DEFAULT_WEIGHT)
+                .bidirectional(ROT42, ASM27, getAssemblyWeight((short) 27), DEFAULT_WEIGHT)
+                .bidirectional(ROT41, ASM28, getAssemblyWeight((short) 28), DEFAULT_WEIGHT)
                 .build();
 
         this.orderManager = new OrderManager(this.processRegistry, this.commsManager, this.databaseManager, this.routingManager);
