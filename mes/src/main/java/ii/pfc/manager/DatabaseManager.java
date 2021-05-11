@@ -169,7 +169,9 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                    .prepareStatement("SELECT * FROM transform_order_status WHERE remaining > 0;")) {
+                    .prepareStatement("SELECT * FROM transform_order_status WHERE order_id=?;")) {
+                sql.setInt(1, orderId);
+
                 ResultSet result = sql.executeQuery();
                 if(result.next()) {
                     return _extractTransformationOrders(result);
@@ -685,6 +687,23 @@ public class DatabaseManager implements IDatabaseManager {
 
     }
 
+    @Override
+    public boolean clearAllUnloadOrders() {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("DELETE FROM unload_order;")) {
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
     /*
 
      */
@@ -803,5 +822,22 @@ public class DatabaseManager implements IDatabaseManager {
 
         return false;
 
+    }
+
+    @Override
+    public boolean clearAllTransformOrders() {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            try (PreparedStatement sql = connection.prepareStatement("DELETE FROM transform_order;")) {
+                sql.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
     }
 }

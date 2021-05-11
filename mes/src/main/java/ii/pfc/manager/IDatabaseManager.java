@@ -87,9 +87,13 @@ public interface IDatabaseManager {
 
     //
 
+    boolean clearAllUnloadOrders();
+
     boolean insertUnloadOrder(UnloadOrder unloadOrder);
 
     //
+
+    boolean clearAllTransformOrders();
 
     boolean insertTransformOrder(TransformationOrder transformationOrder);
 
