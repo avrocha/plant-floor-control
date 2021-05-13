@@ -12,6 +12,8 @@ import ii.pfc.part.PartType;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
 import java.util.Collection;
@@ -210,8 +212,24 @@ public class GUI extends JFrame {
         };
         inventoryTable.setRowSelectionAllowed(false);
 
+        //Buttons and commands
         JButton inventoryClean=new JButton("Clean Inventory");
-        inventoryClean.setBounds(100,100,100, 40);
+        inventoryClean.setBounds(300,300,300, 90);
+        inventoryClean.addActionListener(e -> {
+            databaseManager.clearAllParts();
+        });
+
+        JButton transformOrdersClean=new JButton("Clean Transform Orders");
+        transformOrdersClean.setBounds(300,300,300, 90);
+        transformOrdersClean.addActionListener(e -> {
+            databaseManager.clearAllTransformOrders();
+        });
+
+        JButton unloadingOrdersClean=new JButton("Clean Unloading Orders");
+        unloadingOrdersClean.setBounds(300,300,300, 90);
+        unloadingOrdersClean.addActionListener(e -> {
+            databaseManager.clearAllUnloadOrders();
+        });
 
 
         JTabbedPane tp=new JTabbedPane();
@@ -245,6 +263,10 @@ public class GUI extends JFrame {
         p4.add(tab4Title);
         p4.add(Box.createRigidArea(new Dimension(2,10)));
         p4.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
+
+        p4.add(inventoryClean);
+        p4.add(transformOrdersClean);
+        p4.add(unloadingOrdersClean);
 
         this.add(tp);
         this.setSize(width,height);
