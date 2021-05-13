@@ -93,7 +93,13 @@ public class OrderManager implements IOrderManager {
 
                 Part part = databaseManager.fetchPart(partId);
 
+                // If we have finished the order or we are not bound to any order, return to the warehouse and dont do anything.
                 if (part.getOrderId() != 0 && part.getType() != targetType) {
+                    Process process = processRegistry.getProcess(part.getType(), targetType);
+                    if (process != null) {
+                        databaseManager.insertProcessLog(process, conveyor, part);
+                    }
+
                     TransformationOrder order = databaseManager.fetchTransformOrder(part.getOrderId());
 
                     if (order.getTargetType() == targetType) {
@@ -247,6 +253,8 @@ public class OrderManager implements IOrderManager {
 
                 if (minimumRoute != null) {
                     if (databaseManager.updatePartStateAndOrder(part.getId(), Part.PartState.UNLOADING, order.getOrderId())) {
+                        databaseManager.insertUnloadingBayLog(order, part);
+
                         commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
                         commsManager.sendPlcRoute(minimumRoute);
                     }
