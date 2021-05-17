@@ -116,41 +116,36 @@ public class OrderManager implements IOrderManager {
                     part = databaseManager.fetchPart(partId);
 
                     if (part.getOrderId() != 0) {
+                        logger.info("Trying to get new machine");
                         List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
                         if (processes.isEmpty()) {
+                            logger.info("no process");
                             continue;
                         }
 
-                        Conveyor minimumSource = null;
                         Route minimumRoute = null;
 
-                        for (Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
-                            if (!commsManager.getWarehouseOutConveyorStatus(source.getId())) {
+                        for (Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
+                            Route route = routingManager.traceRoute(part, processes.get(0), conveyor, target);
+
+                            if (route == null) {
                                 continue;
                             }
 
-                            for (Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
-                                Route route = routingManager.traceRoute(part, processes.get(0), source, target);
-
-                                if (route == null) {
-                                    continue;
-                                }
-
-                                if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
-                                    minimumSource = source;
-                                    minimumRoute = route;
-                                }
+                            if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                                minimumRoute = route;
                             }
                         }
 
                         if (minimumRoute != null) {
-                            commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
+                            logger.info("new machine");
                             commsManager.sendPlcRoute(minimumRoute, processes.get(0));
                             continue;
                         }
                     }
                 }
+                logger.info("Send to ware");
 
                 Route minimumRoute = null;
 
@@ -270,6 +265,7 @@ public class OrderManager implements IOrderManager {
         for (TransformationOrder order : orders) {
             logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
             Collection<Part> parts = databaseManager.fetchParts(order.getOrderId(), Part.PartState.STORED, 1);
+            logger.info("#{} - Received {} available part(s)", order.getOrderId(), parts.size());
 
             for (Part part : parts) {
                 List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
@@ -309,7 +305,7 @@ public class OrderManager implements IOrderManager {
             }
 
             parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, 1);
-            //logger.info("Received {} parts", parts.size());
+            logger.info("Received {} parts", parts.size());
 
             boolean updatedStart = false;
 

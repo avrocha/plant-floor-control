@@ -644,10 +644,10 @@ public class DatabaseManager implements IDatabaseManager {
 
             try (PreparedStatement sql = connection.prepareStatement(
                     "INSERT INTO process_log (assembler_id, duration, part_source_type, part_target_type, part_id) " +
-                            "VALUES (?, '? seconds', ?, ?, ?) "
+                            "VALUES (?, ?, ?, ?, ?) "
             )) {
                 sql.setInt(1, assembler.getId());
-                sql.setInt(2, (int) process.getDuration().toSeconds());
+                sql.setObject(2, new PGInterval(0, 0, 0, 0, 0, process.getDuration().toSeconds()));
                 sql.setString(3, process.getSource().getName());
                 sql.setString(4, process.getResult().getName());
                 sql.setObject(5, part.getId());

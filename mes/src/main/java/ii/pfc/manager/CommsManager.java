@@ -272,6 +272,31 @@ public class CommsManager implements ICommsManager {
     }
 
     @Override
+    public void prepareAssemblyTool(short conveyorId, EnumTool tool) {
+        if (!isConnected()) {
+            return;
+        }
+
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
+
+            builder.addItem("TOOL",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.DesiredTool", conveyorId), tool.getId());
+            builder.addItem("PTOOL",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.PrepareTool", conveyorId), true);
+
+            PlcWriteRequest writeRequest = builder.build();
+
+            // Async execution
+            writeRequest.execute();
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public EnumTool getAssemblyConveyorTool(short conveyorId) {
         if (!isConnected()) {
             return null;
@@ -395,6 +420,7 @@ public class CommsManager implements ICommsManager {
                 System.out.println("Adding target " + process.getResult().getName());
                 builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) process.getDuration().toSeconds());
                 builder.addItem("RESERVE", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Reserve", route.getTarget().getId()), true);
+                builder.addItem("ASSTOOL", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.DesiredTool", route.getTarget().getId()), (short) process.getTool().getId());
             } else {
                 builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", (short) 0);
                 builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) 0);

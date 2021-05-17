@@ -61,6 +61,8 @@ public interface ICommsManager {
 
      */
 
+    void prepareAssemblyTool(short conveyorId, EnumTool tool);
+
     EnumTool getAssemblyConveyorTool(short conveyorId);
 
     boolean getAssemblyConveyorOccupation(short conveyorId);

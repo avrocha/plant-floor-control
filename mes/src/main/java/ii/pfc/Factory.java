@@ -5,6 +5,7 @@ import ii.pfc.conveyor.Conveyor;
 import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.gui.GUI;
 import ii.pfc.manager.*;
+import ii.pfc.part.EnumTool;
 import ii.pfc.part.ProcessRegistry;
 import ii.pfc.shell.ShellCommand;
 import ii.pfc.shell.impl.ShellCommandInventory;
@@ -56,7 +57,7 @@ public class Factory {
     public Factory() {
         this.processRegistry = new ProcessRegistry();
 
-        this.commsManager = new CommsManager(54321, new InetSocketAddress("192.168.243.69", 4840));
+        this.commsManager = new CommsManager(54321, new InetSocketAddress("10.227.147.95", 4840));
         this.databaseManager = new DatabaseManager();
 
         this.routingManager = RoutingManager.builder()
@@ -134,6 +135,14 @@ public class Factory {
         this.running = true;
 
         Stopwatch dbPollTimer = Stopwatch.createStarted();
+
+        commsManager.prepareAssemblyTool(ASM21.getId(), EnumTool.T1);
+        commsManager.prepareAssemblyTool(ASM22.getId(), EnumTool.T2);
+        commsManager.prepareAssemblyTool(ASM23.getId(), EnumTool.T3);
+
+        commsManager.prepareAssemblyTool(ASM25.getId(), EnumTool.T1);
+        commsManager.prepareAssemblyTool(ASM26.getId(), EnumTool.T2);
+        commsManager.prepareAssemblyTool(ASM27.getId(), EnumTool.T3);
 
         while (running) {
             commandManager.pollRequests();
