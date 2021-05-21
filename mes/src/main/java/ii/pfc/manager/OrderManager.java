@@ -9,6 +9,7 @@ import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
 import ii.pfc.part.ProcessRegistry;
 import ii.pfc.route.Route;
+import java.util.Collections;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,17 +117,19 @@ public class OrderManager implements IOrderManager {
                     part = databaseManager.fetchPart(partId);
 
                     if (part.getOrderId() != 0) {
-                        logger.info("Trying to get new machine");
                         List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
                         if (processes.isEmpty()) {
-                            logger.info("no process");
                             continue;
                         }
 
                         Route minimumRoute = null;
 
                         for (Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
+                            if (target.equals(conveyor)) {
+                                continue;
+                            }
+
                             Route route = routingManager.traceRoute(part, processes.get(0), conveyor, target);
 
                             if (route == null) {
@@ -218,7 +221,8 @@ public class OrderManager implements IOrderManager {
 
     @Override
     public void pollUnloadOrders() {
-        Collection<UnloadOrder> orders = databaseManager.fetchPendingUnloadOrders();
+        List<UnloadOrder> orders = databaseManager.fetchPendingUnloadOrders();
+        Collections.sort(orders, Collections.reverseOrder());
 
         for (UnloadOrder order : orders) {
             //logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
@@ -260,7 +264,8 @@ public class OrderManager implements IOrderManager {
 
     @Override
     public void pollTransformOrders() {
-        Collection<TransformationOrder> orders = databaseManager.fetchPendingTransformOrders();
+        List<TransformationOrder> orders = databaseManager.fetchPendingTransformOrders();
+        Collections.sort(orders, Collections.reverseOrder());
 
         for (TransformationOrder order : orders) {
             logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
@@ -313,7 +318,6 @@ public class OrderManager implements IOrderManager {
                 List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
                 if (processes.isEmpty()) {
-                    System.out.println("NO PROCESS!");
                     continue;
                 }
 

@@ -5,7 +5,7 @@ import ii.pfc.part.PartType;
 
 import java.time.LocalDateTime;
 
-public class UnloadOrder {
+public class UnloadOrder implements Comparable<UnloadOrder> {
 
     private final int orderId;
 
@@ -78,5 +78,16 @@ public class UnloadOrder {
                 ", remaining=" + remaining +
                 ", completed=" + completed +
                 '}';
+    }
+
+    @Override
+    public int compareTo(UnloadOrder o) {
+        int compare = Integer.compare(remaining, o.remaining);
+        if (compare != 0)  {
+            return compare;
+        }
+
+
+        return o.date.compareTo(date);
     }
 }

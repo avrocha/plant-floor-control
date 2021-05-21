@@ -57,7 +57,7 @@ public class Factory {
     public Factory() {
         this.processRegistry = new ProcessRegistry();
 
-        this.commsManager = new CommsManager(54321, new InetSocketAddress("10.227.147.95", 4840));
+        this.commsManager = new CommsManager(54321, new InetSocketAddress("172.29.0.153", 4840));
         this.databaseManager = new DatabaseManager();
 
         this.routingManager = RoutingManager.builder()
@@ -97,20 +97,20 @@ public class Factory {
                 .unidirectional(ROT40, LIN12, DEFAULT_WEIGHT)
 
                 /*bidirectional right side edges*/
-                .bidirectional(ROT37, ASM24, getAssemblyWeight((short) 24), DEFAULT_WEIGHT)
-                .bidirectional(ROT36, ASM23, getAssemblyWeight((short) 23), DEFAULT_WEIGHT)
-                .bidirectional(ROT35, ASM22, getAssemblyWeight((short) 22), DEFAULT_WEIGHT)
-                .bidirectional(ROT34, ASM21, getAssemblyWeight((short) 21), DEFAULT_WEIGHT)
-                .bidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
-                .bidirectional(ROT31, LIN2, DEFAULT_WEIGHT)
+                .bidirectional(ROT37, ASM24, getAssemblyWeight((short) 24, true), DEFAULT_WEIGHT)
+                .bidirectional(ROT36, ASM23, getAssemblyWeight((short) 23, false), DEFAULT_WEIGHT)
+                .bidirectional(ROT35, ASM22, getAssemblyWeight((short) 22, false), DEFAULT_WEIGHT)
+                .bidirectional(ROT34, ASM21, getAssemblyWeight((short) 21, false), DEFAULT_WEIGHT)
+                .unidirectional(ROT32, LIN2, DEFAULT_WEIGHT)
+                .unidirectional(LIN2, ROT31, DEFAULT_WEIGHT)
                 .bidirectional(ROT38, LIN6, DEFAULT_WEIGHT)
                 .bidirectional(LIN6, ROT39, DEFAULT_WEIGHT)
 
                 /*bidirectional left side edges*/
-                .bidirectional(ROT44, ASM25, getAssemblyWeight((short) 25), DEFAULT_WEIGHT)
-                .bidirectional(ROT43, ASM26, getAssemblyWeight((short) 26), DEFAULT_WEIGHT)
-                .bidirectional(ROT42, ASM27, getAssemblyWeight((short) 27), DEFAULT_WEIGHT)
-                .bidirectional(ROT41, ASM28, getAssemblyWeight((short) 28), DEFAULT_WEIGHT)
+                .bidirectional(ROT44, ASM25, getAssemblyWeight((short) 25, false), DEFAULT_WEIGHT)
+                .bidirectional(ROT43, ASM26, getAssemblyWeight((short) 26, false), DEFAULT_WEIGHT)
+                .bidirectional(ROT42, ASM27, getAssemblyWeight((short) 27, false), DEFAULT_WEIGHT)
+                .bidirectional(ROT41, ASM28, getAssemblyWeight((short) 28, true), DEFAULT_WEIGHT)
                 .build();
 
         this.orderManager = new OrderManager(this.processRegistry, this.commsManager, this.databaseManager, this.routingManager);
@@ -236,15 +236,16 @@ public class Factory {
 
      */
 
-    private Function<RoutingManager.RouteData, Double> getAssemblyWeight(short conveyorId) {
+    private Function<RoutingManager.RouteData, Double> getAssemblyWeight(short conveyorId, boolean allowToolChanges) {
         return (routeData) -> {
             if (commsManager.getAssemblyConveyorOccupation(conveyorId)) {
                 return Double.MAX_VALUE;
             }
 
             if (routeData.getProcess() != null) {
-                if (routeData.getProcess().getTool() != commsManager.getAssemblyConveyorTool(conveyorId)) {
-                    return DEFAULT_WEIGHT.apply(routeData) + 10;
+                EnumTool convTool = commsManager.getAssemblyConveyorTool(conveyorId);
+                if (routeData.getProcess().getTool() != convTool) {
+                    return allowToolChanges ? DEFAULT_WEIGHT.apply(routeData) + 10 : Double.MAX_VALUE;
                 }
             }
 

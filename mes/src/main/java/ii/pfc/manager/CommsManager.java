@@ -312,7 +312,8 @@ public class CommsManager implements ICommsManager {
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
             if (response.getResponseCode("ConveyorActualTool") == PlcResponseCode.OK) {
-                return EnumTool.getTool(response.getShort("ConveyorActualTool"));
+                short toolId = response.getShort("ConveyorActualTool");
+                return EnumTool.getTool(toolId);
             }
         } catch (PlcConnectionException e) {
             e.printStackTrace();
@@ -421,6 +422,8 @@ public class CommsManager implements ICommsManager {
                 builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) process.getDuration().toSeconds());
                 builder.addItem("RESERVE", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Reserve", route.getTarget().getId()), true);
                 builder.addItem("ASSTOOL", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.DesiredTool", route.getTarget().getId()), (short) process.getTool().getId());
+                builder.addItem("PTOOL",
+                    String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.PrepareTool", route.getTarget().getId()), true);
             } else {
                 builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", (short) 0);
                 builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) 0);

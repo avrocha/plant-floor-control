@@ -84,7 +84,7 @@ public class DatabaseManager implements IDatabaseManager {
 
      */
 
-    private Collection<UnloadOrder> _extractUnloadOrders(ResultSet result) throws SQLException {
+    private List<UnloadOrder> _extractUnloadOrders(ResultSet result) throws SQLException {
         List<UnloadOrder> orders = new ArrayList<>();
 
         while (result.next()) {
@@ -103,7 +103,7 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public Collection<UnloadOrder> fetchPendingUnloadOrders() {
+    public List<UnloadOrder> fetchPendingUnloadOrders() {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order_status WHERE remaining > 0;")) {
@@ -114,11 +114,11 @@ public class DatabaseManager implements IDatabaseManager {
             ex.printStackTrace();
         }
 
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     @Override
-    public Collection<UnloadOrder> fetchAllUnloadOrders() {
+    public List<UnloadOrder> fetchAllUnloadOrders() {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement("SELECT * FROM unload_order_status;")) {
@@ -129,7 +129,7 @@ public class DatabaseManager implements IDatabaseManager {
             ex.printStackTrace();
         }
 
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     /*
@@ -186,7 +186,7 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public Collection<TransformationOrder> fetchPendingTransformOrders() {
+    public List<TransformationOrder> fetchPendingTransformOrders() {
         List<TransformationOrder> orders = new ArrayList<>();
 
         try (Connection connection = dataSource.getConnection()) {
@@ -207,7 +207,7 @@ public class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public Collection<TransformationOrder> fetchAllTransformOrders() {
+    public List<TransformationOrder> fetchAllTransformOrders() {
         List<TransformationOrder> orders = new ArrayList<>();
 
         try (Connection connection = dataSource.getConnection()) {
@@ -347,7 +347,7 @@ public class DatabaseManager implements IDatabaseManager {
 
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
-                    PartType type = PartType.getType(result.getString("type"));
+                    PartType type = PartType.getType(result.getString("unloading_type"));
                     if (type.isUnknown()) {
                         continue;
                     }
@@ -803,15 +803,13 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                    .prepareStatement("INSERT INTO unload_order (order_id, conveyor_id, date, quantity, remaining, completed, type) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?) ")) {
+                    .prepareStatement("INSERT INTO unload_order (order_id, conveyor_id, date, quantity, type) " +
+                            "VALUES (?, ?, ?, ?, ?) ")) {
                 sql.setInt(1, unloadOrder.getOrderId());
                 sql.setInt(2, unloadOrder.getConveyorId());
                 sql.setTimestamp(3, Timestamp.valueOf(unloadOrder.getDate()));
                 sql.setInt(4, unloadOrder.getQuantity());
-                sql.setInt(5, unloadOrder.getQuantity());
-                sql.setInt(6, 0);
-                sql.setString(7, unloadOrder.getPartType().getName());
+                sql.setString(5, unloadOrder.getPartType().getName());
                 sql.executeUpdate();
                 return true;
             }

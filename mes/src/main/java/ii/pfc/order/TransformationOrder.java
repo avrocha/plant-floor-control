@@ -122,7 +122,22 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
     public int compareTo(TransformationOrder o) {
         LocalDateTime now = LocalDateTime.now();
 
-        return Integer.compare(computePenalty(now), o.computePenalty(now));
+        int compare = Integer.compare(computePenalty(now), o.computePenalty(now));
+        if (compare != 0)  {
+            return compare;
+        }
+
+        compare = Integer.compare(remaining, o.remaining);
+        if (compare != 0)  {
+            return compare;
+        }
+
+        compare = Integer.compare(penalty, o.penalty);
+        if (compare != 0)  {
+            return compare;
+        }
+
+        return o.deadline.compareTo(deadline);
     }
 
     @Override

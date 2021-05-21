@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,17 +28,17 @@ public interface IDatabaseManager {
 
      */
 
-    Collection<UnloadOrder> fetchPendingUnloadOrders();
+    List<UnloadOrder> fetchPendingUnloadOrders();
 
-    Collection<UnloadOrder> fetchAllUnloadOrders();
+    List<UnloadOrder> fetchAllUnloadOrders();
 
     //
 
     TransformationOrder fetchTransformOrder(int orderId);
 
-    Collection<TransformationOrder> fetchPendingTransformOrders();
+    List<TransformationOrder> fetchPendingTransformOrders();
 
-    Collection<TransformationOrder> fetchAllTransformOrders();
+    List<TransformationOrder> fetchAllTransformOrders();
 
     //
 
