@@ -9,6 +9,7 @@ import ii.pfc.manager.IRoutingManager;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -231,6 +232,7 @@ public class GUI extends JFrame {
             populateMap.put(PartType.PART_5, 20);
             populateMap.put(PartType.PART_6, 20);
 
+            Collection<Part> partsBatch = new ArrayList<>();
             for (Map.Entry<PartType, Integer> entry : populateMap.entrySet()) {
                 for (int j = 0; j < entry.getValue(); j++) {
                     Part part = new Part(
@@ -239,9 +241,11 @@ public class GUI extends JFrame {
                         entry.getKey(),
                         Part.PartState.STORED);
 
-                    databaseManager.insertPart(part);
+                    partsBatch.add(part);
                 }
             }
+
+            databaseManager.insertParts(partsBatch);
         });
 
         JButton transformOrdersClean=new JButton("Clean Transform Orders");
@@ -290,6 +294,7 @@ public class GUI extends JFrame {
         p4.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
 
         p4.add(inventoryClean);
+        p4.add(inventoryPopulate);
         p4.add(transformOrdersClean);
         p4.add(unloadingOrdersClean);
 

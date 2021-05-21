@@ -72,6 +72,8 @@ public interface IDatabaseManager {
 
     boolean insertPart(Part part);
 
+    boolean insertParts(Collection<Part> parts);
+
     boolean updatePartType(UUID partId, PartType type);
 
     boolean updatePartTypeAndOrder(UUID partId, PartType type, int orderId);

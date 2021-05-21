@@ -413,7 +413,6 @@ public class CommsManager implements ICommsManager {
 
             builder.addItem("Type", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.PartType", route.getPart().getType().getName());
             builder.addItem("ID", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.PartId", route.getPart().getId().toString());
-            builder.addItem("CHECK", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.CheckPart", true);
 
             if (process != null) {
                 builder.addItem("TOOL", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.Tool", (short) process.getTool().getId());
@@ -435,8 +434,19 @@ public class CommsManager implements ICommsManager {
             PlcWriteResponse response = writeRequest.execute().get(1000, TimeUnit.SECONDS);
 
             for (String fieldName : writeRequest.getFieldNames()) {
-                //System.out.println(fieldName + " - " + response.getResponseCode(fieldName));
+                if (response.getResponseCode(fieldName) == PlcResponseCode.OK) {
+                    continue;
+                }
+
+                System.out.println(fieldName + " - " + response.getResponseCode(fieldName));
             }
+
+            builder = plcConnection.writeRequestBuilder();
+            builder.addItem("CHECK", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.CheckPart", true);
+
+            writeRequest = builder.build();
+            writeRequest.execute().get(1000, TimeUnit.SECONDS);
+
         } catch (PlcConnectionException e) {
             e.printStackTrace();
         } catch (Exception e) {

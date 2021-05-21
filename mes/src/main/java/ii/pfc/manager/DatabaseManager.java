@@ -537,8 +537,8 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection.prepareStatement(
-                    "INSERT INTO part (id, order_id, type, state) " +
-                            "VALUES (?, ?, ?, ?::part_state) ON CONFLICT DO NOTHING"
+                "INSERT INTO part (id, order_id, type, state) " +
+                    "VALUES (?, ?, ?, ?::part_state) ON CONFLICT DO NOTHING"
             )) {
                 sql.setObject(1, part.getId());
                 sql.setInt(2, part.getOrderId());
@@ -546,6 +546,38 @@ public class DatabaseManager implements IDatabaseManager {
                 sql.setString(4, part.getState().name());
                 sql.executeUpdate();
                 return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean insertParts(Collection<Part> parts) {
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement sql = connection.prepareStatement(
+                "INSERT INTO part (id, order_id, type, state) " +
+                    "VALUES (?, ?, ?, ?::part_state) ON CONFLICT DO NOTHING"
+            )) {
+                for (Part part : parts) {
+                    sql.setObject(1, part.getId());
+                    sql.setInt(2, part.getOrderId());
+                    sql.setString(3, part.getType().getName());
+                    sql.setString(4, part.getState().name());
+                    sql.addBatch();
+                }
+
+                sql.executeBatch();
+                connection.commit();
+
+            }   catch (SQLException ex) {
+                connection.rollback();
+                ex.printStackTrace();
             }
 
         } catch (SQLException ex) {

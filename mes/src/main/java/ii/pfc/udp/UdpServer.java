@@ -28,7 +28,7 @@ public class UdpServer {
 
     private boolean running = false;
 
-    private byte[] buffer = new byte[2048];
+    private byte[] buffer = new byte[4096];
 
     public UdpServer(int port) {
         this.port = port;

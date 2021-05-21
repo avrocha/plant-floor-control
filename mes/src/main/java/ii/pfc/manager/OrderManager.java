@@ -9,15 +9,14 @@ import ii.pfc.part.PartType;
 import ii.pfc.part.Process;
 import ii.pfc.part.ProcessRegistry;
 import ii.pfc.route.Route;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 public class OrderManager implements IOrderManager {
 
@@ -39,7 +38,8 @@ public class OrderManager implements IOrderManager {
 
     //
 
-    public OrderManager(ProcessRegistry processRegistry, ICommsManager commsManager, IDatabaseManager databaseManager, IRoutingManager routingManager) {
+    public OrderManager(ProcessRegistry processRegistry, ICommsManager commsManager, IDatabaseManager databaseManager,
+        IRoutingManager routingManager) {
         this.processRegistry = processRegistry;
         this.commsManager = commsManager;
         this.databaseManager = databaseManager;
@@ -79,96 +79,99 @@ public class OrderManager implements IOrderManager {
 
     @Override
     public void checkAssemblyCompletions() {
-            Collection<Conveyor> assConveyors = routingManager.getConveyors(EnumConveyorType.ASSEMBLY);
-            for (Conveyor conveyor : assConveyors) {
-                Pair<UUID, PartType> result = commsManager.getAssemblyConveyorCompletedStatus(conveyor.getId());
-                if (result == null) {
-                    continue;
+        Collection<Conveyor> assConveyors = routingManager.getConveyors(EnumConveyorType.ASSEMBLY);
+        for (Conveyor conveyor : assConveyors) {
+            Pair<UUID, PartType> result = commsManager.getAssemblyConveyorCompletedStatus(conveyor.getId());
+            if (result == null) {
+                continue;
+            }
+
+            UUID partId = result.getKey();
+            PartType targetType = result.getValue();
+            if (targetType.isUnknown()) {
+                continue;
+            }
+
+            Part part = databaseManager.fetchPart(partId);
+            if (part == null) {
+                continue;
+            }
+
+            // If we have finished the order or we are not bound to any order, return to the warehouse and dont do anything.
+            if (part.getOrderId() != 0 && part.getType() != targetType) {
+                Process process = processRegistry.getProcess(part.getType(), targetType);
+                if (process != null) {
+                    databaseManager.insertProcessLog(process, conveyor, part);
                 }
 
-                UUID partId = result.getKey();
-                PartType targetType = result.getValue();
-                if (targetType.isUnknown()) {
-                    continue;
+                TransformationOrder order = databaseManager.fetchTransformOrder(part.getOrderId());
+
+                if (order.getTargetType() == targetType) {
+                    databaseManager.updatePartTypeAndOrder(part.getId(), targetType, 0);
+                    databaseManager.incrementTransformOrderCompletions(order.getOrderId(), 1);
+
+                    if (order.getCompleted() + 1 == order.getQuantity()) {
+                        databaseManager.updateTransformOrderFinish(order.getOrderId(), LocalDateTime.now());
+                    }
+                } else {
+                    databaseManager.updatePartType(part.getId(), targetType);
                 }
 
-                Part part = databaseManager.fetchPart(partId);
+                part = databaseManager.fetchPart(partId);
 
-                // If we have finished the order or we are not bound to any order, return to the warehouse and dont do anything.
-                if (part.getOrderId() != 0 && part.getType() != targetType) {
-                    Process process = processRegistry.getProcess(part.getType(), targetType);
-                    if (process != null) {
-                        databaseManager.insertProcessLog(process, conveyor, part);
-                    }
+                if (part.getOrderId() != 0) {
+                    List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
 
-                    TransformationOrder order = databaseManager.fetchTransformOrder(part.getOrderId());
-
-                    if (order.getTargetType() == targetType) {
-                        databaseManager.updatePartTypeAndOrder(part.getId(), targetType, 0);
-                        databaseManager.incrementTransformOrderCompletions(order.getOrderId(), 1);
-
-                        if (order.getCompleted() + 1 == order.getQuantity()) {
-                            databaseManager.updateTransformOrderFinish(order.getOrderId(), LocalDateTime.now());
-                        }
-                    } else {
-                        databaseManager.updatePartType(part.getId(), targetType);
-                    }
-
-                    part = databaseManager.fetchPart(partId);
-
-                    if (part.getOrderId() != 0) {
-                        List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
-
-                        if (processes.isEmpty()) {
-                            continue;
-                        }
-
-                        Route minimumRoute = null;
-
-                        for (Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
-                            if (target.equals(conveyor)) {
-                                continue;
-                            }
-
-                            Route route = routingManager.traceRoute(part, processes.get(0), conveyor, target);
-
-                            if (route == null) {
-                                continue;
-                            }
-
-                            if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
-                                minimumRoute = route;
-                            }
-                        }
-
-                        if (minimumRoute != null) {
-                            logger.info("new machine");
-                            commsManager.sendPlcRoute(minimumRoute, processes.get(0));
-                            continue;
-                        }
-                    }
-                }
-                logger.info("Send to ware");
-
-                Route minimumRoute = null;
-
-                for (Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
-                    Route route = routingManager.traceRoute(part, null, conveyor, target);
-
-                    if (route == null) {
+                    if (processes.isEmpty()) {
                         continue;
                     }
 
-                    if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
-                        minimumRoute = route;
+                    Route minimumRoute = null;
+
+                    for (Conveyor target : routingManager.getConveyors(EnumConveyorType.ASSEMBLY)) {
+                        if (target.equals(conveyor)) {
+                            continue;
+                        }
+
+                        Route route = routingManager.traceRoute(part, processes.get(0), conveyor, target);
+
+                        if (route == null) {
+                            continue;
+                        }
+
+                        if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                            minimumRoute = route;
+                        }
+                    }
+
+                    if (minimumRoute != null) {
+                        logger.info("new machine");
+                        commsManager.sendPlcRoute(minimumRoute, processes.get(0));
+                        continue;
                     }
                 }
+            }
+            logger.info("Send to ware");
 
-                if (minimumRoute != null) {
-                    commsManager.sendPlcRoute(minimumRoute);
+            Route minimumRoute = null;
+
+            for (Conveyor target : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN)) {
+                Route route = routingManager.traceRoute(part, null, conveyor, target);
+
+                if (route == null) {
+                    continue;
                 }
 
+                if (minimumRoute == null || route.getWeight() < minimumRoute.getWeight()) {
+                    minimumRoute = route;
+                }
             }
+
+            if (minimumRoute != null) {
+                commsManager.sendPlcRoute(minimumRoute);
+            }
+
+        }
     }
 
     //
