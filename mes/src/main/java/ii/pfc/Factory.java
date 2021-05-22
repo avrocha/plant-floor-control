@@ -26,7 +26,7 @@ import java.util.function.Function;
 
 public class Factory {
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(5);
+    private final ExecutorService executor = Executors.newFixedThreadPool(10);
 
     //
 
@@ -57,7 +57,7 @@ public class Factory {
     public Factory() {
         this.processRegistry = new ProcessRegistry();
 
-        this.commsManager = new CommsManager(54321, new InetSocketAddress("172.29.0.153", 4840));
+        this.commsManager = new CommsManager(54321, new InetSocketAddress("172.29.0.60", 4840));
         this.databaseManager = new DatabaseManager();
 
         this.routingManager = RoutingManager.builder()
@@ -130,33 +130,39 @@ public class Factory {
     private static short LOAD_ORDER_ID = 1;
 
     private void mainTask() {
-        this.databaseManager.fetchProcesses().forEach(processRegistry::registerProcess);
-
-        this.running = true;
-
         Stopwatch dbPollTimer = Stopwatch.createStarted();
 
-        commsManager.prepareAssemblyTool(ASM21.getId(), EnumTool.T1);
-        commsManager.prepareAssemblyTool(ASM22.getId(), EnumTool.T2);
-        commsManager.prepareAssemblyTool(ASM23.getId(), EnumTool.T3);
+        while (running) {
+            try {
+                if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 250) {
+                    dbPollTimer.reset().start();
 
-        commsManager.prepareAssemblyTool(ASM25.getId(), EnumTool.T1);
-        commsManager.prepareAssemblyTool(ASM26.getId(), EnumTool.T2);
-        commsManager.prepareAssemblyTool(ASM27.getId(), EnumTool.T3);
+                    orderManager.checkWarehouseEntries();
+                    orderManager.checkAssemblyCompletions();
+                }
+            } catch(Throwable ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private void orderTask() {
+        Stopwatch dbPollTimer = Stopwatch.createStarted();
 
         while (running) {
-            commandManager.pollRequests();
-
             if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 250) {
                 dbPollTimer.reset().start();
 
-                orderManager.checkWarehouseEntries();
-                orderManager.checkAssemblyCompletions();
-
                 orderManager.pollLoadOrders();
-                orderManager.pollUnloadOrders();
                 orderManager.pollTransformOrders();
+                orderManager.pollUnloadOrders();
             }
+        }
+    }
+
+    private void commandTask() {
+        while (running) {
+            commandManager.pollRequests();
         }
     }
 
@@ -195,8 +201,22 @@ public class Factory {
         this.gui.init();
 
         this.executor.submit(this.commsManager::startUdpServer);
-        this.executor.submit(this::mainTask);
         this.executor.submit(this::uiTask);
+
+        this.databaseManager.fetchProcesses().forEach(processRegistry::registerProcess);
+        this.running = true;
+
+        commsManager.prepareAssemblyTool(ASM21.getId(), EnumTool.T1);
+        commsManager.prepareAssemblyTool(ASM22.getId(), EnumTool.T2);
+        commsManager.prepareAssemblyTool(ASM23.getId(), EnumTool.T3);
+
+        commsManager.prepareAssemblyTool(ASM25.getId(), EnumTool.T1);
+        commsManager.prepareAssemblyTool(ASM26.getId(), EnumTool.T2);
+        commsManager.prepareAssemblyTool(ASM27.getId(), EnumTool.T3);
+
+        this.executor.submit(this::mainTask);
+        this.executor.submit(this::orderTask);
+        this.executor.submit(this::commandTask);
 
         this.shellTask();
     }

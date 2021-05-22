@@ -73,7 +73,7 @@ public class RoutingManager implements IRoutingManager {
     @Override
     public Route traceRoute(Part part, Process process, Conveyor source, Conveyor target) {
         synchronized (ConveyorEdge.LOCK) {
-            System.out.println("Tracing route between " + source.getId() + " and " + target.getId());
+            // System.out.println("Tracing route between " + source.getId() + " and " + target.getId());
             ConveyorEdge.currentRouteData = new RouteData(part, source, target, process);
             GraphPath<Conveyor, ConveyorEdge> path = DijkstraShortestPath.findPathBetween(this.regionGraph, source, target);
             ConveyorEdge.currentRouteData = null;

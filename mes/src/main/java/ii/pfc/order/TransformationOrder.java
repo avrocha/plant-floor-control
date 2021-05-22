@@ -132,12 +132,12 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
             return compare;
         }
 
-        compare = Integer.compare(penalty, o.penalty);
+        compare = o.deadline.compareTo(deadline);
         if (compare != 0)  {
             return compare;
         }
 
-        return o.deadline.compareTo(deadline);
+        return Integer.compare(penalty, o.penalty);
     }
 
     @Override

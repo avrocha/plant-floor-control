@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE PRODUCTION_ORDERS [
+<!ELEMENT ORDERS (Request_Stores | Order*)>
+<!ELEMENT Request_Stores EMPTY>
+<!ELEMENT Order (Transform | Unload)>
+<!ATTLIST Order
+          Number   (CDATA) #REQUIRED
+>
+<!ELEMENT Transform EMPTY>
+<!ATTLIST Transform
+          From     (CDATA) #REQUIRED
+          To       (CDATA) #REQUIRED
+          Quantity (CDATA) #REQUIRED
+          Time     (CDATA) #REQUIRED
+          MaxDelay (CDATA) #REQUIRED
+          Penalty  (CDATA) #REQUIRED
+>
+<!ELEMENT Unload EMPTY>
+<!ATTLIST Unload
+          Type        (CDATA) #REQUIRED
+          Destination (CDATA) #REQUIRED
+          Quantity    (CDATA) #REQUIRED
+>
+]>
+<ORDERS>
+<Request_Stores/>
+</ORDERS>
+
+
