@@ -29,6 +29,15 @@ public class GUI extends JFrame {
 
     private final IRoutingManager routingManager;
 
+    /*
+
+     */
+    private Object[][] dataAssemblers;
+
+    private Object[][] dataParts;
+
+    private JTable assemblersTable;
+
     public GUI(IDatabaseManager databaseManager, IRoutingManager routingManager) {
         super("Interface");
 
@@ -36,45 +45,12 @@ public class GUI extends JFrame {
         this.routingManager = routingManager;
     }
 
-    public void init() {
-        int width = 600;
-        int height = 600;
+    public void updateAssemblesTable() {
+        int assemblerConveyorIndex = 0;
 
-        JLabel tab1Title = new JLabel("Assemblers Stats");
-        JLabel tab2Title = new JLabel("Unloaded Parts");
-        JLabel tab3Title = new JLabel("Inventory");
-        JLabel tab4Title = new JLabel("Admin");
-
-        JPanel p1=new JPanel();
-        JPanel p2=new JPanel();
-        JPanel p3=new JPanel();
-        JPanel p4=new JPanel();
-
-        p1.setLayout(new BoxLayout(p1, BoxLayout.PAGE_AXIS));
-        p2.setLayout(new BoxLayout(p2, BoxLayout.PAGE_AXIS));
-        p3.setLayout(new BoxLayout(p3, BoxLayout.PAGE_AXIS));
-        p4.setLayout(new BoxLayout(p4, BoxLayout.PAGE_AXIS));
-
-        Part.PartState[] partStates = Part.PartState.values();
         Collection<PartType> partTypes = PartType.getTypes();
-
-        /*
-            Info table about Assemblers
-         */
-
-        // Assembler   | Operation time | Number of operated parts
-        // Assembler 1 |        0       |        0
-        // ...
-
-
-
         Collection<Conveyor> assemblerConveyors = routingManager.getConveyors(EnumConveyorType.ASSEMBLY);
 
-        String assemblers[] = {"Assembler", "Operation time", "Number of operated parts"};
-
-        Object[][] dataAssemblers = new Object[assemblerConveyors.size()][assemblers.length];
-
-        int assemblerConveyorIndex = 0;
         for(Conveyor assemblerConveyor : assemblerConveyors) {
             dataAssemblers[assemblerConveyorIndex][0] = String.format("Assembler %d", assemblerConveyorIndex + 1);
 
@@ -96,17 +72,88 @@ public class GUI extends JFrame {
             assemblerConveyorIndex++;
 
         }
+    }
+
+    public void updateInventoryTable() {
+        Collection<PartType> partTypes = PartType.getTypes();
+        Part.PartState[] partStates = Part.PartState.values();
+
+        Collection<Part> parts = databaseManager.fetchParts();
+        Map<Part.PartState, Multimap<PartType, Part>> stateMap = new HashMap<>();
+
+        for(Part part : parts) {
+            Part.PartState state = part.getState();
+            Multimap<PartType, Part> typeMap = stateMap.get(state);
+
+            if (typeMap == null) {
+                typeMap = HashMultimap.create();
+                stateMap.put(state, typeMap);
+            }
+
+            typeMap.put(part.getType(), part);
+        }
+
+        dataParts = new Object[partTypes.size()][1 + partStates.length];
+
+        int i = 0;
+        for(PartType type : partTypes) {
+            dataParts[i][0] = type.getName();
+
+            for(int j = 0; j < partStates.length; j++) {
+                if (stateMap.containsKey(partStates[j])) {
+                    dataParts[i][j + 1] = stateMap.get(partStates[j]).get(type).size();
+                } else {
+                    dataParts[i][j + 1] = 0;
+                }
+            }
+
+            i++;
+        }
+    }
+    public void init() {
+        int width = 600;
+        int height = 600;
+
+        JTabbedPane tp=new JTabbedPane();
+
+        JLabel tab1Title = new JLabel("Assemblers Stats");
+        JLabel tab2Title = new JLabel("Unloaded Parts");
+        JLabel tab3Title = new JLabel("Inventory");
+        JLabel tab4Title = new JLabel("Admin");
+
+        JPanel p1=new JPanel();
+        JPanel p2=new JPanel();
+        JPanel p3=new JPanel();
+        JPanel p4=new JPanel();
+
+        Part.PartState[] partStates = Part.PartState.values();
+        Collection<PartType> partTypes = PartType.getTypes();
+
+
+        /*
+            Info table about Assemblers
+         */
+
+        // Assembler   | Operation time | Number of operated parts
+        // Assembler 1 |        0       |        0
+        // ...
+
+        Collection<Conveyor> assemblerConveyors = routingManager.getConveyors(EnumConveyorType.ASSEMBLY);
+
+        String assemblers[] = {"Assembler", "Operation time", "Number of operated parts"};
+
+        dataAssemblers = new Object[assemblerConveyors.size()][assemblers.length];
 
 
 
-        JTable assemblersTable= new JTable(dataAssemblers, assemblers){
+        assemblersTable= new JTable(dataAssemblers, assemblers){
             @Override
             public boolean editCellAt(int row, int column, EventObject event) {
                 return false;
             }
         };
         assemblersTable.setRowSelectionAllowed(false);
-
+        updateAssemblesTable();
         /*
            Info table about Unloading Parts
          */
@@ -158,6 +205,7 @@ public class GUI extends JFrame {
         };
         unloadedPartsTable.setRowSelectionAllowed(false);
 
+
         /*
             Info table about Inventory
          */
@@ -176,34 +224,6 @@ public class GUI extends JFrame {
         Collection<Part> parts = databaseManager.fetchParts();
         Map<Part.PartState, Multimap<PartType, Part>> stateMap = new HashMap<>();
 
-        for(Part part : parts) {
-            Part.PartState state = part.getState();
-            Multimap<PartType, Part> typeMap = stateMap.get(state);
-
-            if (typeMap == null) {
-                typeMap = HashMultimap.create();
-                stateMap.put(state, typeMap);
-            }
-
-            typeMap.put(part.getType(), part);
-        }
-
-        Object[][] dataParts = new Object[partTypes.size()][1 + partStates.length];
-
-        int i = 0;
-        for(PartType type : partTypes) {
-            dataParts[i][0] = type.getName();
-
-            for(int j = 0; j < partStates.length; j++) {
-                if (stateMap.containsKey(partStates[j])) {
-                    dataParts[i][j + 1] = stateMap.get(partStates[j]).get(type).size();
-                } else {
-                    dataParts[i][j + 1] = 0;
-                }
-            }
-
-            i++;
-        }
 
         JTable inventoryTable= new JTable(dataParts, partHeaders){
             @Override
@@ -212,8 +232,12 @@ public class GUI extends JFrame {
             }
         };
         inventoryTable.setRowSelectionAllowed(false);
+        updateInventoryTable();
 
-        //Buttons and commands
+
+        /*
+            BUTTONS AND COMMANDS
+         */
         JButton inventoryClean=new JButton("Clean Inventory");
         inventoryClean.setBounds(300,300,300, 90);
         inventoryClean.addActionListener(e -> {
@@ -257,41 +281,75 @@ public class GUI extends JFrame {
         });
 
 
-        JTabbedPane tp=new JTabbedPane();
+        /*
+            REFRESH BUTTONS
+         */
+        JButton refreshButtonP1 = new JButton(("Refresh"));
+        refreshButtonP1.setBounds(600,600,400,400);
+        refreshButtonP1.addActionListener(e -> {
+            updateAssemblesTable();
+        });
 
-        tp.add("Assemblers",p1);
-        tp.add("Unloaded parts",p2);
-        tp.add("Inventory", p3);
-        tp.add("Admin", p4);
+        JButton refreshButtonP2= new JButton(("Refresh"));
+        refreshButtonP2.setBounds(300,300,400,400);
+        refreshButtonP2.addActionListener(e -> {
 
+        });
+        JButton refreshButtonP3 = new JButton(("Refresh"));
+        refreshButtonP3.setBounds(300,300,400,400);
+        refreshButtonP3.addActionListener(e -> {
+            updateInventoryTable();
+        });
+
+
+        /*
+            SETTING PANELS LAYOUTS
+         */
+        p1.setLayout(new BoxLayout(p1, BoxLayout.PAGE_AXIS));
+        p2.setLayout(new BoxLayout(p2, BoxLayout.PAGE_AXIS));
+        p3.setLayout(new BoxLayout(p3, BoxLayout.PAGE_AXIS));
+        p4.setLayout(new BoxLayout(p4, BoxLayout.PAGE_AXIS));
+
+
+        /*
+            ADDING TO PANELS TABLES AND BUTTONS
+         */
         p1.add(tab1Title);
         p1.add(Box.createRigidArea(new Dimension(2,10)));
         p1.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
-
         p1.add(assemblersTable.getTableHeader());
         p1.add(assemblersTable);
+        p1.add(refreshButtonP1);
 
         p2.add(tab2Title);
         p2.add(Box.createRigidArea(new Dimension(2,10)));
         p2.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
-
         p2.add(unloadedPartsTable.getTableHeader());
         p2.add(unloadedPartsTable);
+        p2.add(refreshButtonP2);
 
         p3.add(tab3Title);
         p3.add(Box.createRigidArea(new Dimension(2,10)));
         p3.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
-
         p3.add(inventoryTable.getTableHeader());
         p3.add(inventoryTable);
+        p3.add(refreshButtonP3);
 
         p4.add(tab4Title);
         p4.add(Box.createRigidArea(new Dimension(2,10)));
         p4.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
-
         p4.add(inventoryClean);
         p4.add(transformOrdersClean);
         p4.add(unloadingOrdersClean);
+
+
+        /*
+            ADDING TO PANE THE TABS
+         */
+        tp.add("Assemblers", p1);
+        tp.add("Unloaded parts",p2);
+        tp.add("Inventory", p3);
+        tp.add("Admin", p4);
 
         this.add(tp);
         this.setSize(width,height);
