@@ -8,6 +8,7 @@ import ii.pfc.manager.IDatabaseManager;
 import ii.pfc.manager.IRoutingManager;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
+import org.apache.commons.lang3.compare.ObjectToStringComparator;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -36,6 +37,10 @@ public class GUI extends JFrame {
     private Object[][] dataAssemblers;
 
     private Object[][] dataParts;
+
+    private Object[][] dataUnloadedParts;
+
+    private String[] unloadInfo;
 
     private JTable assemblersTable;
 
@@ -75,6 +80,37 @@ public class GUI extends JFrame {
         }
     }
 
+    public void updateUnloadedPartsTable () {
+        Collection<PartType> partTypes = PartType.getTypes();
+        Collection<Conveyor> sliderConveyors = routingManager.getConveyors(EnumConveyorType.SLIDER);
+
+        unloadInfo = new String[1 + sliderConveyors.size() + 1];
+
+        dataUnloadedParts = new Object[partTypes.size()][1 + sliderConveyors.size() + 1];
+
+        int typeIndex = 0;
+        for(PartType type : partTypes) {
+            dataUnloadedParts[typeIndex][0] = type.getName();
+            dataUnloadedParts[typeIndex][unloadInfo.length - 1] = 0;
+
+            typeIndex++;
+        }
+
+        int sliderConveyorIndex = 0;
+        for(Conveyor sliderConveyor : sliderConveyors) {
+            Map<PartType, Integer> unloadedParts = databaseManager.countUnloadedParts(sliderConveyor.getId());
+
+            typeIndex = 0;
+            for (PartType type : partTypes) {
+                int amount = unloadedParts.getOrDefault(type, 0);
+                dataUnloadedParts[typeIndex][1 + sliderConveyorIndex] = amount;
+                dataUnloadedParts[typeIndex][unloadInfo.length - 1] = ((int) dataUnloadedParts[typeIndex][unloadInfo.length - 1]) + amount;
+                typeIndex++;
+            }
+
+            sliderConveyorIndex++;
+        }
+    }
     public void updateInventoryTable() {
         Collection<PartType> partTypes = PartType.getTypes();
         Part.PartState[] partStates = Part.PartState.values();
@@ -111,6 +147,7 @@ public class GUI extends JFrame {
             i++;
         }
     }
+
     public void init() {
         int width = 600;
         int height = 600;
@@ -145,8 +182,6 @@ public class GUI extends JFrame {
 
         dataAssemblers = new Object[assemblerConveyors.size()][assemblers.length];
 
-
-
         assemblersTable= new JTable(dataAssemblers, assemblers){
             @Override
             public boolean editCellAt(int row, int column, EventObject event) {
@@ -155,6 +190,8 @@ public class GUI extends JFrame {
         };
         assemblersTable.setRowSelectionAllowed(false);
         updateAssemblesTable();
+
+
         /*
            Info table about Unloading Parts
          */
@@ -164,7 +201,9 @@ public class GUI extends JFrame {
         // ...
 
         Collection<Conveyor> sliderConveyors = routingManager.getConveyors(EnumConveyorType.SLIDER);
-        String[] unloadInfo = new String[1 + sliderConveyors.size() + 1];
+
+        unloadInfo = new String[1 + sliderConveyors.size() + 1];
+
         unloadInfo[0] = "Type";
 
         for(int i = 0; i < sliderConveyors.size(); i++) {
@@ -173,30 +212,7 @@ public class GUI extends JFrame {
 
         unloadInfo[unloadInfo.length - 1] = "Total";
 
-        Object[][] dataUnloadedParts = new Object[partTypes.size()][1 + sliderConveyors.size() + 1];
-
-        int typeIndex = 0;
-        for(PartType type : partTypes) {
-            dataUnloadedParts[typeIndex][0] = type.getName();
-            dataUnloadedParts[typeIndex][unloadInfo.length - 1] = 0;
-
-            typeIndex++;
-        }
-
-        int sliderConveyorIndex = 0;
-        for(Conveyor sliderConveyor : sliderConveyors) {
-            Map<PartType, Integer> unloadedParts = databaseManager.countUnloadedParts(sliderConveyor.getId());
-
-            typeIndex = 0;
-            for (PartType type : partTypes) {
-                int amount = unloadedParts.getOrDefault(type, 0);
-                dataUnloadedParts[typeIndex][1 + sliderConveyorIndex] = amount;
-                dataUnloadedParts[typeIndex][unloadInfo.length - 1] = ((int) dataUnloadedParts[typeIndex][unloadInfo.length - 1]) + amount;
-                typeIndex++;
-            }
-
-            sliderConveyorIndex++;
-        }
+        dataUnloadedParts = new Object[partTypes.size()][1 + sliderConveyors.size() + 1];
 
         JTable unloadedPartsTable = new JTable(dataUnloadedParts, unloadInfo){
             @Override
@@ -205,7 +221,7 @@ public class GUI extends JFrame {
             }
         };
         unloadedPartsTable.setRowSelectionAllowed(false);
-
+        updateUnloadedPartsTable();
 
         /*
             Info table about Inventory
@@ -297,7 +313,7 @@ public class GUI extends JFrame {
         JButton refreshButtonP2= new JButton(("Refresh"));
         refreshButtonP2.setBounds(300,300,400,400);
         refreshButtonP2.addActionListener(e -> {
-
+            updateUnloadedPartsTable();
         });
         JButton refreshButtonP3 = new JButton(("Refresh"));
         refreshButtonP3.setBounds(300,300,400,400);
