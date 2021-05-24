@@ -192,7 +192,7 @@ public class DatabaseManager implements IDatabaseManager {
         try (Connection connection = dataSource.getConnection()) {
 
             try (PreparedStatement sql = connection
-                    .prepareStatement("SELECT * FROM transform_order_status WHERE remaining > 0;")) {
+                    .prepareStatement("SELECT * FROM transform_order_status WHERE completed <> quantity;")) {
                 ResultSet result = sql.executeQuery();
                 while(result.next()) {
                     orders.add(_extractTransformationOrders(result));

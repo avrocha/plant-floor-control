@@ -312,6 +312,10 @@ public class OrderManager implements IOrderManager {
                 }
             }
 
+            if (order.getRemaining() <= 0) {
+                continue;
+            }
+
             parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, 1);
             logger.info("Received {} parts", parts.size());
 

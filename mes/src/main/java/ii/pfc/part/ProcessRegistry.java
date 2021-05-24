@@ -11,7 +11,17 @@ import java.util.List;
 
 public class ProcessRegistry {
 
+    public static ProcessRegistry INSTANCE;
+
     private final Graph<PartType, ProcessEdge> graph = new DefaultUndirectedGraph<>(ProcessEdge.class);
+
+    public ProcessRegistry() {
+        INSTANCE = this;
+    }
+
+    /*
+
+     */
 
     public void registerProcess(Process process) {
         graph.addVertex(process.getSource());

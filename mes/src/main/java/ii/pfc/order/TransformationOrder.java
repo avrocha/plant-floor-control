@@ -1,6 +1,7 @@
 package ii.pfc.order;
 
 import ii.pfc.part.PartType;
+import ii.pfc.part.ProcessRegistry;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -127,7 +128,8 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
             return compare;
         }
 
-        compare = Integer.compare(remaining, o.remaining);
+
+        compare = Integer.compare((quantity - completed) * ProcessRegistry.INSTANCE.getProcesses(sourceType, targetType).size(), (o.quantity - o.completed) * ProcessRegistry.INSTANCE.getProcesses(o.sourceType, o.targetType).size());
         if (compare != 0)  {
             return compare;
         }
