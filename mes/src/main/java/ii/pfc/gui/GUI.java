@@ -211,7 +211,7 @@ public class GUI extends JFrame {
 
             unloadInfo[unloadInfo.length - 1] = "Total";
 
-            dataUnloadedParts = new Object[partTypes.size()][1 + sliderConveyors.size() + 1];
+            dataUnloadedParts = new Object[partTypes.size()][partStates.length + 1];
 
             JTable unloadedPartsTable = new JTable(dataUnloadedParts, unloadInfo){
                 @Override
@@ -221,6 +221,7 @@ public class GUI extends JFrame {
             };
             unloadedPartsTable.setRowSelectionAllowed(false);
             updateUnloadedPartsTable();
+
 
         /*
             Info table about Inventory
@@ -237,9 +238,7 @@ public class GUI extends JFrame {
                 partHeaders[i + 1] = partStates[i].getDisplayName();
             }
 
-            Collection<Part> parts = databaseManager.fetchParts();
-            Map<Part.PartState, Multimap<PartType, Part>> stateMap = new HashMap<>();
-
+            dataParts = new Object[partTypes.size()][1 + sliderConveyors.size() + 1];
 
             JTable inventoryTable= new JTable(dataParts, partHeaders){
                 @Override
@@ -248,7 +247,7 @@ public class GUI extends JFrame {
                 }
             };
             inventoryTable.setRowSelectionAllowed(false);
-            //updateInventoryTable();
+            updateInventoryTable();
 
 
         /*
@@ -347,12 +346,12 @@ public class GUI extends JFrame {
             p2.add(unloadedPartsTable);
             p2.add(refreshButtonP2);
 
-            /*p3.add(tab3Title);
+            p3.add(tab3Title);
             p3.add(Box.createRigidArea(new Dimension(2,10)));
             p3.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
             p3.add(inventoryTable.getTableHeader());
             p3.add(inventoryTable);
-            p3.add(refreshButtonP3);*/
+            p3.add(refreshButtonP3);
 
             p4.add(tab4Title);
             p4.add(Box.createRigidArea(new Dimension(2,10)));
