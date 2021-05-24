@@ -57,7 +57,7 @@ public class Factory {
     public Factory() {
         this.processRegistry = new ProcessRegistry();
 
-        this.commsManager = new CommsManager(54321, new InetSocketAddress("172.29.0.60", 4840));
+        this.commsManager = new CommsManager(54321, new InetSocketAddress("10.227.113.101", 4840));
         this.databaseManager = new DatabaseManager();
 
         this.routingManager = RoutingManager.builder()
