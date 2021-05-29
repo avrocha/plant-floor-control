@@ -112,7 +112,7 @@ public class CommsManager implements ICommsManager {
             PlcWriteRequest writeRequest = builder.build();
 
             // Async execution
-            writeRequest.execute();
+            writeRequest.execute().get(1000, TimeUnit.SECONDS);
         } catch (PlcConnectionException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -255,12 +255,13 @@ public class CommsManager implements ICommsManager {
             String fieldName = "SliderStatus";
             builder.addItem(fieldName,
                     String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.SlidersStatus[%d]", (short) (conveyorId - 60)));
+            builder.addItem("Reservations",  String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CS%d.Reservations", conveyorId));
 
             PlcReadRequest readRequest = builder.build();
             PlcReadResponse response = readRequest.execute().get(1000, TimeUnit.MILLISECONDS);
 
-            if (response.getResponseCode(fieldName) == PlcResponseCode.OK) {
-                return response.getInteger(fieldName);
+            if (response.getResponseCode(fieldName) == PlcResponseCode.OK && response.getResponseCode("Reservations") == PlcResponseCode.OK) {
+                return response.getInteger(fieldName) + response.getInteger("Reservations");
             }
         } catch (PlcConnectionException e) {
             e.printStackTrace();
@@ -269,6 +270,28 @@ public class CommsManager implements ICommsManager {
         }
 
         return -1;
+    }
+
+    @Override
+    public void incrementSliderConveyorReservation(short conveyorId) {
+        if (!isConnected()) {
+            return;
+        }
+
+        try (PlcConnection plcConnection = getPlcConnection()) {
+            PlcWriteRequest.Builder builder = plcConnection.writeRequestBuilder();
+
+            builder.addItem("Reserve", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CS%d.Reserve", conveyorId), true);
+
+            PlcWriteRequest writeRequest = builder.build();
+
+            // Async execution
+            writeRequest.execute().get(1000, TimeUnit.SECONDS);
+        } catch (PlcConnectionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -420,6 +443,7 @@ public class CommsManager implements ICommsManager {
                 System.out.println("Adding target " + process.getResult().getName());
                 builder.addItem("ASSEMBLETIME", "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.RouteData.AssembleTime", (short) process.getDuration().toSeconds());
                 builder.addItem("RESERVE", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.Reserve", route.getTarget().getId()), true);
+
                 builder.addItem("ASSTOOL", String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.DesiredTool", route.getTarget().getId()), (short) process.getTool().getId());
                 builder.addItem("PTOOL",
                     String.format("ns=4;s=|var|CODESYS Control Win V3 x64.Application.PlantFloor.CA%d.PrepareTool", route.getTarget().getId()), true);

@@ -57,6 +57,8 @@ public interface ICommsManager {
 
     int getSliderConveyorOccupation(short conveyorId);
 
+    void incrementSliderConveyorReservation(short conveyorId);
+
     /*
 
      */

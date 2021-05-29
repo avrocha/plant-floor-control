@@ -66,6 +66,7 @@ public class OrderManager implements IOrderManager {
 
                 } else {
                     if (!databaseManager.insertPart(tempPart)) {
+                        System.out.println("INSERT PART");
                         continue;
                     }
 
@@ -230,13 +231,13 @@ public class OrderManager implements IOrderManager {
         for (UnloadOrder order : orders) {
             //logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
             Collection<Part> parts = databaseManager.fetchParts(0, order.getPartType(), Part.PartState.STORED, 1);
+            Conveyor target = routingManager.getConveyor(order.getConveyorId());
 
             for (Part part : parts) {
                 Conveyor minimumSource = null;
                 Route minimumRoute = null;
 
                 for (Conveyor source : routingManager.getConveyors(EnumConveyorType.WAREHOUSE_OUT)) {
-                    Conveyor target = routingManager.getConveyor(order.getConveyorId());
                     Route route = routingManager.traceRoute(part, null, source, target);
 
                     if (route == null) {
@@ -257,6 +258,7 @@ public class OrderManager implements IOrderManager {
                     if (databaseManager.updatePartStateAndOrder(part.getId(), Part.PartState.UNLOADING, order.getOrderId())) {
                         databaseManager.insertUnloadingBayLog(order, part);
 
+                        commsManager.incrementSliderConveyorReservation(target.getId());
                         commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
                         commsManager.sendPlcRoute(minimumRoute);
                     }

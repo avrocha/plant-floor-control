@@ -6,7 +6,7 @@ nc -c -u -w 1 127.0.0.1 54321 < command1.xml
 sleep 3
 
 echo 'sending command2.xml'
-# nc -c -u -w 1 127.0.0.1 54321 < command2.xml 
+# nc -c -u -w 1 127.0.0.1 54321 < command6.xml 
 
 sleep 47
 

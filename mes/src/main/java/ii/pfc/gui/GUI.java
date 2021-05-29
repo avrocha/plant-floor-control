@@ -134,7 +134,7 @@ public class GUI extends JFrame {
         for(PartType type : partTypes) {
             dataParts[i][0] = type.getName();
 
-            for(int j = 0; j < partStates.length; j++) {
+            for (int j = 0; j < partStates.length; j++) {
                 if (stateMap.containsKey(partStates[j])) {
                     dataParts[i][j + 1] = stateMap.get(partStates[j]).get(type).size();
                 } else {
@@ -306,17 +306,20 @@ public class GUI extends JFrame {
             refreshButtonP1.setBounds(600,600,400,400);
             refreshButtonP1.addActionListener(e -> {
                 updateAssemblesTable();
+                repaint();
             });
 
             JButton refreshButtonP2= new JButton(("Refresh"));
             refreshButtonP2.setBounds(300,300,400,400);
             refreshButtonP2.addActionListener(e -> {
                 updateUnloadedPartsTable();
+                repaint();
             });
             JButton refreshButtonP3 = new JButton(("Refresh"));
             refreshButtonP3.setBounds(300,300,400,400);
             refreshButtonP3.addActionListener(e -> {
                 updateInventoryTable();
+                repaint();
             });
 
 

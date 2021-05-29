@@ -57,7 +57,7 @@ public class Factory {
     public Factory() {
         this.processRegistry = new ProcessRegistry();
 
-        this.commsManager = new CommsManager(54321, new InetSocketAddress("10.227.113.101", 4840));
+        this.commsManager = new CommsManager(54321, new InetSocketAddress("192.168.60.69", 4840));
         this.databaseManager = new DatabaseManager();
 
         this.routingManager = RoutingManager.builder()
@@ -138,7 +138,6 @@ public class Factory {
                     dbPollTimer.reset().start();
 
                     orderManager.checkWarehouseEntries();
-                    orderManager.checkAssemblyCompletions();
                 }
             } catch(Throwable ex) {
                 ex.printStackTrace();
@@ -152,6 +151,8 @@ public class Factory {
         while (running) {
             if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 250) {
                 dbPollTimer.reset().start();
+
+                orderManager.checkAssemblyCompletions();
 
                 orderManager.pollLoadOrders();
                 orderManager.pollTransformOrders();

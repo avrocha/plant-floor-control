@@ -108,6 +108,10 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
     }
 
     public int computePenalty(LocalDateTime currentDate) {
+        if (this.finishDate != null) {
+            currentDate = this.finishDate;
+        }
+
         if (currentDate.isBefore(deadline)) {
             return 0;
         }
