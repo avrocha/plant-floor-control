@@ -261,6 +261,7 @@ public class OrderManager implements IOrderManager {
                         commsManager.incrementSliderConveyorReservation(target.getId());
                         commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
                         commsManager.sendPlcRoute(minimumRoute);
+                        return;
                     }
                 }
             }
@@ -273,9 +274,9 @@ public class OrderManager implements IOrderManager {
         Collections.sort(orders, Collections.reverseOrder());
 
         for (TransformationOrder order : orders) {
-            logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
+            //logger.info("#{} - {} part(s) remaining", order.getOrderId(), order.getRemaining());
             Collection<Part> parts = databaseManager.fetchParts(order.getOrderId(), Part.PartState.STORED, 1);
-            logger.info("#{} - Received {} available part(s)", order.getOrderId(), parts.size());
+            //logger.info("#{} - Received {} available part(s)", order.getOrderId(), parts.size());
 
             for (Part part : parts) {
                 List<Process> processes = processRegistry.getProcesses(part.getType(), order.getTargetType());
@@ -310,6 +311,7 @@ public class OrderManager implements IOrderManager {
                     if (databaseManager.updatePartState(part.getId(), Part.PartState.PROCESSING)) {
                         commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
                         commsManager.sendPlcRoute(minimumRoute, processes.get(0));
+                        return;
                     }
                 }
             }
@@ -319,7 +321,7 @@ public class OrderManager implements IOrderManager {
             }
 
             parts = databaseManager.fetchParts(0, order.getSourceType(), Part.PartState.STORED, 1);
-            logger.info("Received {} parts", parts.size());
+            //logger.info("Received {} parts", parts.size());
 
             boolean updatedStart = false;
 
@@ -361,6 +363,7 @@ public class OrderManager implements IOrderManager {
 
                         commsManager.dispatchWarehouseOutConveyorExit(minimumSource.getId(), part.getType());
                         commsManager.sendPlcRoute(minimumRoute, processes.get(0));
+                        return;
                     }
                 }
             }
