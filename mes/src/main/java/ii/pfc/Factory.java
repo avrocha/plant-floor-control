@@ -57,7 +57,7 @@ public class Factory {
     public Factory() {
         this.processRegistry = new ProcessRegistry();
 
-        this.commsManager = new CommsManager(54321, new InetSocketAddress("192.168.60.69", 4840));
+        this.commsManager = new CommsManager(54321, new InetSocketAddress("127.0.0.1", 4840));
         this.databaseManager = new DatabaseManager();
 
         this.routingManager = RoutingManager.builder()
@@ -245,7 +245,7 @@ public class Factory {
 
     private Function<RoutingManager.RouteData, Double> getSliderWeight(short conveyorId) {
         return (routeData) -> {
-            if (commsManager.getSliderConveyorOccupation(conveyorId) == 3) {
+            if (commsManager.getSliderConveyorOccupation(conveyorId) >= 3) {
                 return Double.MAX_VALUE;
             }
 
