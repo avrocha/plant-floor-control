@@ -2,6 +2,7 @@ package ii.pfc.route;
 
 import ii.pfc.conveyor.Conveyor;
 import ii.pfc.part.Part;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,8 +13,11 @@ public class Route {
 
     private final List<Conveyor> conveyorList;
 
-    public Route(Part part) {
+    private final double weight;
+
+    public Route(Part part, double weight) {
         this.part = part;
+        this.weight = weight;
         this.conveyorList = new ArrayList<>();
     }
 
@@ -25,9 +29,21 @@ public class Route {
         return part;
     }
 
+    public double getWeight() {
+        return weight;
+    }
+
     /*
 
      */
+
+    public Conveyor getSource() {
+        return conveyorList.isEmpty() ? null : conveyorList.get(0);
+    }
+
+    public Conveyor getTarget() {
+        return conveyorList.isEmpty() ? null : conveyorList.get(conveyorList.size() - 1);
+    }
 
     public void addConveyor(Conveyor conveyor) {
         this.conveyorList.add(conveyor);

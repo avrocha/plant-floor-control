@@ -5,27 +5,30 @@ import ii.pfc.part.PartType;
 
 import java.time.LocalDateTime;
 
-public class UnloadOrder {
+public class UnloadOrder implements Comparable<UnloadOrder> {
 
     private final int orderId;
 
     private final PartType partType;
 
-    private final int conveyorId;
+    private final short conveyorId;
 
     private final LocalDateTime date;
 
     private final int quantity;
 
-    private final UnloadState state;
+    private final int remaining;
 
-    public UnloadOrder(int orderId, PartType partType, int conveyorId, LocalDateTime date, int quantity, UnloadState state) {
+    private final int completed;
+
+    public UnloadOrder(int orderId, PartType partType, short conveyorId, LocalDateTime date, int quantity, int remaining, int completed) {
         this.orderId = orderId;
         this.partType = partType;
         this.conveyorId = conveyorId;
         this.date = date;
         this.quantity = quantity;
-        this.state = state;
+        this.remaining = remaining;
+        this.completed = completed;
     }
 
     /*
@@ -40,7 +43,7 @@ public class UnloadOrder {
         return partType;
     }
 
-    public int getConveyorId() {
+    public short getConveyorId() {
         return conveyorId;
     }
 
@@ -52,8 +55,12 @@ public class UnloadOrder {
         return quantity;
     }
 
-    public UnloadState getState() {
-        return state;
+    public int getRemaining() {
+        return remaining;
+    }
+
+    public int getCompleted() {
+        return completed;
     }
 
     /*
@@ -68,14 +75,19 @@ public class UnloadOrder {
                 ", conveyorId=" + conveyorId +
                 ", date=" + date +
                 ", quantity=" + quantity +
+                ", remaining=" + remaining +
+                ", completed=" + completed +
                 '}';
     }
 
-    /*
+    @Override
+    public int compareTo(UnloadOrder o) {
+        int compare = Integer.compare(remaining, o.remaining);
+        if (compare != 0)  {
+            return compare;
+        }
 
-     */
 
-    public static enum UnloadState {
-        PENDING, IN_PROGRESS, COMPLETED
+        return o.date.compareTo(date);
     }
 }

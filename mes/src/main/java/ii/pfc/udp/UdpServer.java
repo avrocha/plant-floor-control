@@ -1,6 +1,9 @@
 package ii.pfc.udp;
 
 import com.google.common.base.Charsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -8,8 +11,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class UdpServer {
 
@@ -27,7 +28,7 @@ public class UdpServer {
 
     private boolean running = false;
 
-    private byte[] buffer = new byte[2048];
+    private byte[] buffer = new byte[4096];
 
     public UdpServer(int port) {
         this.port = port;
@@ -45,7 +46,7 @@ public class UdpServer {
             logger.info("UDP server running in port {}", this.port);
 
             this.listenForPackets();
-        } catch(SocketException ex) {
+        } catch (SocketException ex) {
             logger.error("Could not start UDP server");
             ex.printStackTrace();
         }
@@ -53,6 +54,7 @@ public class UdpServer {
 
     public void close() {
         this.running = false;
+        this.socket.close();
     }
 
     private void listenForPackets() {
@@ -67,6 +69,7 @@ public class UdpServer {
                 for (UdpListener udpListener : this.udpListeners) {
                     udpListener.onReceive(data, address);
                 }
+            } catch (SocketException ignored) {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

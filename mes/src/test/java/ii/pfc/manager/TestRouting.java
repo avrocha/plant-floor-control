@@ -5,20 +5,16 @@ import ii.pfc.conveyor.Conveyor;
 import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import ii.pfc.route.Route;
-
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import junit.framework.TestCase;
 import org.apache.plc4x.java.api.PlcConnection;
 import org.apache.plc4x.java.api.exceptions.PlcConnectionException;
-import org.apache.plc4x.java.api.messages.PlcReadRequest;
-import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.apache.plc4x.java.api.messages.PlcWriteRequest;
 import org.apache.plc4x.java.api.messages.PlcWriteResponse;
 import org.apache.plc4x.java.api.types.PlcResponseCode;
 import org.junit.Test;
+
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class TestRouting extends TestCase {
 
@@ -31,8 +27,8 @@ public class TestRouting extends TestCase {
 
     @Test
     public void testRoutes() {
-        Part part = new Part(UUID.randomUUID(), PartType.PART_1);
-        Route route = this.factory.routingManager.traceRoute(null, this.factory.LIN8, this.factory.LIN7);
+        Part part = new Part(UUID.randomUUID(), 0, PartType.PART_1, Part.PartState.STORED);
+        Route route = this.factory.routingManager.traceRoute(null, null, this.factory.LIN8, this.factory.LIN7);
 
         try (PlcConnection plcConnection = this.factory.commsManager.getPlcConnection()) {
             // Check if this connection support reading of data.

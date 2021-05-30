@@ -2,13 +2,18 @@ package ii.pfc.command.impl;
 
 import ii.pfc.command.CommandRequest;
 import ii.pfc.manager.ICommandManager;
+import ii.pfc.manager.IDatabaseManager;
+import ii.pfc.manager.IOrderManager;
+import ii.pfc.order.UnloadOrder;
 import ii.pfc.part.PartType;
 import ii.pfc.part.xml.PartTypeAdapter;
-import java.net.InetSocketAddress;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
 
 public class CommandRequestUnload implements CommandRequest {
 
@@ -25,7 +30,7 @@ public class CommandRequestUnload implements CommandRequest {
     private PartType partType;
 
     @XmlAttribute(name = "Destination")
-    private int conveyorId;
+    private short conveyorId;
 
     @XmlAttribute(name = "Quantity")
     private int quantity;
@@ -34,9 +39,35 @@ public class CommandRequestUnload implements CommandRequest {
 
      */
 
+    public CommandRequestUnload() {
+
+    }
+
+    public CommandRequestUnload(int orderId, PartType partType, short conveyorId, int quantity) {
+        this.orderId = orderId;
+        this.partType = partType;
+        this.conveyorId = conveyorId;
+        this.quantity = quantity;
+    }
+
+    /*
+
+     */
+
     @Override
-    public void onReceive(ICommandManager commandManager, InetSocketAddress source) {
-        logger.info("Received request: {}", this.toString());
+    public void onReceive(ICommandManager commandManager, IOrderManager orderManager, IDatabaseManager databaseManager,
+                          InetSocketAddress source) {
+        UnloadOrder order = new UnloadOrder(
+                orderId,
+                partType,
+                conveyorId,
+                LocalDateTime.now(),
+                quantity,
+                quantity,
+                0
+        );
+
+        orderManager.enqueueUnloadOrder(order);
     }
 
     /*
@@ -46,10 +77,10 @@ public class CommandRequestUnload implements CommandRequest {
     @Override
     public String toString() {
         return "CommandRequestUnload{" +
-            "orderId=" + orderId +
-            ", partType=" + partType +
-            ", conveyorId=" + conveyorId +
-            ", quantity=" + quantity +
-            '}';
+                "orderId=" + orderId +
+                ", partType=" + partType +
+                ", conveyorId=" + conveyorId +
+                ", quantity=" + quantity +
+                '}';
     }
 }
