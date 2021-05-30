@@ -1,26 +1,23 @@
 package ii.pfc.part;
 
-import java.awt.Color;
 import java.util.UUID;
 
 public class Part {
 
     private final UUID id;
 
-    private PartType type;
+    private final int orderId;
 
-    private Color color;
+    private final PartType type;
 
-    public Part(UUID id, PartType type) {
-        this(id, type, type.getDefaultColor());
-    }
+    private final PartState state;
 
-    public Part(UUID id, PartType type, Color color) {
+    public Part(UUID id, int orderId, PartType type, PartState state) {
         this.id = id;
+        this.orderId = orderId;
         this.type = type;
-        this.color = color;
+        this.state = state;
     }
-
     /*
 
      */
@@ -29,12 +26,16 @@ public class Part {
         return id;
     }
 
+    public int getOrderId() {
+        return orderId;
+    }
+
     public PartType getType() {
         return type;
     }
 
-    public Color getColor() {
-        return color;
+    public PartState getState() {
+        return state;
     }
 
     /*
@@ -45,8 +46,34 @@ public class Part {
     public String toString() {
         return "Part{" +
                 "id=" + id +
+                ", orderId=" + orderId +
                 ", type=" + type +
-                ", color=" + color +
                 '}';
+    }
+
+    /*
+
+     */
+
+    public static enum PartState {
+
+        STORED("Stored"),
+        PROCESSING("Processing"),
+        UNLOADING("Unloading"),
+        COMPLETED("Completed");
+
+        private final String displayName;
+
+        PartState(String displayName) {
+            this.displayName = displayName;
+        }
+
+        /*
+
+         */
+
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 }

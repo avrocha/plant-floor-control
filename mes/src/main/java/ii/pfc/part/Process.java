@@ -38,4 +38,14 @@ public class Process {
     public Duration getDuration() {
         return duration;
     }
+
+    @Override
+    public String toString() {
+        return "Process{" +
+                "source=" + source +
+                ", result=" + result +
+                ", tool=" + tool +
+                ", duration=" + duration +
+                '}';
+    }
 }

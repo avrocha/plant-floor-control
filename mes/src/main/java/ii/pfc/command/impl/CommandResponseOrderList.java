@@ -3,13 +3,14 @@ package ii.pfc.command.impl;
 import ii.pfc.command.CommandResponse;
 import ii.pfc.part.PartType;
 import ii.pfc.part.xml.PartTypeAdapter;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @XmlRootElement(name = "Order_Schedule")
 public class CommandResponseOrderList implements CommandResponse {
@@ -26,12 +27,12 @@ public class CommandResponseOrderList implements CommandResponse {
      */
 
     public void addOrder(int orderId, PartType sourceType, PartType targetType, int quantityTotal, int quantityProcessed,
-        int quantityProcessing, int quantityHolding, int time, int timeReceived, int deadline, int penalty, int startTime, int endTime,
-        int penaltyIncurred) {
+                         int quantityProcessing, int quantityHolding, int time, int timeReceived, int deadline, int penalty, int startTime, int endTime,
+                         int penaltyIncurred) {
 
         this.responseList.add(new OrderData(orderId,
-            new OrderTransformData(sourceType, targetType, quantityTotal, quantityProcessed, quantityProcessing, quantityHolding, time,
-                timeReceived, deadline, penalty, startTime, endTime, penaltyIncurred)));
+                new OrderTransformData(sourceType, targetType, quantityTotal, quantityProcessed, quantityProcessing, quantityHolding, time,
+                        timeReceived, deadline, penalty, startTime, endTime, penaltyIncurred)));
     }
 
     /*
@@ -105,7 +106,7 @@ public class CommandResponseOrderList implements CommandResponse {
         private final int penaltyIncurred;
 
         private OrderTransformData(PartType sourceType, PartType targetType, int quantityTotal, int quantityProcessed, int quantityProcessing,
-            int quantityHolding, int time, int timeReceived, int deadline, int penalty, int startTime, int endTime, int penaltyIncurred) {
+                                   int quantityHolding, int time, int timeReceived, int deadline, int penalty, int startTime, int endTime, int penaltyIncurred) {
 
             this.sourceType = sourceType;
             this.targetType = targetType;

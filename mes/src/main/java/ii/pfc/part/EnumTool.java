@@ -1,22 +1,36 @@
 package ii.pfc.part;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum EnumTool {
 
-    TOOL_1(1),
-    TOOL_2(2),
-    TOOL_3(3);
+    T1(1),
+    T2(2),
+    T3(3);
 
-    private final int id;
+    private final short id;
 
     EnumTool(int id) {
-        this.id = id;
+        this.id = (short) id;
     }
 
     /*
 
      */
 
-    public int getId() {
+    public short getId() {
         return id;
+    }
+
+    private static final Map<Short, EnumTool> registry = new HashMap<>();
+    static {
+        for(EnumTool tool : values() ){
+            registry.put(tool.id, tool);
+        }
+    }
+
+    public static EnumTool getTool(short id) {
+        return registry.get(id);
     }
 }

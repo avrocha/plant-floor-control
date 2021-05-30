@@ -1,19 +1,24 @@
 package ii.pfc.manager;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import ii.pfc.conveyor.Conveyor;
+import ii.pfc.conveyor.EnumConveyorType;
 import ii.pfc.part.Part;
+import ii.pfc.part.Process;
 import ii.pfc.route.Route;
-import java.util.Collections;
-import java.util.function.Function;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.alg.interfaces.ManyToManyShortestPathsAlgorithm;
-import org.jgrapht.alg.shortestpath.DijkstraManyToManyShortestPaths;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.AsWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class RoutingManager implements IRoutingManager {
 
@@ -23,7 +28,11 @@ public class RoutingManager implements IRoutingManager {
 
      */
 
-    private Graph<Conveyor, ConveyorEdge> regionGraph;
+    private final Graph<Conveyor, ConveyorEdge> regionGraph;
+
+    private final Map<Short, Conveyor> conveyorIdMap = new HashMap<>();
+
+    private final Multimap<EnumConveyorType, Conveyor> conveyorTypeMap = HashMultimap.create();
 
     private RoutingManager(Graph<Conveyor, ConveyorEdge> graph) {
         this.regionGraph = new AsWeightedGraph<>(
@@ -36,6 +45,11 @@ public class RoutingManager implements IRoutingManager {
                 return testEdge.getWeight();
             }
         };
+
+        for (Conveyor conveyor : this.regionGraph.vertexSet()) {
+            conveyorIdMap.put(conveyor.getId(), conveyor);
+            conveyorTypeMap.put(conveyor.getType(), conveyor);
+        }
     }
 
     /*
@@ -43,9 +57,24 @@ public class RoutingManager implements IRoutingManager {
      */
 
     @Override
-    public Route traceRoute(Part part, Conveyor source, Conveyor target) {
+    public Conveyor getConveyor(short conveyorId) {
+        return conveyorIdMap.get(conveyorId);
+    }
+
+    @Override
+    public Collection<Conveyor> getConveyors(EnumConveyorType conveyorType) {
+        return conveyorTypeMap.get(conveyorType);
+    }
+
+    /*
+
+     */
+
+    @Override
+    public Route traceRoute(Part part, Process process, Conveyor source, Conveyor target) {
         synchronized (ConveyorEdge.LOCK) {
-            ConveyorEdge.currentRouteData = new RouteData(part, source, target);
+            // System.out.println("Tracing route between " + source.getId() + " and " + target.getId());
+            ConveyorEdge.currentRouteData = new RouteData(part, source, target, process);
             GraphPath<Conveyor, ConveyorEdge> path = DijkstraShortestPath.findPathBetween(this.regionGraph, source, target);
             ConveyorEdge.currentRouteData = null;
 
@@ -53,7 +82,7 @@ public class RoutingManager implements IRoutingManager {
                 return null;
             }
 
-            Route route = new Route(part);
+            Route route = new Route(part, path.getWeight());
             route.addConveyor(source);
 
             for (ConveyorEdge edge : path.getEdgeList()) {
@@ -64,7 +93,7 @@ public class RoutingManager implements IRoutingManager {
         }
     }
 
-    @Override
+    /*@Override
     public Route[] traceRoutes(Part part, Conveyor source, Conveyor[] targets) {
         synchronized (ConveyorEdge.LOCK) {
             ConveyorEdge.currentRouteData = new RouteData(part, source, targets);
@@ -80,7 +109,7 @@ public class RoutingManager implements IRoutingManager {
 
                 GraphPath<Conveyor, ConveyorEdge> path = many.getPath(source, target);
 
-                Route route = new Route(null);
+                Route route = new Route(part, path.getWeight());
                 route.addConveyor(source);
 
                 for (ConveyorEdge edge : path.getEdgeList()) {
@@ -94,7 +123,7 @@ public class RoutingManager implements IRoutingManager {
 
             return routes;
         }
-    }
+    }*/
 
     /*
 
@@ -106,20 +135,19 @@ public class RoutingManager implements IRoutingManager {
 
         private final Conveyor source;
 
-        private final Conveyor[] targets;
+        private final Conveyor target;
+
+        private final Process process;
 
         /*
 
          */
 
-        public RouteData(Part part, Conveyor source, Conveyor target) {
-            this(part, source, new Conveyor[] {target});
-        }
-
-        public RouteData(Part part, Conveyor source, Conveyor[] targets) {
+        public RouteData(Part part, Conveyor source, Conveyor target, Process process) {
             this.part = part;
             this.source = source;
-            this.targets = targets;
+            this.target = target;
+            this.process = process;
         }
 
         /*
@@ -135,11 +163,11 @@ public class RoutingManager implements IRoutingManager {
         }
 
         public Conveyor getTarget() {
-            return targets[0];
+            return target;
         }
 
-        public Conveyor[] getTargets() {
-            return targets;
+        public Process getProcess() {
+            return process;
         }
     }
 
@@ -229,6 +257,10 @@ public class RoutingManager implements IRoutingManager {
             }
 
             return super.getWeight();
+        }
+
+        public boolean conflictsWith(ConveyorEdge other) {
+            return getSource().equals(other.getTarget()) && other.getTarget().equals(getSource());
         }
     }
 

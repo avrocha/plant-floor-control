@@ -1,9 +1,9 @@
 package ii.pfc.command.impl;
 
 import ii.pfc.command.CommandRequest;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 public class RequestOrderWrapper {
 
@@ -41,9 +41,9 @@ public class RequestOrderWrapper {
     @Override
     public String toString() {
         return "CommandRequestWrapper{" +
-            "orderId=" + orderId +
-            ", unload=" + unload +
-            ", transform=" + transform +
-            '}';
+                "orderId=" + orderId +
+                ", unload=" + unload +
+                ", transform=" + transform +
+                '}';
     }
 }

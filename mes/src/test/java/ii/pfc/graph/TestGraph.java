@@ -1,10 +1,5 @@
 package ii.pfc.graph;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import junit.framework.TestCase;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -13,6 +8,12 @@ import org.jgrapht.graph.AsWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 import org.junit.Test;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class TestGraph extends TestCase {
 
@@ -32,23 +33,23 @@ public class TestGraph extends TestCase {
      */
 
     Graph<Bean, TestEdge> graph = new AsWeightedGraph<>(
-        SimpleDirectedWeightedGraph.<Bean, TestEdge>createBuilder(TestEdge.class)
-            .addEdge(A, B)
-            .addEdge(B, C)
-            .addEdge(C, D)
-            .addEdge(D, E)
-            .addEdge(D, F)
-            .addEdge(E, I)
-            .addEdge(F, G)
-            .addEdge(F, I)
-            .addEdge(G, J)
-            .addEdge(I, J)
-            .addEdge(D, J, new TestEdge((data) -> {
-                return data.id.startsWith("A-") ? 10000.0 : 0;
-            }))
-            .build(),
-        Collections.emptyMap(),
-        false
+            SimpleDirectedWeightedGraph.<Bean, TestEdge>createBuilder(TestEdge.class)
+                    .addEdge(A, B)
+                    .addEdge(B, C)
+                    .addEdge(C, D)
+                    .addEdge(D, E)
+                    .addEdge(D, F)
+                    .addEdge(E, I)
+                    .addEdge(F, G)
+                    .addEdge(F, I)
+                    .addEdge(G, J)
+                    .addEdge(I, J)
+                    .addEdge(D, J, new TestEdge((data) -> {
+                        return data.id.startsWith("A-") ? 10000.0 : 0;
+                    }))
+                    .build(),
+            Collections.emptyMap(),
+            false
     ) {
         @Override
         public double getEdgeWeight(TestEdge testEdge) {
@@ -96,8 +97,8 @@ public class TestGraph extends TestCase {
         @Override
         public String toString() {
             return "Bean{" +
-                "name='" + name + '\'' +
-                '}';
+                    "name='" + name + '\'' +
+                    '}';
         }
     }
 

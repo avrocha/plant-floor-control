@@ -4,12 +4,13 @@ import ii.pfc.command.impl.CommandResponseOrderList;
 import ii.pfc.command.impl.CommandResponsePartList;
 import ii.pfc.command.impl.RequestOrderWrapper;
 import ii.pfc.part.PartType;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.xml.bind.JAXB;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.JAXB;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class TestXML {
 
