@@ -139,7 +139,7 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
             return Integer.compare(penalty, o.penalty);
         }
 
-        compare = receivedDate.plus(deadline).compareTo(o.receivedDate.plus(o.deadline));
+        compare = o.receivedDate.plus(o.deadline).compareTo(receivedDate.plus(deadline));
         if (compare != 0)  {
             return compare;
         }

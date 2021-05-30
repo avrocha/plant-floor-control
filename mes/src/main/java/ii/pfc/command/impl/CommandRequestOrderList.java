@@ -32,7 +32,7 @@ public class CommandRequestOrderList implements CommandRequest {
 
             LocalDateTime predictedStart = order.getStartDate();
             if (predictedStart == null) {
-                predictedStart = order.getReceivedDate().plus(order.getDeadline().dividedBy(2));
+                predictedStart = LocalDateTime.now().plus(order.getDeadline().dividedBy(2));
             }
 
             LocalDateTime predictedFinish = order.getFinishDate();

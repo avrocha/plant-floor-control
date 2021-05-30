@@ -10,8 +10,7 @@ import ii.pfc.part.Part;
 import ii.pfc.part.PartType;
 import org.apache.commons.lang3.compare.ObjectToStringComparator;
 
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
@@ -19,10 +18,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
-import java.util.Collection;
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class GUI extends JFrame {
@@ -94,8 +89,9 @@ public class GUI extends JFrame {
             typeIndex++;
         }
 
-        int sliderConveyorIndex = 0;
+        Conveyor minConveyorId = Collections.min(sliderConveyors, Comparator.comparing(Conveyor::getId));
         for(Conveyor sliderConveyor : sliderConveyors) {
+            int sliderConveyorIndex = sliderConveyor.getId() - minConveyorId.getId();
             Map<PartType, Integer> unloadedParts = databaseManager.countUnloadedParts(sliderConveyor.getId());
 
             typeIndex = 0;
@@ -106,7 +102,6 @@ public class GUI extends JFrame {
                 typeIndex++;
             }
 
-            sliderConveyorIndex++;
         }
     }
 
