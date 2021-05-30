@@ -29,16 +29,23 @@ public class CommandRequestOrderList implements CommandRequest {
         Collection<TransformationOrder> orders = databaseManager.fetchAllTransformOrders();
         for (TransformationOrder order : orders) {
             int date = (int) order.getDate().atZone(ZoneId.systemDefault()).toEpochSecond();
-            int deadline = (int) Duration.between(order.getDate(), order.getDeadline()).toSeconds();
 
-            List<Process> processes = ProcessRegistry.INSTANCE.getProcesses(order.getSourceType(), order.getTargetType());
-
-            Duration predictedDuration = Duration.ZERO;
-            for(Process process : processes) {
-                predictedDuration = predictedDuration.plus(process.getDuration());
+            LocalDateTime predictedStart = order.getStartDate();
+            if (predictedStart == null) {
+                predictedStart = order.getReceivedDate().plus(order.getDeadline().dividedBy(2));
             }
 
-            LocalDateTime predictedFinish = order.getStartDate().plus(predictedDuration);
+            LocalDateTime predictedFinish = order.getFinishDate();
+            if (predictedFinish == null) {
+                List<Process> processes = ProcessRegistry.INSTANCE.getProcesses(order.getSourceType(), order.getTargetType());
+
+                Duration predictedDuration = Duration.ZERO;
+                for(Process process : processes) {
+                    predictedDuration = predictedDuration.plus(process.getDuration());
+                }
+
+                predictedFinish = predictedStart.plus(predictedDuration);
+            }
 
             response.addOrder(
                     order.getOrderId(),
@@ -50,10 +57,10 @@ public class CommandRequestOrderList implements CommandRequest {
                     order.getHolding(),
                     date,
                     (int) order.getReceivedDate().atZone(ZoneId.systemDefault()).toEpochSecond(),
-                    deadline,
+                    (int) order.getDeadline().toSeconds(),
                     order.getDayPenalty(),
-                    order.getStartDate() == null ? date + (deadline - date) / 2 : (int) Duration.between(order.getReceivedDate(), order.getStartDate()).toSeconds(),
-                    order.getFinishDate() == null ? (int) Duration.between(order.getReceivedDate(), predictedFinish).toSeconds() : (int) Duration.between(order.getReceivedDate(), order.getFinishDate()).toSeconds(),
+                    (int) Duration.between(order.getReceivedDate(), predictedStart).toSeconds(),
+                    (int) Duration.between(order.getReceivedDate(), predictedFinish).toSeconds(),
                     order.computePenalty(predictedFinish)
             );
         }

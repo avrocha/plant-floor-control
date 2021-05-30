@@ -48,6 +48,7 @@ public class CommandManager implements ICommandManager {
     @Override
     public void enqueueRequests(CommandRequest[] requests, InetSocketAddress address) {
         for (CommandRequest request : requests) {
+            logger.info("Received request: " + request.getClass().getSimpleName());
             enqueueRequest(request, address);
         }
     }
@@ -89,7 +90,9 @@ public class CommandManager implements ICommandManager {
         StringWriter writer = new StringWriter();
         JAXB.marshal(response, writer);
 
-        this.commsManager.sendUdpData(target, writer.toString());
+        String xml = writer.toString();
+        logger.info(xml);
+        this.commsManager.sendUdpData(target, xml);
     }
 
     /*

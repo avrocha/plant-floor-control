@@ -134,6 +134,8 @@ public class Factory {
 
         while (running) {
             try {
+                commandManager.pollRequests();
+
                 if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 250) {
                     dbPollTimer.reset().start();
 
@@ -158,12 +160,6 @@ public class Factory {
                 orderManager.pollTransformOrders();
                 orderManager.pollUnloadOrders();
             }
-        }
-    }
-
-    private void commandTask() {
-        while (running) {
-            commandManager.pollRequests();
         }
     }
 
@@ -217,7 +213,6 @@ public class Factory {
 
         this.executor.submit(this::mainTask);
         this.executor.submit(this::orderTask);
-        this.executor.submit(this::commandTask);
 
         this.shellTask();
     }

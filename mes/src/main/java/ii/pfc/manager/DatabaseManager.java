@@ -147,6 +147,12 @@ public class DatabaseManager implements IDatabaseManager {
             finishDate = null;
         }
 
+        PGInterval interval = (PGInterval) result.getObject("deadline");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(0);
+
+        interval.add(calendar);
+
         return new TransformationOrder(
                 result.getInt("order_id"),
                 PartType.getType(result.getString("source_type")),
@@ -159,7 +165,7 @@ public class DatabaseManager implements IDatabaseManager {
                 result.getInt("remaining"),
                 result.getInt("holding"),
                 result.getInt("completed"),
-                result.getTimestamp("deadline").toLocalDateTime(),
+                Duration.ofMillis(calendar.getTimeInMillis()),
                 result.getInt("penalty")
         );
     }
@@ -409,13 +415,17 @@ public class DatabaseManager implements IDatabaseManager {
             )) {
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(0);
+
                     PGInterval interval = (PGInterval) result.getObject("duration");
+                    interval.add(calendar);
 
                     processes.add(new Process(
                             PartType.getType(result.getString("source_type")),
                             PartType.getType(result.getString("target_type")),
                             EnumTool.valueOf(result.getString("tool")),
-                            Duration.ofSeconds((long) interval.getSeconds())
+                            Duration.ofMillis(calendar.getTimeInMillis())
 
                     ));
                 }
@@ -470,10 +480,16 @@ public class DatabaseManager implements IDatabaseManager {
 
                 ResultSet result = sql.executeQuery();
                 while (result.next()) {
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(0);
+
                     PGInterval interval = (PGInterval) result.getObject("total");
+                    interval.add(calendar);
+
                     durationMap.put(
                             PartType.getType(result.getString("part_target_type")),
-                            Duration.ofSeconds((long) interval.getSeconds())
+                            Duration.ofMillis(calendar.getTimeInMillis())
                     );
                 }
             }
@@ -755,7 +771,7 @@ public class DatabaseManager implements IDatabaseManager {
                 sql.setInt(5, transformationOrder.getDayPenalty());
                 sql.setString(6, transformationOrder.getSourceType().getName());
                 sql.setString(7, transformationOrder.getTargetType().getName());
-                sql.setTimestamp(8, Timestamp.valueOf(transformationOrder.getDeadline()));
+                sql.setObject(8, new PGInterval(0, 0, 0, 0, 0, transformationOrder.getDeadline().toSeconds()));
                 sql.executeUpdate();
                 return true;
             }

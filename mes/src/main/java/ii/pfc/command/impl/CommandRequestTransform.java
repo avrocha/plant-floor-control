@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -86,7 +87,7 @@ public class CommandRequestTransform implements CommandRequest {
                 quantity,
                 0,
                 0,
-                time.plusSeconds(deadline),
+                Duration.ofSeconds(deadline),
                 penalty
         );
 

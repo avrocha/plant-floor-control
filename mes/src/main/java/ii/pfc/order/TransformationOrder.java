@@ -30,12 +30,12 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
 
     private final int completed;
 
-    private final LocalDateTime deadline;
+    private final Duration deadline;
 
     private final int penalty;
 
     public TransformationOrder(int orderId, PartType sourceType, PartType targetType, LocalDateTime date, LocalDateTime receivedDate, LocalDateTime startDate, LocalDateTime finishDate, int quantity,
-                               int remaining, int holding, int completed, LocalDateTime deadline, int penalty) {
+                               int remaining, int holding, int completed, Duration deadline, int penalty) {
         this.orderId = orderId;
         this.sourceType = sourceType;
         this.targetType = targetType;
@@ -99,7 +99,7 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
         return completed;
     }
 
-    public LocalDateTime getDeadline() {
+    public Duration getDeadline() {
         return deadline;
     }
 
@@ -112,12 +112,12 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
             currentDate = this.finishDate;
         }
 
-        if (currentDate.isBefore(deadline)) {
+        Duration passed = Duration.between(this.receivedDate, currentDate);
+        if (passed.compareTo(deadline) < 0) {
             return 0;
         }
 
-        Duration duration = Duration.between(deadline, currentDate);
-        return (int) (penalty * Math.ceil((duration.toSeconds() / 50)));
+        return (int) (penalty * Math.ceil((passed.minus(deadline).toSeconds() / 50)));
     }
 
     /*
@@ -127,18 +127,24 @@ public class TransformationOrder implements Comparable<TransformationOrder> {
     public int compareTo(TransformationOrder o) {
         LocalDateTime now = LocalDateTime.now();
 
-        int compare = Integer.compare(computePenalty(now), o.computePenalty(now));
+        int penalty1 = computePenalty(now);
+        int penalty2 = o.computePenalty(now);
+
+        int compare = Integer.compare(penalty1, penalty2);
         if (compare != 0)  {
             return compare;
         }
 
+        if (penalty1 != 0) {
+            return Integer.compare(penalty, o.penalty);
+        }
+
+        compare = receivedDate.plus(deadline).compareTo(o.receivedDate.plus(o.deadline));
+        if (compare != 0)  {
+            return compare;
+        }
 
         compare = Integer.compare((quantity - completed) * ProcessRegistry.INSTANCE.getProcesses(sourceType, targetType).size(), (o.quantity - o.completed) * ProcessRegistry.INSTANCE.getProcesses(o.sourceType, o.targetType).size());
-        if (compare != 0)  {
-            return compare;
-        }
-
-        compare = o.deadline.compareTo(deadline);
         if (compare != 0)  {
             return compare;
         }
