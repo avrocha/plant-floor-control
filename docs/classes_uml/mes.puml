@@ -12,9 +12,7 @@ class Factory <<Singleton>> {
 
 CommandManager "1"--* Factory
 DatabaseManager "1"--* Factory
-StorageManager "1"--* Factory
 RoutingManager "1"--* Factory
-RegionManager "1"--* Factory
 CommsManager "1"--* Factory
 OrderManager "1"--* Factory
 
@@ -67,58 +65,6 @@ class Conveyor {
 }
 
 Conveyor -- Part
-
-/'
-
-Regions
-
-'/
-class RegionManager{
-  - Region[] regions;
-  + Region getRegions();
-  + Region getPartRegion(Part);
-  + Region getConveyorRegion(Conveyor);
-  + Region[] getConnectedRegions(Region, Region);
-}
-
-class Region {
-  - String name;
-  - Conveyor[] inputs;
-  - Conveyor[] output;
-  - Conveyor[] all;
-
-  + bool canReceiveFrom(Conveyor);
-  + void send(Conveyor);
-  + int getNumParts();
-  + int getNumParts(PartType);
-  + string getName();
-  + bool hasPart(Part);
-  + bool hasConveyor(Conveyor);
-  + Conveyor[] getAllConveyors();
-  + Conveyor[] getInputs();
-  + Conveyor[] getOutputs();
-}
-
-Region "1" -- "*" Conveyor
-Region "*"-- RegionManager
-
-class RegionStorage {
-  + void store(Part);
-  + void extract(PartType);
-}
-
-RegionStorage --|> Region
-
-class RegionLoadingBay {
-}
-
-RegionLoadingBay --|> Region
-
-class RegionAssemblyLine {
-  + void executeProcess(Process, Conveyor);
-}
-
-RegionAssemblyLine "2"--|> Region
 
 /'
 
@@ -315,19 +261,6 @@ class DatabaseManager{
   + void updateLoadOrder(LoadOrder);
   + void closeDatabase();
 }
-
-/'
-
-Storage
-
-'/
-class StorageManager{
-  + int getQuantity(PartType);
-  + void store(Part);
-  + void extract(PartType);
-}
-
-StorageManager -- "*" Part
 
 /'
 
