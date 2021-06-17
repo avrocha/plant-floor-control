@@ -83,9 +83,9 @@ loop Pending unload orders
     OrderManager -> DatabaseManager:  fetchParts(0, partType, STORED, 1)
     note left: Fetch at max one stored part not bound to any \n order
 
-    loop All unloading docks conveyors
+    OrderManager -> CommsManager: OPC-UA: getWarehouseOutConveyorStatus(unloadingDock)
 
-    alt isNotFull
+    alt Target unloading bay is not full
         OrderManager -> RoutingManager: traceRoute(part, unloadingDock, warehouseOut)
 
         alt validRoute
@@ -96,8 +96,6 @@ loop Pending unload orders
         OrderManager -> CommsManager: OPC-UA: dispatchWarehouseOutConveyorExit(warehouseOut, partType)
         OrderManager -> CommsManager: OPC-UA: sendRoute(route)
         end
-    end
-
     end
 
 
