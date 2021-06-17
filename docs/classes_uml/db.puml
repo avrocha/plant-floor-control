@@ -4,15 +4,11 @@ skinparam Monochrome true
 
 title Database UML
 
-class Storage{
-    
-}
-
-Storage --"*" Part
 
 class Part{
 	UUID id;
   int orderId;
+  partState state;
 }
 
 Part --"1" PartType
@@ -28,6 +24,10 @@ class TransformOrder{
   int quantity;
   int deadline;
   int penalty;
+  int completed;
+  time start_date;
+  time finish_date;
+  time received_date;
 }
 
 TransformOrder --"2" PartType
@@ -41,15 +41,17 @@ class UnloadOrder{
 
 UnloadOrder --"1" PartType
 
-class LoadOrder{
-  int orderID;
-	int conveyorId;
-  date date;
+class Process{
+  int id;
+  int assemblerId;
+	time duration;
+  EnumTool tool;
 }
 
-LoadOrder --"1" PartType
+Process --"2" PartType
 
 class ProcessLog{
+  int id;
 	int assemblerId;
 	time duration;
 }
@@ -58,6 +60,7 @@ ProcessLog --"1" Part
 ProcessLog --"2" PartType
 
 class UnloadingBayLog{
+  int id;
 	int conveyorId;
 }
 

@@ -49,6 +49,7 @@ class ConveyorPusher {
 class ConveyorSlider {
   int id;
   bool ReadyToReceive;
+  int NumPart;  
 }
 
 class ConveyorAssembly {
@@ -63,11 +64,49 @@ class ConveyorAssembly {
   void ChangeTool();
 }
 
+class ConveyorWarehouseIn {
+  int id;
+  bool ReadyToReceive;
+  bool ReadyToSend; 
+  bool ReadyToStore;
+
+  void MoveFoward();
+  void MoveBackward();
+  void Store();
+}
+
+class ConveyorWarehouseOut {
+  int id;
+  bool ReadyToReceive;
+  bool ReadyToSend;  
+  bool ReadyToExtract;
+  string ExtractType;
+
+  void MoveFoward();
+  void MoveBackward();
+  void Extract();
+}
+
+class Part {
+  UUID id;
+
+}
+
 ConveyorLinear --|> Conveyor
 ConveyorRotative --|> Conveyor
 ConveyorPusher --|> Conveyor
 ConveyorSlider --|> Conveyor
 ConveyorAssembly --|> Conveyor
+ConveyorWarehouseIn --|> Conveyor
+ConveyorWarehouseOut --|> Conveyor
+
+Part -- ConveyorLinear
+Part -- ConveyorRotative
+Part -- ConveyorPusher
+Part -- ConveyorSlider
+Part -- ConveyorAssembly
+Part -- ConveyorWarehouseIn
+Part -- ConveyorWarehouseOut
 
 /'
 

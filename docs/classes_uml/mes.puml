@@ -23,28 +23,32 @@ Basic blocks
 '/
 
 class PartType {
+  - PartType registerType(type);
+  - short internalId;
   - String name;
   - Color defaultColor;
 
   + String getName();
+  + short getInternalId();
   + Color getDefaultColor();
+  + bool isUnknown();
+  + PartType getType(name);
+  + PartType getTypes();
 }
 
 class Part {
   - UUID id;
-  - Color color;
   - int orderId;
+  - PartState state;
 
   + UUID getId();
-  + Color getColor();
   + int getOrderId();
-  + PartType getType();
-  + void setType(PartType);
+  + PartState getState();
 }
 
 Part -- PartType
 
-class Tool {
+class EnumTool {
   - int id;
   + int getId();
 }
@@ -73,13 +77,17 @@ Processes
 '/
 
 class Process {
-  - Time time;
+  - EnumTool tool;
+  - Duration duration;
+   
 
-  + Time getTime();
+  + Process(source, result, tool, duration);
+  + EnumTool getTool();
+  + Duration getDuration();
 }
 
 Process -- "2" PartType
-Process -- "1" Tool
+Process -- "1" EnumTool
 
 /'
 
@@ -90,13 +98,13 @@ Communication
 'Requests'
 
 class CommandManager{
-  - CommandRequest[] requestQueue;
 
-  - void serializeResponse();
-  - void deserializeRequest();
+  + void enqueueRequest(CommandRequest request);
+  + void enqueueRequests(CommandRequest[] requests);
+  + void enqueueRequest(string);
   + void sendResponse();
   + void pollRequests();
-  + void enqueueRequest(string);
+  
 }
 
 interface CommandRequest {
@@ -123,16 +131,6 @@ CommandRequestUnload --|> CommandRequest
 CommandRequestUnload -- "1" Conveyor
 CommandRequestUnload -- "1" PartType
 
-class CommandRequestLoad {
-  - int orderId;
-
-  + int getOrderId();
-}
-
-CommandRequestLoad --|> CommandRequest
-CommandRequestLoad -- "1" Conveyor
-CommandRequestLoad -- "1" PartType
-
 class CommandRequestOrderList {
 }
 
@@ -146,11 +144,15 @@ CommandRequestPartList --|> CommandRequest
 'Orders'
 class TransformOrder{
   - int orderId;
+  - Date receivedDate;
+  - Date startDate;
+  - Date finishDate;
   - Date date;
-
   - int quantity;
-
-  - int deadline;
+  - int remaining;
+  - int holding;
+  - int completed;
+  - Date deadline;
   - int penalty;
 
   + int getOrderId();
@@ -158,18 +160,32 @@ class TransformOrder{
   + int getQuantity();
   + int getDayPenalty();
   + int computePenalty(Date);
+  + Date getReceivedDate();
+  + Date getStartDate();
+  + Date getFinishDate();
+  + int getRemaining();
+  + int getHolding();
+  + int getCompleted();
+  + Date getDeadline();
+
 }
 
 class UnloadOrder{
   - int orderId;
 	- int conveyorId;
+  - PartType partType;
   - Date date;
   - int quantity;
+  - int remaining;
+  - int completed;
 
   + int getOrderId();
   + int getConveyorId();
   + Date getDate();
   + int getQuantity();
+  + PartType getPartType();
+  + int getRemaining();
+  + int getCompleted();
 }
 
 UnloadOrder --"1" PartType
@@ -186,7 +202,6 @@ class LoadOrder{
 }
 
 LoadOrder --"1" PartType
-LoadOrder "1"-- CommandRequestLoad
 
 'Responses'
 
@@ -216,23 +231,18 @@ Routing
 '/
 
 class RoutingManager{
-  - Route[] routes;
 
-  - Route traceRoute(Map<Region, Route[]>);
-  - Route[] makeRegionRoutes(Region);
-  - bool enqueueRoute(Route);
-  
-  + Route makeRoute(Conveyor, Conveyor);
-  + Routes[] getRoutes();
-  + Routes[] getRoutes(Conveyor);
-  + Routes[] getRoutes(Region);
-  + bool initRoute(Route);
+  + Conveyor getConveyor(conveyorId);
+  + Conveyor getConveyors(EnumConveyorType conveyorType);
+  + Route traceRoute(part, process, source, target);
+
 }
 
 RoutingManager --"*" Route
 
 class Route{
-  -Conveyor[] conveyors;
+  - Conveyor[] conveyors;
+  - double weight;
 }
 
 Route --"*" Conveyor
@@ -245,21 +255,39 @@ Database
 '/
 class DatabaseManager{
   
-  + void initDatabase();
-  + Database getDatabase();
-  + Part fetchPart(UUID);
-  + void updatePart(Part);
-  + Time fetchProcessDuration(assemblerId, PartType);
-  + void updateProcessLog(assemblerId, Process, Part);
-  + int fetchUnloadedParts(conveyorId, PartType);
-  + void updateUnloadingBayLog(conveyorId, Part);
-  + TransformOrder[] fetchPendingTransformOrders();
-  + TransformOrder[] fetchAllTransformOrders();
-  + void updateTransformOrder(TransformOrder);
-  + UnloadOrder[] fetchUnloadOrders();
-  + void updateUnloadOrder(UnloadOrder);
-  + void updateLoadOrder(LoadOrder);
-  + void closeDatabase();
+  + boolean openConnection();
+  + void closeConnection();
+  + UnloadOrder fetchPendingUnloadOrders();
+  + UnloadOrder fetchAllUnloadOrders();
+  + TransformationOrder fetchTransformOrder(orderId);
+  + TransformationOrder fetchPendingTransformOrders();
+  + TransformationOrder fetchAllTransformOrders();
+  + Part fetchPart(id);
+  + Part fetchParts();
+  + Part fetchParts(orderId, state, limit);
+  + Part fetchParts(orderId, type, state, limit);
+  + int countUnloadedParts(conveyorId);
+  + int countPartsTypes(state);
+  + Process fetchProcesses();
+  + Duration fetchProcessDurations(assemblerId);
+  + int countProcessedParts(assemblerId);
+  + boolean clearAllParts();
+  + boolean insertPart(part);
+  + boolean insertParts(parts);
+  + boolean updatePartType(partId, type);
+  + boolean updatePartTypeAndOrder(partId, type, orderId);
+  + boolean updatePartState(partId, state);
+  + boolean updatePartStateAndOrder(partId, state, orderId);
+  + boolean insertProcessLog(process, assembler, part);
+  + boolean insertUnloadingBayLog(order, Part part);
+  + boolean clearAllUnloadOrders();
+  + boolean insertUnloadOrder( unloadOrder);
+  + boolean clearAllTransformOrders();
+  + boolean insertTransformOrder(transformationOrder);
+  + boolean incrementTransformOrderCompletions(orderId, quantity);
+  + boolean updateTransformOrderStart(orderId, startDate);
+  + boolean updateTransformOrderFinish(orderId, finishDate);
+
 }
 
 /'
@@ -267,11 +295,28 @@ class DatabaseManager{
 UDP Manager
 
 '/
+
 class CommsManager{
   - int port;
 
   + void stopServer();
   + void startServer();
+  + void sendUdpData(data);
+  + void addUdpListener(listener);
+  + PlcConnection getPlcConnection();
+  + void dispatchWarehouseInConveyorEntry(conveyorId);
+  + Part getWarehouseInConveyorPart(conveyorId);
+  + void dispatchWarehouseOutConveyorExit(conveyorId, type);
+  + boolean getWarehouseOutConveyorStatus(conveyorId);
+  + boolean getLoadConveyorStatus(conveyorId);
+  + int getSliderConveyorOccupation(conveyorId);
+  + void prepareAssemblyTool(conveyorId, tool);
+  + EnumTool getAssemblyConveyorTool(conveyorId);
+  + boolean getAssemblyConveyorOccupation(conveyorId);
+  + UUID getAssemblyConveyorCompletedStatus(conveyorId);
+  + void sendPlcRoute(route);
+  + void sendPlcRoute(route, process);
+
 }
 
 /' 
@@ -282,8 +327,14 @@ Order Manager
 
 class OrderManager{
 
-  + void pollOrders();
-  + T enqueueOrders();
+  + void checkWarehouseEntries();
+  + void checkAssemblyCompletions();
+  + void pollLoadOrders();
+  + void pollUnloadOrders();
+  + void pollTransformOrders();
+  + void enqueueUnloadOrder(unloadOrder);
+  + void enqueueTransformationOrder(transformationOrder);
+
 }
 
 @enduml
