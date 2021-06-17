@@ -1,0 +1,110 @@
+@startuml
+
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+title Order Execution Sequence Diagram
+
+activate OrderManager
+
+group Load Orders
+
+loop All loading docks conveyors
+
+OrderManager->CommsManager: OPC-UA: Get loading dock's parts
+
+alt hasParts
+
+OrderManager -> RoutingManager: traceRoute(part, loadingDock, warehouseIn)
+note left: Trace route to nearest warehouse entry
+
+alt validRoute
+OrderManager -> CommsManager: OPC-UA: sendRoute(route)
+end
+
+end
+
+end
+
+end
+
+group Transform Orders
+OrderManager -> DatabaseManager: fetchPendingTransformOrders
+note left: Fetch orders that have parts pending,\n and sort by priority
+
+loop Pending transform orders
+
+    == Parts already bound to the order ==
+
+    OrderManager -> DatabaseManager:  fetchParts(orderId, STORED, 1)
+    note left: Fetch at max one stored part bound to the \n current order
+
+    OrderManager -> RoutingManager: traceRoute(part, assemblyLine, warehouseOut)
+    note left: Trace route to nearest assembly line
+
+    alt validRoute
+    OrderManager -> DatabaseManager: updatePartState(part, PROCESSING)
+
+    OrderManager -> CommsManager: OPC-UA: dispatchWarehouseOutConveyorExit(warehouseOut, partType)
+    OrderManager -> CommsManager: OPC-UA: sendRoute(route)
+    end
+
+    == Parts not bound to any order ==
+
+    alt order.getRemaining() > 0
+
+    OrderManager -> DatabaseManager:  fetchParts(0, STORED, 1)
+    note left: Fetch at max one  stored part not bound \n to any order
+
+    OrderManager -> RoutingManager: traceRoute(part, assemblyLine, warehouseOut)
+    note left: Trace route to nearest assembly line
+
+    alt validRoute
+    OrderManager -> DatabaseManager: updatePartStateAndOrder(part, PROCESSING, orderId)
+
+    OrderManager -> CommsManager: OPC-UA: dispatchWarehouseOutConveyorExit(warehouseOut, partType)
+    OrderManager -> CommsManager: OPC-UA: sendRoute(route)
+    end
+
+    end
+
+
+end
+
+end
+
+group Unload Orders
+OrderManager -> DatabaseManager: fetchPendingUnloadOrders
+note left: Fetch orders that have parts pending,\n and sort by quantity
+
+loop Pending unload orders
+
+    OrderManager -> DatabaseManager:  fetchParts(0, partType, STORED, 1)
+    note left: Fetch at max one stored part not bound to any \n order
+
+    loop All unloading docks conveyors
+
+    alt isNotFull
+        OrderManager -> RoutingManager: traceRoute(part, unloadingDock, warehouseOut)
+
+        alt validRoute
+        OrderManager -> DatabaseManager: updatePartStateAndOrder(part, UNLOADING, orderId)
+        OrderManager -> DatabaseManager: insertUnloadingBayLog(orderId, part)
+
+        OrderManager -> CommsManager: OPC-UA: incrementSliderConveyorReservation(unloadingDock)
+        OrderManager -> CommsManager: OPC-UA: dispatchWarehouseOutConveyorExit(warehouseOut, partType)
+        OrderManager -> CommsManager: OPC-UA: sendRoute(route)
+        end
+    end
+
+    end
+
+
+end
+
+end
+
+deactivate OrderManager
+
+@enduml

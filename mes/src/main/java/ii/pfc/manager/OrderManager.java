@@ -54,7 +54,7 @@ public class OrderManager implements IOrderManager {
     public void checkWarehouseEntries() {
         Collection<Conveyor> winConveyors = routingManager.getConveyors(EnumConveyorType.WAREHOUSE_IN);
         for (Conveyor conveyor : winConveyors) {
-            Part tempPart = commsManager.getWarehouseInConveyorPart(conveyor.getId());
+                Part tempPart = commsManager.getWarehouseInConveyorPart(conveyor.getId());
 
             if (tempPart != null) {
                 Part part = databaseManager.fetchPart(tempPart.getId());

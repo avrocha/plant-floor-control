@@ -134,7 +134,7 @@ public class Factory {
 
         while (running) {
             try {
-                commandManager.pollRequests();
+                commandManager.pollRequests(); // complete
 
                 if (dbPollTimer.elapsed(TimeUnit.MILLISECONDS) > 250) {
                     dbPollTimer.reset().start();
@@ -156,7 +156,7 @@ public class Factory {
 
                 orderManager.checkAssemblyCompletions();
 
-                orderManager.pollLoadOrders();
+                orderManager.pollLoadOrders(); // complete
                 orderManager.pollTransformOrders();
                 orderManager.pollUnloadOrders();
             }

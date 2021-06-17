@@ -1,0 +1,73 @@
+@startuml
+
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+Factory->CommandManager: pollRequests
+activate CommandManager
+
+alt isUnload
+
+participant ":CommandRequestUnload"
+participant ":CommandRequestTransform"
+participant ":CommandRequestOrderList"
+participant ":CommandResponseOrderList"
+participant ":CommandRequestPartList"
+participant ":CommandResponsePartList"
+
+CommandManager->":CommandRequestUnload" **: create
+activate ":CommandRequestUnload"
+
+":CommandRequestUnload"->OrderManager: enqueueUnloadOrder
+OrderManager->DatabaseManager: enqueueUnloadOrder
+
+deactivate ":CommandRequestUnload"
+
+end
+
+alt isTransform
+
+CommandManager->":CommandRequestTransform" **: create
+activate ":CommandRequestTransform"
+
+":CommandRequestTransform"->OrderManager: enqueueTransformOrder
+OrderManager->DatabaseManager: enqueueTransformOrder
+
+deactivate ":CommandRequestTransform"
+
+end
+
+alt isOrderList
+
+CommandManager->":CommandRequestOrderList" **: create
+activate ":CommandRequestOrderList"
+
+":CommandRequestOrderList"->DatabaseManager: fetchAllTransformOrders
+
+":CommandRequestOrderList"->":CommandResponseOrderList" **: create
+activate ":CommandResponseOrderList"
+":CommandResponseOrderList"->":CommandRequestOrderList": setResponse
+deactivate ":CommandResponseOrderList"
+
+deactivate ":CommandRequestOrderList"
+
+end
+
+alt isPartList
+
+CommandManager->":CommandRequestPartList" **: create
+activate ":CommandRequestPartList"
+
+":CommandRequestPartList"->DatabaseManager: countPartsTypes
+
+":CommandRequestPartList"->":CommandResponsePartList" **: create
+activate ":CommandResponsePartList"
+":CommandResponsePartList"->":CommandRequestPartList": setResponse
+deactivate ":CommandResponsePartList"
+
+deactivate ":CommandRequestPartList"
+
+end
+
+@enduml

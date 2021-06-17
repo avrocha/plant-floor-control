@@ -1,0 +1,57 @@
+@startuml
+
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+title Assembly Completions Sequence Diagram
+
+loop All assembly lines conveyors
+
+activate OrderManager
+
+OrderManager->CommsManager: OPC-UA: Get assembly line status
+note left: Fetch the partId and the current assembly process
+
+alt hasCompleted
+
+OrderManager->DatabaseManager: fetchPart(partId)
+note left: Fetch the part currently in the assembly line
+
+alt partHasOrder AND partType != processTargetType
+    OrderManager->DatabaseManager: insertProcessLog(process, assemblyLine, part)
+
+    OrderManager->DatabaseManager: fetchTransformOrder(orderId)
+    note left: Fetch the order bound to the part
+
+    alt partType == orderTargetType
+        OrderManager->DatabaseManager: updatePartTypeAndOrder(partId, processTargetType, 0)
+        note left: Unbound the part to the order because the process has finished
+    else
+        OrderManager->DatabaseManager: updatePartType(partId, processTargetType)
+
+        OrderManager -> RoutingManager: traceRoute(part, targetAssemblyLine, currentAssemblyLine)
+        note left: Trace route to nearest assembly line
+
+        alt validRoute
+        OrderManager -> CommsManager: OPC-UA: sendRoute(route)
+        end
+    end
+end
+
+
+
+OrderManager -> RoutingManager: traceRoute(part, assemblyLine, warehouseIn)
+note left: If no route was able to be traced previously, \n trace a route to the nearest warehouse entry
+
+alt validRoute
+OrderManager -> CommsManager: OPC-UA: sendRoute(route)
+end
+
+end
+
+deactivate OrderManager
+
+end
+
+@enduml

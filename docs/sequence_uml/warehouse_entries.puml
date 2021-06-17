@@ -1,0 +1,37 @@
+@startuml
+
+skinparam linetype ortho
+skinparam Monochrome true
+skinparam classAttributeIconSize 0
+
+title Warehouse Entries Sequence Diagram
+
+loop All warehouse in conveyors
+
+activate OrderManager
+
+OrderManager->CommsManager: OPC-UA: Get warehouse in conveyor's parts
+
+alt hasParts
+
+OrderManager->DatabaseManager: fetchPart(partId)
+
+alt validPart
+    note left: The part already existed and the state must be updated
+
+    OrderManager->DatabaseManager: updatePartState(part, STORED)
+else
+    note left: The part comes from a load order, \n and does not exist yet in the database
+
+    OrderManager->DatabaseManager: insertPart(part)
+end
+
+OrderManager->CommsManager: OPC-UA: dispatchWarehouseInConveyorEntry(warehouseIn)
+
+end
+
+deactivate OrderManager
+
+end
+
+@enduml
